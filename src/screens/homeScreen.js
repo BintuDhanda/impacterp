@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
+import Colors from '../constants/Colors';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -12,58 +13,60 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.cardContainer}>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('UserScreen')}>
-          <Icon name="users" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Users</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('ManageRoleScreen')}>
-          <Icon name="key" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Roles</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentsScreen')}>
-          <Icon name="graduation-cap" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Students</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('QualificationScreen')}>
-          <Icon name="certificate" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Qualification</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CountryScreen')}>
-          <Icon name="globe" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Country</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StateScreen')}>
-          <Icon name="map-marker" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>State</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CityScreen')}>
-          <Icon name="building" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>City</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseCategoryScreen')}>
-          <Icon name="book" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Course Category</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseScreen')}>
-          <Icon name="book" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Course</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('BatchScreen')}>
-          <Icon name="calendar" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Batch</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AddressTypeScreen')}>
-          <Icon name="map" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Address Type</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AccountScreen')}>
-          <Icon name="bank" size={50} color="#e60000" style={styles.icon} />
-          <Text style={styles.title}>Account</Text>
-        </TouchableOpacity>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.cardContainer}>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('UserScreen')}>
+            <Icon name="users" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Users</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('RolesScreen')}>
+            <Icon name="key" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Roles</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentsScreen')}>
+            <Icon name="graduation-cap" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Students</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('QualificationScreen')}>
+            <Icon name="certificate" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Qualification</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CountryScreen')}>
+            <Icon name="globe" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Country</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StateScreen')}>
+            <Icon name="map-marker" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>State</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CityScreen')}>
+            <Icon name="building" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>City</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseCategoryScreen')}>
+            <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Course Category</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseScreen')}>
+            <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Course</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('BatchScreen')}>
+            <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Batch</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AddressTypeScreen')}>
+            <Icon name="map" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Address Type</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('EnterAccountScreen')}>
+            <Icon name="bank" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Enter Account</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

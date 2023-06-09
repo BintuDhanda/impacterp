@@ -4,19 +4,19 @@ import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
-const StateScreen = () => {
-  const [state, setState] = useState({ "Id": 0, "StateName": "", "IsActive": true, "CountryId": "" });
-  const [countryData, setCountryData] = useState([]);
-  const [stateList, setStateList] = useState([]);
+const CourseScreen = () => {
+  const [course, setCourse] = useState({ "Id": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": "" });
+  const [courseCategoryData, setCourseCategoryData] = useState([]);
+  const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   useEffect(() => {
-    GetCountryList();
+    GetCourseCategoryList();
   }, []);
 
-  const GetCountryList = () => {
-    axios.get('http://192.168.1.11:5291/api/Country/get', {
+  const GetCourseCategoryList = () => {
+    axios.get('http://192.168.1.11:5291/api/CourseCategory/get', {
       headers: {
         'Content-Type': 'application/json', // Example header
         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -24,56 +24,60 @@ const StateScreen = () => {
     })
       .then((response) => {
         console.log(response.data);
-        const countryArray = response.data.map((country) => ({
-          value: country.id,
-          label: country.countryName,
+        const courseCategoryArray = response.data.map((courseCategory) => ({
+          value: courseCategory.id,
+          label: courseCategory.courseCategoryName,
         }));
-        setCountryData(countryArray);
+        setCourseCategoryData(courseCategoryArray);
       })
       .catch((error) => {
         console.log(error);
       });
   }
 
-  const fetchStatesByCountryId = async (countryId) => {
+  const fetchCoursesByCourseCategoryId = async (courseCategoryId) => {
     try {
-      const response = await axios.get(`http://192.168.1.11:5291/api/State/getStateByCountryId?Id=${countryId}`, {
+      const response = await axios.get(`http://192.168.1.11:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
         headers: {
           'Content-Type': 'application/json', // Example header
           'User-Agent': 'react-native/0.64.2', // Example User-Agent header
         },
       });
-      setStateList(response.data);
-      console.log(stateList, 'stateList')
+      setCourseList(response.data);
+      console.log(courseList, 'courseList')
     } catch (error) {
-      console.log('Error fetching states:', error);
+      console.log('Error fetching Courses:', error);
     }
   };
-  const handleCountrySelect = (country) => {
-    setValue(country.value);
-    fetchStatesByCountryId(country.value);
+  const handleCourseCategorySelect = (courseCategory) => {
+    setValue(courseCategory.value);
+    fetchCoursesByCourseCategoryId(courseCategory.value);
   };
 
 
-  const handleAddState = () => {
-    setState({
+  const handleAddCourse = () => {
+    setCourse({
       Id: 0,
-      StateName: "",
+      CourseName: "",
+      Fees: "",
+      Duration: "",
       IsActive: true,
-      CountryId: ""
+      CourseCategoryId: ""
     });
     setModalVisible(true);
   };
 
-  const handleEditState = (id) => {
-    axios.get(`http://192.168.1.11:5291/api/State/getById?Id=${id}`)
+  const handleEditCourse = (id) => {
+    axios.get(`http://192.168.1.11:5291/api/Course/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
-        setState(
+        setCourse(
           {
             Id: result.data.id,
-            StateName: result.data.stateName,
-            CountryId: result.data.countryId,
+            CourseName: result.data.courseName,
+            Fees: result.data.fees,
+            Duration: result.data.duration,
+            CourseCategoryId: result.data.courseCategoryId,
             IsActive: result.data.isActive
           }
         );
@@ -82,50 +86,54 @@ const StateScreen = () => {
     setModalVisible(true);
   };
 
-  const handleDeleteState = (id) => {
-    axios.delete(`http://192.168.1.11:5291/api/State/delete?Id=${id}`)
+  const handleDeleteCourse = (id) => {
+    axios.delete(`http://192.168.1.11:5291/api/Course/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
-        fetchStatesByCountryId(result.data.countryId)
+        fetchCoursesByCourseCategoryId(result.data.courseCategoryId)
       })
       .catch(err => console.error("Delete Error", err));
   }
 
-  const handleSaveState = async () => {
+  const handleSaveCourse = async () => {
     try {
-      if (state.Id !== 0) {
-        await axios.put(`http://192.168.1.11:5291/api/State/put`, JSON.stringify(state), {
+      if (course.Id !== 0) {
+        await axios.put(`http://192.168.1.11:5291/api/Course/put`, JSON.stringify(course), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              fetchStatesByCountryId(response.data.countryId);
-              Alert.alert('Sucess', 'State Update successfully');
-              setState({
+              fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
+              Alert.alert('Sucess', 'Data fetched successfully');
+              setCourse({
                 "Id": 0,
-                "StateName": "",
-                "CountryId": "",
+                "CourseName": "",
+                "Fees": "",
+                "Duration": "",
+                "CourseCategoryId": "",
                 "IsActive": true
               });
             }
           })
-          .catch(err => console.error("Post error in state", err));
+          .catch(err => console.error("Post error in Course", err));
       } else {
-        await axios.post('http://192.168.1.11:5291/api/State/post', JSON.stringify(state), {
+        await axios.post('http://192.168.1.11:5291/api/Course/post', JSON.stringify(course), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              fetchStatesByCountryId(response.data.countryId);
-              Alert.alert('Sucess', 'State is Added Successfully')
-              setState({
+              fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
+              Alert.alert('Sucess', 'Course is Added Successfully')
+              setCourse({
                 "Id": 0,
-                "StateName": "",
-                "CountryId": "",
+                "CourseName": "",
+                "Fees": "",
+                "Duration": "",
+                "CourseCategoryId": "",
                 "IsActive": true
               });
             }
@@ -133,7 +141,7 @@ const StateScreen = () => {
       }
       setModalVisible(false);
     } catch (error) {
-      console.log('Error saving state:', error);
+      console.log('Error saving Course:', error);
     }
   };
 
@@ -142,11 +150,8 @@ const StateScreen = () => {
   };
 
 
-  const renderStateCard = ({ item }) => (
+  const renderCourseCard = ({ item }) => (
     <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
       backgroundColor: Colors.background,
       borderRadius: 10,
       padding: 10,
@@ -160,18 +165,26 @@ const StateScreen = () => {
       borderWidth: 0.5,
       borderColor: Colors.primary
     }}>
-      <Text style={{
-        fontSize: 16,
-        fontWeight: 'bold',
-      }}>{item.stateName}</Text>
       <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Course Name : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.courseName}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Fees : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.fees}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Duration : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
+      </View>
+      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
         <TouchableOpacity style={{
           backgroundColor: '#5a67f2',
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditState(item.id)}>
+        }} onPress={() => handleEditCourse(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -183,7 +196,7 @@ const StateScreen = () => {
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteState(item.id)}>
+        }} onPress={() => handleDeleteCourse(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -203,11 +216,11 @@ const StateScreen = () => {
         <Dropdown
           style={[{
             height: 50,
-            borderColor: 'gray',
+            borderColor: Colors.primary,
             borderWidth: 0.5,
-            borderRadius: 10,
+            borderRadius: 8,
             paddingHorizontal: 8,
-          }, isFocus && { borderColor: Colors.primary }]}
+          }, isFocus && { borderColor: 'blue' }]}
           placeholderStyle={{ fontSize: 16, }}
           selectedTextStyle={{ fontSize: 16, }}
           inputSearchStyle={{
@@ -218,7 +231,7 @@ const StateScreen = () => {
             width: 20,
             height: 20,
           }}
-          data={countryData}
+          data={courseCategoryData}
           search
           maxHeight={300}
           labelField="label"
@@ -228,7 +241,7 @@ const StateScreen = () => {
           value={value}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={handleCountrySelect}
+          onChange={handleCourseCategorySelect}
         />
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
@@ -237,17 +250,17 @@ const StateScreen = () => {
           paddingHorizontal: 12,
           marginTop: 10,
           alignSelf: 'flex-start',
-        }} onPress={handleAddState}>
+        }} onPress={handleAddCourse}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
             fontWeight: 'bold',
-          }}>Add</Text>
+          }}>Add Course</Text>
         </TouchableOpacity>
         <FlatList
-          data={stateList}
+          data={courseList}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderStateCard}
+          renderItem={renderCourseCard}
         />
 
         {modalVisible && (
@@ -272,9 +285,34 @@ const StateScreen = () => {
                     padding: 8,
                     marginBottom: 20,
                   }}
-                  placeholder="State Name"
-                  value={state.StateName}
-                  onChangeText={(text) => setState({ ...state, StateName: text })}
+                  placeholder="Course Name"
+                  value={course.CourseName}
+                  onChangeText={(text) => setCourse({ ...course, CourseName: text })}
+                />
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    padding: 8,
+                    marginBottom: 20,
+                  }}
+                  placeholder="Fees"
+                  value={course.Fees}
+                  keyboardType='numeric'
+                  onChangeText={(text) => setCourse({ ...course, Fees: text })}
+                />
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    padding: 8,
+                    marginBottom: 20,
+                  }}
+                  placeholder="Duration"
+                  value={course.Duration}
+                  onChangeText={(text) => setCourse({ ...course, Duration: text })}
                 />
                 <Dropdown
                   style={[{
@@ -294,17 +332,17 @@ const StateScreen = () => {
                     width: 20,
                     height: 20,
                   }}
-                  data={countryData}
+                  data={courseCategoryData}
                   search
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
                   placeholder={!isFocus ? 'Select item' : '...'}
                   searchPlaceholder="Search..."
-                  value={state.CountryId}
+                  value={course.CourseCategoryId}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
-                  onChange={(value) => setState({ ...state, CountryId: value.value })}
+                  onChange={(value) => setCourse({ ...course, CourseCategoryId: value.value })}
                 />
                 <View style={{
                   marginTop: 10,
@@ -316,12 +354,12 @@ const StateScreen = () => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                  }} onPress={handleSaveState}>
+                  }} onPress={handleSaveCourse}>
                     <Text style={{
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{state.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{course.Id === 0 ? 'Add' : 'Save'}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={{
                     backgroundColor: '#f25252',
@@ -346,7 +384,7 @@ const StateScreen = () => {
   );
 };
 
-export default StateScreen;
+export default CourseScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -400,7 +438,7 @@ export default StateScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   stateCard: {
+//   courseCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -415,7 +453,7 @@ export default StateScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   stateName: {
+//   courseName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

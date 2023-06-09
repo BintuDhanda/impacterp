@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const DrawerContent = (props) => {
@@ -18,7 +17,7 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => props.navigation.navigate('HomeScreen')}>
+            <TouchableOpacity onPress={() => props.navigation.navigate('Home')}>
               <Text style={styles.title}>Home</Text>
             </TouchableOpacity>
           </View>
@@ -32,7 +31,7 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => props.navigation.navigate('Roles')}>
+            <TouchableOpacity onPress={() => props.navigation.navigate('RolesScreen')}>
               <Text style={styles.title}>Roles</Text>
             </TouchableOpacity>
           </View>
@@ -53,8 +52,29 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => navigateToScreen('CourseCategoryScreen')}>
-              <Text style={styles.title}>Coure Category</Text>
+            <TouchableOpacity onPress={() => props.navigation.navigate('StateScreen')}>
+              <Text style={styles.title}>State</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.drawerItem}>
+            <Icon name="rocket" size={20} color="#900" />
+            <TouchableOpacity onPress={() => props.navigation.navigate('CityScreen')}>
+              <Text style={styles.title}>City</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.drawerItem}>
+            <Icon name="rocket" size={20} color="#900" />
+            <TouchableOpacity onPress={() => props.navigation.navigate('CourseCategoryScreen')}>
+              <Text style={styles.title}>Course Category</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.drawerItem}>
+            <Icon name="rocket" size={20} color="#900" />
+            <TouchableOpacity onPress={() => props.navigation.navigate('CourseScreen')}>
+              <Text style={styles.title}>Course</Text>
             </TouchableOpacity>
           </View>
 
@@ -66,7 +86,7 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="call" size={20} color="#900" />
-            <TouchableOpacity onPress={() => navigateToScreen('AddressTypeScreen')}>
+            <TouchableOpacity onPress={() => props.navigation.navigate('AddressTypeScreen')}>
               <Text style={styles.title}>Address Type</Text>
             </TouchableOpacity>
           </View>
@@ -74,8 +94,8 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => navigateToScreen('AccountScreen')}>
-              <Text style={styles.title}>Account</Text>
+            <TouchableOpacity onPress={() => props.navigation.navigate('EnterAccountScreen')}>
+              <Text style={styles.title}>Enter Account</Text>
             </TouchableOpacity>
           </View>
         </View>

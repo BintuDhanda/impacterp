@@ -3,101 +3,101 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const QualificationScreen = () => {
-  const [qualification, setQualification] = useState({ "Id": 0, "QualificationName": "", "IsActive": true });
-  const [qualificationList, setQualificationList] = useState([]);
+const RoleScreen = () => {
+  const [role, setRole] = useState({ "Id": 0, "RoleName": "", "IsActive": true });
+  const [roleList, setRoleList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    GetQualificationList();
+    GetRoleList();
   }, []);
-  const GetQualificationList = () => {
-    axios.get("http://192.168.1.11:5291/api/Qualification/get", {
+  const GetRoleList = () => {
+    axios.get("http://192.168.1.11:5291/api/Role/get", {
       headers: {
         'Content-Type': 'application/json'
       }
     })
       .then((result) => {
         console.log(result.data)
-        setQualificationList(result.data)
+        setRoleList(result.data)
       })
-      .catch(err => console.log('Get Qualification error :', err))
+      .catch(err => console.log('Get Role error :', err))
   }
-  const handleAddQualification = () => {
-    setQualification({
+  const handleAddRole = () => {
+    setRole({
       Id: 0,
-      QualificationName: "",
+      RoleName: "",
       IsActive: true,
     });
     setModalVisible(true);
   };
 
-  const handleSaveQualification = () => {
+  const handleSaveRole = () => {
     try {
-      if (qualification.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/Qualification/put`, JSON.stringify(qualification), {
+      if (role.Id !== 0) {
+        axios.put(`http://192.168.1.11:5291/api/Role/put`, JSON.stringify(role), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              GetQualificationList();
-              Alert.alert('Sucees', 'Update Qualification Successfully')
-              setQualification({
+              GetRoleList();
+              Alert.alert('Sucees', 'Update Role Successfully')
+              setRole({
                 "Id": 0,
-                "QualificationName": "",
+                "RoleName": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.log("Qualification update error : ", err));
+          .catch(err => console.log("Role update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/Qualification/post`, JSON.stringify(qualification), {
+        axios.post(`http://192.168.1.11:5291/api/Role/post`, JSON.stringify(role), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              GetQualificationList();
-              Alert.alert('Success', 'Add Qualification Successfully')
-              setQualification({
+              GetRoleList();
+              Alert.alert('Success', 'Add Role Successfully')
+              setRole({
                 "Id": 0,
-                "QualificationName": "",
+                "RoleName": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.log('Qualification Add error :', err));
+          .catch(err => console.log('Role Add error :', err));
       }
       setModalVisible(false);
     }
     catch (error) {
-      console.log('Error saving Qualification:', error);
+      console.log('Error saving Role:', error);
     }
   }
 
-  const handleDeleteQualification = (qualificationId) => {
-    axios.delete(`http://192.168.1.11:5291/api/Qualification/delete?Id=${qualificationId}`)
+  const handleDeleteRole = (roleId) => {
+    axios.delete(`http://192.168.1.11:5291/api/Role/delete?Id=${roleId}`)
       .then((result) => {
         console.log(result);
-        GetQualificationList();
+        GetRoleList();
       })
       .catch(err => console.error("Delete Error", err));
   };
 
-  const handleEditQualification = (qualificationId) => {
-    axios.get(`http://192.168.1.11:5291/api/Qualification/getById?Id=${qualificationId}`)
+  const handleEditRole = (roleId) => {
+    axios.get(`http://192.168.1.11:5291/api/Role/getById?Id=${roleId}`)
       .then((response) => {
-        setQualification({
+        setRole({
           Id: response.data.id,
-          QualificationName: response.data.qualificationName,
+          RoleName: response.data.roleName,
           IsActive: response.data.isActive
         })
       })
-      .catch(error => console.log('Qualification Get By Id :', error))
+      .catch(error => console.log('Role Get By Id :', error))
     setModalVisible(true);
   };
 
@@ -105,7 +105,7 @@ const QualificationScreen = () => {
     setModalVisible(false);
   }
 
-  const renderQualificationCard = ({ item }) => {
+  const renderRoleCard = ({ item }) => {
     return (
       <View style={{
         flexDirection: 'row',
@@ -116,17 +116,17 @@ const QualificationScreen = () => {
         padding: 10,
         marginBottom: 10,
         shadowColor: Colors.shadow,
-        shadowOffset: { width: 10, height: 10 },
+        shadowOffset: { width: 10, height: 2 },
         shadowOpacity: 10,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
-        borderColor: Colors.primary,
+        borderWidth: 0.8,
+        borderColor: Colors.primary
       }}>
         <Text style={{
           fontSize: 16,
           fontWeight: 'bold',
-        }}>{item.qualificationName}</Text>
+        }}>{item.roleName}</Text>
         <View style={{ flexDirection: 'row', }}>
           <TouchableOpacity
             style={{
@@ -135,7 +135,7 @@ const QualificationScreen = () => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleEditQualification(item.id)} >
+            }} onPress={() => handleEditRole(item.id)} >
             <Text style={{
               color: Colors.background,
               fontSize: 14,
@@ -149,7 +149,7 @@ const QualificationScreen = () => {
               paddingVertical: 8,
               paddingHorizontal: 12,
             }}
-            onPress={() => handleDeleteQualification(item.id)}
+            onPress={() => handleDeleteRole(item.id)}
           >
             <Text style={{
               color: Colors.background,
@@ -171,13 +171,13 @@ const QualificationScreen = () => {
           paddingVertical: 10,
           paddingHorizontal: 20,
           marginBottom: 20,
-        }} onPress={handleAddQualification}>
+        }} onPress={handleAddRole}>
           <Text style={{
             color: Colors.background,
             fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
-          }}>Add Qualification</Text>
+          }}>Add Role</Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
@@ -203,9 +203,9 @@ const QualificationScreen = () => {
                   marginBottom: 10,
                   paddingHorizontal: 10,
                 }}
-                placeholder="Qualification Name"
-                value={qualification.QualificationName}
-                onChangeText={(text) => setQualification({ ...qualification, QualificationName: text })}
+                placeholder="Role Name"
+                value={role.RoleName}
+                onChangeText={(text) => setRole({ ...role, RoleName: text })}
               />
 
               <TouchableOpacity style={{
@@ -214,13 +214,13 @@ const QualificationScreen = () => {
                 paddingVertical: 10,
                 paddingHorizontal: 20,
                 marginBottom: 10,
-              }} onPress={handleSaveQualification}>
+              }} onPress={handleSaveRole}>
                 <Text style={{
                   color: Colors.background,
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{qualification.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{role.Id !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -233,7 +233,7 @@ const QualificationScreen = () => {
               onPress={handleClose}
             >
               <Text style={{
-                color: Colors.background,
+                color: '#ffffff',
                 fontSize: 16,
                 fontWeight: 'bold',
                 textAlign: 'center',
@@ -243,10 +243,10 @@ const QualificationScreen = () => {
         </Modal>
 
         <FlatList
-          data={qualificationList}
-          renderItem={renderQualificationCard}
+          data={roleList}
+          renderItem={renderRoleCard}
           keyExtractor={(item) => item.id.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
+          contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>
     </ScrollView>
@@ -317,10 +317,10 @@ const QualificationScreen = () => {
 //     fontWeight: 'bold',
 //     textAlign: 'center',
 //   },
-//   qualificationList: {
+//   roleList: {
 //     flexGrow: 1,
 //   },
-//   qualificationCard: {
+//   roleCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -334,7 +334,7 @@ const QualificationScreen = () => {
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   qualificationName: {
+//   roleName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },
@@ -361,4 +361,4 @@ const QualificationScreen = () => {
 //   },
 // });
 
-export default QualificationScreen;
+export default RoleScreen;

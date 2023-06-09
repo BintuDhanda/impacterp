@@ -4,14 +4,17 @@ import DrawerContent from './DrawerContent';
 import HomeScreen from '../screens/homeScreen';
 import UserScreen from '../screens/userScreen';
 import QualificationScreen from '../screens/qualificationScreen';
-import ManageRoleScreen from '../screens/manageRoleScreen';
+import RoleScreen from '../screens/roleScreen';
 import CountryScreen from '../screens/countryScreen';
 import CourseCategoryScreen from '../screens/courseCategory';
 import AddressTypeScreen from '../screens/addressTypeScreen';
-import AccountScreen from '../screens/accountScreen';
+import EnterAccountScreen from '../screens/enterAccountScreen';
 import AccountCategoryScreen from '../screens/accountCategory';
 import StateScreen from '../screens/stateScreen';
-import DropdownComponent from '../components/dropdownComponent';
+import AccountScreen from '../screens/accountScreen';
+import CourseScreen from '../screens/courseScreen';
+import DayBookScreen from '../screens/dayBook';
+import CityScreen from '../screens/cityScreen';
 
 
 const Drawer = createDrawerNavigator();
@@ -20,16 +23,20 @@ const DrawerNavigator = () => {
   return (
    
       <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-        <Drawer.Screen name="HomeScreen" component={HomeScreen} />
+        <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="UserScreen" component={UserScreen} />
-        <Drawer.Screen name="Roles" component={ManageRoleScreen} />
+        <Drawer.Screen name="RolesScreen" component={RoleScreen} />
         <Drawer.Screen name="QualificationScreen" component={QualificationScreen} />
         <Drawer.Screen name="CountryScreen" component={CountryScreen} />
-        <Drawer.Screen name="StateScreen" component={DropdownComponent} />
+        <Drawer.Screen name="StateScreen" component={StateScreen} />
+        <Drawer.Screen name="CityScreen" component={CityScreen} />
         <Drawer.Screen name="CourseCategoryScreen" component={CourseCategoryScreen} />
+        <Drawer.Screen name="CourseScreen" component={CourseScreen} />
         <Drawer.Screen name="AddressTypeScreen" component={AddressTypeScreen} />
-        <Drawer.Screen name="AccountScreen" component={AccountScreen} />
+        <Drawer.Screen name="EnterAccountScreen" component={EnterAccountScreen} />
         <Drawer.Screen name="AccountCategoryScreen" component={AccountCategoryScreen} />
+        <Drawer.Screen name="AccountScreen" component={AccountScreen} />
+        <Drawer.Screen name="DayBookScreen" component={DayBookScreen} />
       </Drawer.Navigator>
   );
 };
