@@ -1,43 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
-const CityScreen = () => {
-    const [city, setCity] = useState({ "Id": 0, "CityName": "", "IsActive": true, "StateId": "" });
-    const [countryData, setCountryData] = useState([]);
+const CityScreen = ({ route }) => {
+    const { stateId } = route.params;
+    const [city, setCity] = useState({ "Id": 0, "CityName": "", "IsActive": true, "StateId": stateId });
     const [cityList, setCityList] = useState([]);
-    const [stateList, setStateList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [value, setValue] = useState(null);
-    const [stateValue, setStateValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
+
     useEffect(() => {
-        GetCountryList();
+        fetchCityByStateId(stateId);
     }, []);
 
-    const GetCountryList = () => {
-        axios.get('http://192.168.1.11:5291/api/Country/get', {
-            headers: {
-                'Content-Type': 'application/json', // Example header
-                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-        })
-            .then((response) => {
-                console.log(response.data);
-                const countryArray = response.data.map((country) => ({
-                    value: country.id,
-                    label: country.countryName,
-                }));
-                setCountryData(countryArray);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-
-    const fetchCityByStateId = async (stateId) => {
+    const fetchCityByStateId = async () => {
         try {
             const response = await axios.get(`http://192.168.1.11:5291/api/City/getCityByStateId?Id=${stateId}`, {
                 headers: {
@@ -51,36 +27,13 @@ const CityScreen = () => {
             console.log('Error fetching citys:', error);
         }
     };
-    const fetchStateByCountryId = async (countryId) => {
-        try {
-            const response = await axios.get(`http://192.168.1.11:5291/api/State/getStateByCountryId?Id=${countryId}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
-            setStateList(response.data);
-            console.log(stateList, 'stateList')
-        } catch (error) {
-            console.log('Error fetching state:', error);
-        }
-    };
-    const handleCountrySelect = (country) => {
-        setValue(country.value);
-        fetchStateByCountryId(country.value);
-    };
-
-    const handleStateSelect = (state) => {
-        console.log(state, "State")
-        fetchCityByStateId(state.id);
-    };
 
     const handleAddCity = () => {
         setCity({
             Id: 0,
             CityName: "",
             IsActive: true,
-            StateId: ""
+            StateId: stateId
         });
         setModalVisible(true);
     };
@@ -126,12 +79,12 @@ const CityScreen = () => {
                             setCity({
                                 "Id": 0,
                                 "CityName": "",
-                                "StateId": "",
+                                "StateId": stateId,
                                 "IsActive": true
                             });
                         }
                     })
-                    .catch(err => console.error("Post error in City", err));
+                    .catch(err => console.error("Update error in City", err));
             } else {
                 await axios.post('http://192.168.1.11:5291/api/City/post', JSON.stringify(city), {
                     headers: {
@@ -145,7 +98,7 @@ const CityScreen = () => {
                             setCity({
                                 "Id": 0,
                                 "CityName": "",
-                                "StateId": "",
+                                "StateId": stateId,
                                 "IsActive": true
                             });
                         }
@@ -220,66 +173,6 @@ const CityScreen = () => {
                 padding: 16,
                 justifyContent: 'center'
             }}>
-                <Dropdown
-                    style={[{
-                        height: 50,
-                        borderColor: 'gray',
-                        borderWidth: 0.5,
-                        borderRadius: 10,
-                        paddingHorizontal: 8,
-                    }, isFocus && { borderColor: Colors.primary }]}
-                    placeholderStyle={{ fontSize: 16, }}
-                    selectedTextStyle={{ fontSize: 16, }}
-                    inputSearchStyle={{
-                        height: 40,
-                        fontSize: 16,
-                    }}
-                    iconStyle={{
-                        width: 20,
-                        height: 20,
-                    }}
-                    data={countryData}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? 'Select Country' : '...'}
-                    searchPlaceholder="Search..."
-                    value={value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={handleCountrySelect}
-                />
-                <Dropdown
-                    style={[{
-                        height: 50,
-                        borderColor: 'gray',
-                        borderWidth: 0.5,
-                        borderRadius: 10,
-                        paddingHorizontal: 8,
-                    }, isFocus && { borderColor: Colors.primary }]}
-                    placeholderStyle={{ fontSize: 16, }}
-                    selectedTextStyle={{ fontSize: 16, }}
-                    inputSearchStyle={{
-                        height: 40,
-                        fontSize: 16,
-                    }}
-                    iconStyle={{
-                        width: 20,
-                        height: 20,
-                    }}
-                    data={stateList}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? 'Select State' : '...'}
-                    searchPlaceholder="Search..."
-                    value={value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={handleStateSelect}
-                />
                 <TouchableOpacity style={{
                     backgroundColor: Colors.primary,
                     borderRadius: 5,
@@ -292,7 +185,7 @@ const CityScreen = () => {
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
-                    }}>Add</Text>
+                    }}>Add City</Text>
                 </TouchableOpacity>
                 <FlatList
                     data={cityList}
@@ -320,41 +213,10 @@ const CityScreen = () => {
                                         borderColor: Colors.primary,
                                         borderRadius: 8,
                                         padding: 8,
-                                        marginBottom: 20,
                                     }}
                                     placeholder="City Name"
                                     value={city.CityName}
                                     onChangeText={(text) => setCity({ ...city, CityName: text })}
-                                />
-                                <Dropdown
-                                    style={[{
-                                        height: 50,
-                                        borderColor: Colors.primary,
-                                        borderWidth: 1,
-                                        borderRadius: 8,
-                                        paddingHorizontal: 8,
-                                    }, isFocus && { borderColor: 'blue' }]}
-                                    placeholderStyle={{ fontSize: 16, }}
-                                    selectedTextStyle={{ fontSize: 16, }}
-                                    inputSearchStyle={{
-                                        height: 40,
-                                        fontSize: 16,
-                                    }}
-                                    iconStyle={{
-                                        width: 20,
-                                        height: 20,
-                                    }}
-                                    data={countryData}
-                                    search
-                                    maxHeight={300}
-                                    labelField="label"
-                                    valueField="value"
-                                    placeholder={!isFocus ? 'Select State' : '...'}
-                                    searchPlaceholder="Search..."
-                                    value={city.StateId}
-                                    onFocus={() => setIsFocus(true)}
-                                    onBlur={() => setIsFocus(false)}
-                                    onChange={(value) => setCity({ ...city, StateId: value.value })}
                                 />
                                 <View style={{
                                     marginTop: 10,

@@ -1,41 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
-const StateScreen = () => {
-  const [state, setState] = useState({ "Id": 0, "StateName": "", "IsActive": true, "CountryId": "" });
-  const [countryData, setCountryData] = useState([]);
+const StateScreen = ({ route, navigation }) => {
+  const { countryId } = route.params;
+  const [state, setState] = useState({ "Id": 0, "StateName": "", "IsActive": true, "CountryId": countryId });
   const [stateList, setStateList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
   useEffect(() => {
-    GetCountryList();
+    fetchStatesByCountryId(countryId);
   }, []);
-
-  const GetCountryList = () => {
-    axios.get('http://192.168.1.11:5291/api/Country/get', {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
-      .then((response) => {
-        console.log(response.data);
-        const countryArray = response.data.map((country) => ({
-          value: country.id,
-          label: country.countryName,
-        }));
-        setCountryData(countryArray);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleNavigate = (stateId) => {
+    navigation.navigate('CityScreen', { stateId: stateId })
   }
-
-  const fetchStatesByCountryId = async (countryId) => {
+  const fetchStatesByCountryId = async () => {
     try {
       const response = await axios.get(`http://192.168.1.11:5291/api/State/getStateByCountryId?Id=${countryId}`, {
         headers: {
@@ -49,18 +28,13 @@ const StateScreen = () => {
       console.log('Error fetching states:', error);
     }
   };
-  const handleCountrySelect = (country) => {
-    setValue(country.value);
-    fetchStatesByCountryId(country.value);
-  };
-
 
   const handleAddState = () => {
     setState({
       Id: 0,
       StateName: "",
       IsActive: true,
-      CountryId: ""
+      CountryId: countryId
     });
     setModalVisible(true);
   };
@@ -106,7 +80,7 @@ const StateScreen = () => {
               setState({
                 "Id": 0,
                 "StateName": "",
-                "CountryId": "",
+                "CountryId": countryId,
                 "IsActive": true
               });
             }
@@ -125,7 +99,7 @@ const StateScreen = () => {
               setState({
                 "Id": 0,
                 "StateName": "",
-                "CountryId": "",
+                "CountryId": countryId,
                 "IsActive": true
               });
             }
@@ -140,7 +114,6 @@ const StateScreen = () => {
   const handleCloseModal = () => {
     setModalVisible(false);
   };
-
 
   const renderStateCard = ({ item }) => (
     <View style={{
@@ -160,10 +133,12 @@ const StateScreen = () => {
       borderWidth: 0.5,
       borderColor: Colors.primary
     }}>
+
       <Text style={{
         fontSize: 16,
         fontWeight: 'bold',
       }}>{item.stateName}</Text>
+
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity style={{
           backgroundColor: '#5a67f2',
@@ -178,6 +153,22 @@ const StateScreen = () => {
             fontWeight: 'bold',
           }}>Edit</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#ffff80',
+            borderRadius: 5,
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            marginRight: 10,
+          }} onPress={() => handleNavigate(item.id)} >
+          <Text style={{
+            color: Colors.primary,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}>Manage</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,
@@ -200,36 +191,6 @@ const StateScreen = () => {
         padding: 16,
         justifyContent: 'center'
       }}>
-        <Dropdown
-          style={[{
-            height: 50,
-            borderColor: 'gray',
-            borderWidth: 0.5,
-            borderRadius: 10,
-            paddingHorizontal: 8,
-          }, isFocus && { borderColor: Colors.primary }]}
-          placeholderStyle={{ fontSize: 16, }}
-          selectedTextStyle={{ fontSize: 16, }}
-          inputSearchStyle={{
-            height: 40,
-            fontSize: 16,
-          }}
-          iconStyle={{
-            width: 20,
-            height: 20,
-          }}
-          data={countryData}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
-          searchPlaceholder="Search..."
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={handleCountrySelect}
-        />
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
@@ -242,7 +203,7 @@ const StateScreen = () => {
             color: Colors.background,
             fontSize: 14,
             fontWeight: 'bold',
-          }}>Add</Text>
+          }}>Add State</Text>
         </TouchableOpacity>
         <FlatList
           data={stateList}
@@ -258,12 +219,14 @@ const StateScreen = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
+
               <View style={{
                 backgroundColor: Colors.background,
                 borderRadius: 10,
                 padding: 20,
                 width: '80%',
               }}>
+
                 <TextInput
                   style={{
                     borderWidth: 1,
@@ -276,53 +239,28 @@ const StateScreen = () => {
                   value={state.StateName}
                   onChangeText={(text) => setState({ ...state, StateName: text })}
                 />
-                <Dropdown
-                  style={[{
-                    height: 50,
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    borderRadius: 8,
-                    paddingHorizontal: 8,
-                  }, isFocus && { borderColor: 'blue' }]}
-                  placeholderStyle={{ fontSize: 16, }}
-                  selectedTextStyle={{ fontSize: 16, }}
-                  inputSearchStyle={{
-                    height: 40,
-                    fontSize: 16,
-                  }}
-                  iconStyle={{
-                    width: 20,
-                    height: 20,
-                  }}
-                  data={countryData}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? 'Select item' : '...'}
-                  searchPlaceholder="Search..."
-                  value={state.CountryId}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(value) => setState({ ...state, CountryId: value.value })}
-                />
+
                 <View style={{
                   marginTop: 10,
                   flexDirection: 'row',
                   justifyContent: 'flex-end',
                 }}>
+
                   <TouchableOpacity style={{
                     backgroundColor: Colors.primary,
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
                   }} onPress={handleSaveState}>
+
                     <Text style={{
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
                     }}>{state.Id === 0 ? 'Add' : 'Save'}</Text>
+
                   </TouchableOpacity>
+
                   <TouchableOpacity style={{
                     backgroundColor: '#f25252',
                     borderRadius: 5,
@@ -330,12 +268,15 @@ const StateScreen = () => {
                     paddingHorizontal: 12,
                     marginLeft: 10
                   }} onPress={handleCloseModal}>
+
                     <Text style={{
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
                     }}>Cancel</Text>
+
                   </TouchableOpacity>
+
                 </View>
               </View>
             </View>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const CountryScreen = () => {
+const CountryScreen = ({ navigation }) => {
   const [country, setCountry] = useState({ "Id": 0, "CountryName": "", "IsActive": true });
   const [countryList, setCountryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -88,6 +88,10 @@ const CountryScreen = () => {
       .catch(err => console.error("Delete Error", err));
   };
 
+  const handleNavigate = (countryId) => {
+    navigation.navigate('StateScreen', { countryId: countryId })
+  }
+
   const handleEditCountry = (countryId) => {
     axios.get(`http://192.168.1.11:5291/api/Country/getById?Id=${countryId}`)
       .then((response) => {
@@ -123,10 +127,12 @@ const CountryScreen = () => {
         borderWidth: 0.5,
         borderColor: Colors.primary
       }}>
+
         <Text style={{
           fontSize: 16,
           fontWeight: 'bold',
         }}>{item.countryName}</Text>
+
         <View style={{ flexDirection: 'row', }}>
           <TouchableOpacity
             style={{
@@ -142,6 +148,22 @@ const CountryScreen = () => {
               fontWeight: 'bold',
             }}>Edit</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#ffff80',
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              marginRight: 10,
+            }} onPress={() => handleNavigate(item.id)} >
+            <Text style={{
+              color: Colors.primary,
+              fontSize: 14,
+              fontWeight: 'bold',
+            }}>Manage</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={{
               backgroundColor: '#f25252',

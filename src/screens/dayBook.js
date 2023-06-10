@@ -231,7 +231,7 @@ const DayBookScreen = () => {
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
-                    }}>Add DayBook</Text>
+                    }}>DayBook Entry</Text>
                 </TouchableOpacity>
                 <FlatList
                     data={dayBookList}
