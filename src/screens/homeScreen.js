@@ -33,16 +33,8 @@ const HomeScreen = () => {
             <Text style={styles.title}>Qualification</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CountryScreen')}>
-            <Icon name="globe" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Country</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StateScreen')}>
-            <Icon name="map-marker" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>State</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CityScreen')}>
-            <Icon name="building" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>City</Text>
+          <Icon name="map-marker" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Location</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseCategoryScreen')}>
             <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />

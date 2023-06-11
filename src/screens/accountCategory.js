@@ -12,7 +12,7 @@ const AccountCategoryScreen = () => {
     GetAccountCategoryList();
   }, []);
   const GetAccountCategoryList = () => {
-    axios.get("http://192.168.1.11:5291/api/AccountCategory/get", {
+    axios.get("http://192.168.1.7:5291/api/AccountCategory/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const AccountCategoryScreen = () => {
   const handleSaveAccountCategory = () => {
     try {
       if (accountCategory.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/AccountCategory/put`, JSON.stringify(accountCategory), {
+        axios.put(`http://192.168.1.7:5291/api/AccountCategory/put`, JSON.stringify(accountCategory), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const AccountCategoryScreen = () => {
           .catch(err => console.log("AccountCategory update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/AccountCategory/post`, JSON.stringify(accountCategory), {
+        axios.post(`http://192.168.1.7:5291/api/AccountCategory/post`, JSON.stringify(accountCategory), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const AccountCategoryScreen = () => {
   }
 
   const handleDeleteAccountCategory = (accountCategoryId) => {
-    axios.delete(`http://192.168.1.11:5291/api/AccountCategory/delete?Id=${accountCategoryId}`)
+    axios.delete(`http://192.168.1.7:5291/api/AccountCategory/delete?Id=${accountCategoryId}`)
       .then((result) => {
         console.log(result);
         GetAccountCategoryList();
@@ -89,7 +89,7 @@ const AccountCategoryScreen = () => {
   };
 
   const handleEditAccountCategory = (accountCategoryId) => {
-    axios.get(`http://192.168.1.11:5291/api/AccountCategory/getById?Id=${accountCategoryId}`)
+    axios.get(`http://192.168.1.7:5291/api/AccountCategory/getById?Id=${accountCategoryId}`)
       .then((response) => {
         setAccountCategory({
           Id: response.data.id,

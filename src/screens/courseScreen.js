@@ -11,12 +11,14 @@ const CourseScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+
   useEffect(() => {
     GetCourseCategoryList();
   }, []);
 
+  console.log(course, "course")
   const GetCourseCategoryList = () => {
-    axios.get('http://192.168.1.11:5291/api/CourseCategory/get', {
+    axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
       headers: {
         'Content-Type': 'application/json', // Example header
         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -37,7 +39,7 @@ const CourseScreen = () => {
 
   const fetchCoursesByCourseCategoryId = async (courseCategoryId) => {
     try {
-      const response = await axios.get(`http://192.168.1.11:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
+      const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
         headers: {
           'Content-Type': 'application/json', // Example header
           'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -68,7 +70,7 @@ const CourseScreen = () => {
   };
 
   const handleEditCourse = (id) => {
-    axios.get(`http://192.168.1.11:5291/api/Course/getById?Id=${id}`)
+    axios.get(`http://192.168.1.7:5291/api/Course/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setCourse(
@@ -87,7 +89,7 @@ const CourseScreen = () => {
   };
 
   const handleDeleteCourse = (id) => {
-    axios.delete(`http://192.168.1.11:5291/api/Course/delete?Id=${id}`)
+    axios.delete(`http://192.168.1.7:5291/api/Course/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchCoursesByCourseCategoryId(result.data.courseCategoryId)
@@ -98,7 +100,7 @@ const CourseScreen = () => {
   const handleSaveCourse = async () => {
     try {
       if (course.Id !== 0) {
-        await axios.put(`http://192.168.1.11:5291/api/Course/put`, JSON.stringify(course), {
+        await axios.put(`http://192.168.1.7:5291/api/Course/put`, JSON.stringify(course), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -119,7 +121,7 @@ const CourseScreen = () => {
           })
           .catch(err => console.error("Post error in Course", err));
       } else {
-        await axios.post('http://192.168.1.11:5291/api/Course/post', JSON.stringify(course), {
+        await axios.post('http://192.168.1.7:5291/api/Course/post', JSON.stringify(course), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -236,7 +238,7 @@ const CourseScreen = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
+          placeholder={!isFocus ? 'Select Course Category' : '...'}
           searchPlaceholder="Search..."
           value={value}
           onFocus={() => setIsFocus(true)}
@@ -298,7 +300,7 @@ const CourseScreen = () => {
                     marginBottom: 20,
                   }}
                   placeholder="Fees"
-                  value={course.Fees}
+                  value={course.Fees.toString()}
                   keyboardType='numeric'
                   onChangeText={(text) => setCourse({ ...course, Fees: text })}
                 />

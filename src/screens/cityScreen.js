@@ -4,7 +4,7 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 
 const CityScreen = ({ route }) => {
-    const { stateId } = route.params;
+    const { stateId, stateName } = route.params;
     const [city, setCity] = useState({ "Id": 0, "CityName": "", "IsActive": true, "StateId": stateId });
     const [cityList, setCityList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
@@ -15,7 +15,7 @@ const CityScreen = ({ route }) => {
 
     const fetchCityByStateId = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.11:5291/api/City/getCityByStateId?Id=${stateId}`, {
+            const response = await axios.get(`http://192.168.1.7:5291/api/City/getCityByStateId?Id=${stateId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -39,7 +39,7 @@ const CityScreen = ({ route }) => {
     };
 
     const handleEditCity = (id) => {
-        axios.get(`http://192.168.1.11:5291/api/City/getById?Id=${id}`)
+        axios.get(`http://192.168.1.7:5291/api/City/getById?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 setCity(
@@ -56,7 +56,7 @@ const CityScreen = ({ route }) => {
     };
 
     const handleDeleteCity = (id) => {
-        axios.delete(`http://192.168.1.11:5291/api/City/delete?Id=${id}`)
+        axios.delete(`http://192.168.1.7:5291/api/City/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 fetchCityByStateId(result.data.stateId)
@@ -67,7 +67,7 @@ const CityScreen = ({ route }) => {
     const handleSaveCity = async () => {
         try {
             if (city.Id !== 0) {
-                await axios.put(`http://192.168.1.11:5291/api/City/put`, JSON.stringify(city), {
+                await axios.put(`http://192.168.1.7:5291/api/City/put`, JSON.stringify(city), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -86,7 +86,7 @@ const CityScreen = ({ route }) => {
                     })
                     .catch(err => console.error("Update error in City", err));
             } else {
-                await axios.post('http://192.168.1.11:5291/api/City/post', JSON.stringify(city), {
+                await axios.post('http://192.168.1.7:5291/api/City/post', JSON.stringify(city), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -173,6 +173,7 @@ const CityScreen = ({ route }) => {
                 padding: 16,
                 justifyContent: 'center'
             }}>
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>State Name : {stateName}</Text>
                 <TouchableOpacity style={{
                     backgroundColor: Colors.primary,
                     borderRadius: 5,

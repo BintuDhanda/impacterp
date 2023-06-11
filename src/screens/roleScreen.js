@@ -12,7 +12,7 @@ const RoleScreen = () => {
     GetRoleList();
   }, []);
   const GetRoleList = () => {
-    axios.get("http://192.168.1.11:5291/api/Role/get", {
+    axios.get("http://192.168.1.7:5291/api/Role/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const RoleScreen = () => {
   const handleSaveRole = () => {
     try {
       if (role.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/Role/put`, JSON.stringify(role), {
+        axios.put(`http://192.168.1.7:5291/api/Role/put`, JSON.stringify(role), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const RoleScreen = () => {
           .catch(err => console.log("Role update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/Role/post`, JSON.stringify(role), {
+        axios.post(`http://192.168.1.7:5291/api/Role/post`, JSON.stringify(role), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const RoleScreen = () => {
   }
 
   const handleDeleteRole = (roleId) => {
-    axios.delete(`http://192.168.1.11:5291/api/Role/delete?Id=${roleId}`)
+    axios.delete(`http://192.168.1.7:5291/api/Role/delete?Id=${roleId}`)
       .then((result) => {
         console.log(result);
         GetRoleList();
@@ -89,7 +89,7 @@ const RoleScreen = () => {
   };
 
   const handleEditRole = (roleId) => {
-    axios.get(`http://192.168.1.11:5291/api/Role/getById?Id=${roleId}`)
+    axios.get(`http://192.168.1.7:5291/api/Role/getById?Id=${roleId}`)
       .then((response) => {
         setRole({
           Id: response.data.id,

@@ -16,7 +16,7 @@ const AccountScreen = () => {
   }, []);
 
   const GetAccCategoryList = () => {
-    axios.get('http://192.168.1.11:5291/api/AccountCategory/get', {
+    axios.get('http://192.168.1.7:5291/api/AccountCategory/get', {
       headers: {
         'Content-Type': 'application/json', // Example header
         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -37,7 +37,7 @@ const AccountScreen = () => {
 
   const fetchAccountsByAccCategoryId = async (accCategoryId) => {
     try {
-      const response = await axios.get(`http://192.168.1.11:5291/api/Account/getAccountByAccountCategoryId?Id=${accCategoryId}`, {
+      const response = await axios.get(`http://192.168.1.7:5291/api/Account/getAccountByAccountCategoryId?Id=${accCategoryId}`, {
         headers: {
           'Content-Type': 'application/json', // Example header
           'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -65,7 +65,7 @@ const AccountScreen = () => {
   };
 
   const handleEditAccount = (id) => {
-    axios.get(`http://192.168.1.11:5291/api/Account/getById?Id=${id}`)
+    axios.get(`http://192.168.1.7:5291/api/Account/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setAccount(
@@ -82,7 +82,7 @@ const AccountScreen = () => {
   };
 
   const handleDeleteAccount = (id) => {
-    axios.delete(`http://192.168.1.11:5291/api/Account/delete?Id=${id}`)
+    axios.delete(`http://192.168.1.7:5291/api/Account/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchAccountsByAccCategoryId(result.data.accCategoryId)
@@ -93,7 +93,7 @@ const AccountScreen = () => {
   const handleSaveAccount = async () => {
     try {
       if (account.Id !== 0) {
-        await axios.put(`http://192.168.1.11:5291/api/Account/put`, JSON.stringify(account), {
+        await axios.put(`http://192.168.1.7:5291/api/Account/put`, JSON.stringify(account), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -112,7 +112,7 @@ const AccountScreen = () => {
           })
           .catch(err => console.error("Post error in Account", err));
       } else {
-        await axios.post('http://192.168.1.11:5291/api/Account/post', JSON.stringify(account), {
+        await axios.post('http://192.168.1.7:5291/api/Account/post', JSON.stringify(account), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -222,7 +222,7 @@ const AccountScreen = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
+          placeholder={!isFocus ? 'Select Account Category' : '...'}
           searchPlaceholder="Search..."
           value={value}
           onFocus={() => setIsFocus(true)}

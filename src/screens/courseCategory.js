@@ -12,7 +12,7 @@ const CourseCategoryScreen = () => {
     GetCourseCategoryList();
   }, []);
   const GetCourseCategoryList = () => {
-    axios.get("http://192.168.1.11:5291/api/CourseCategory/get", {
+    axios.get("http://192.168.1.7:5291/api/CourseCategory/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const CourseCategoryScreen = () => {
   const handleSaveCourseCategory = () => {
     try {
       if (courseCategory.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/CourseCategory/put`, JSON.stringify(courseCategory), {
+        axios.put(`http://192.168.1.7:5291/api/CourseCategory/put`, JSON.stringify(courseCategory), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const CourseCategoryScreen = () => {
           .catch(err => console.log("CourseCategory update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/CourseCategory/post`, JSON.stringify(courseCategory), {
+        axios.post(`http://192.168.1.7:5291/api/CourseCategory/post`, JSON.stringify(courseCategory), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const CourseCategoryScreen = () => {
   }
 
   const handleDeleteCourseCategory = (courseCategoryId) => {
-    axios.delete(`http://192.168.1.11:5291/api/CourseCategory/delete?Id=${courseCategoryId}`)
+    axios.delete(`http://192.168.1.7:5291/api/CourseCategory/delete?Id=${courseCategoryId}`)
       .then((result) => {
         console.log(result);
         GetCourseCategoryList();
@@ -89,7 +89,7 @@ const CourseCategoryScreen = () => {
   };
 
   const handleEditCourseCategory = (courseCategoryId) => {
-    axios.get(`http://192.168.1.11:5291/api/CourseCategory/getById?Id=${courseCategoryId}`)
+    axios.get(`http://192.168.1.7:5291/api/CourseCategory/getById?Id=${courseCategoryId}`)
       .then((response) => {
         setCourseCategory({
           Id: response.data.id,

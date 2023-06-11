@@ -12,7 +12,7 @@ const AddressTypeScreen = () => {
     GetAddressTypeList();
   }, []);
   const GetAddressTypeList = () => {
-    axios.get("http://192.168.1.11:5291/api/AddressType/get", {
+    axios.get("http://192.168.1.7:5291/api/AddressType/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const AddressTypeScreen = () => {
   const handleSaveAddressType = () => {
     try {
       if (addressType.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/AddressType/put`, JSON.stringify(addressType), {
+        axios.put(`http://192.168.1.7:5291/api/AddressType/put`, JSON.stringify(addressType), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const AddressTypeScreen = () => {
           .catch(err => console.log("AddressType update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/AddressType/post`, JSON.stringify(addressType), {
+        axios.post(`http://192.168.1.7:5291/api/AddressType/post`, JSON.stringify(addressType), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const AddressTypeScreen = () => {
   }
 
   const handleDeleteAddressType = (addressTypeId) => {
-    axios.delete(`http://192.168.1.11:5291/api/AddressType/delete?Id=${addressTypeId}`)
+    axios.delete(`http://192.168.1.7:5291/api/AddressType/delete?Id=${addressTypeId}`)
       .then((result) => {
         console.log(result);
         GetAddressTypeList();
@@ -89,7 +89,7 @@ const AddressTypeScreen = () => {
   };
 
   const handleEditAddressType = (addressTypeId) => {
-    axios.get(`http://192.168.1.11:5291/api/AddressType/getById?Id=${addressTypeId}`)
+    axios.get(`http://192.168.1.7:5291/api/AddressType/getById?Id=${addressTypeId}`)
       .then((response) => {
         setAddressType({
           Id: response.data.id,

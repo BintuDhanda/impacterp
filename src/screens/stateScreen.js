@@ -4,19 +4,22 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 
 const StateScreen = ({ route, navigation }) => {
-  const { countryId } = route.params;
+  const { countryId, countryName } = route.params;
   const [state, setState] = useState({ "Id": 0, "StateName": "", "IsActive": true, "CountryId": countryId });
   const [stateList, setStateList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+
   useEffect(() => {
     fetchStatesByCountryId(countryId);
   }, []);
-  const handleNavigate = (stateId) => {
-    navigation.navigate('CityScreen', { stateId: stateId })
+
+  const handleNavigate = (stateId, stateName) => {
+    navigation.navigate('CityScreen', { stateId: stateId, stateName: stateName })
   }
+
   const fetchStatesByCountryId = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.11:5291/api/State/getStateByCountryId?Id=${countryId}`, {
+      const response = await axios.get(`http://192.168.1.7:5291/api/State/getStateByCountryId?Id=${countryId}`, {
         headers: {
           'Content-Type': 'application/json', // Example header
           'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -40,7 +43,7 @@ const StateScreen = ({ route, navigation }) => {
   };
 
   const handleEditState = (id) => {
-    axios.get(`http://192.168.1.11:5291/api/State/getById?Id=${id}`)
+    axios.get(`http://192.168.1.7:5291/api/State/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setState(
@@ -57,7 +60,7 @@ const StateScreen = ({ route, navigation }) => {
   };
 
   const handleDeleteState = (id) => {
-    axios.delete(`http://192.168.1.11:5291/api/State/delete?Id=${id}`)
+    axios.delete(`http://192.168.1.7:5291/api/State/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchStatesByCountryId(result.data.countryId)
@@ -68,7 +71,7 @@ const StateScreen = ({ route, navigation }) => {
   const handleSaveState = async () => {
     try {
       if (state.Id !== 0) {
-        await axios.put(`http://192.168.1.11:5291/api/State/put`, JSON.stringify(state), {
+        await axios.put(`http://192.168.1.7:5291/api/State/put`, JSON.stringify(state), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -87,7 +90,7 @@ const StateScreen = ({ route, navigation }) => {
           })
           .catch(err => console.error("Post error in state", err));
       } else {
-        await axios.post('http://192.168.1.11:5291/api/State/post', JSON.stringify(state), {
+        await axios.post('http://192.168.1.7:5291/api/State/post', JSON.stringify(state), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -161,7 +164,7 @@ const StateScreen = ({ route, navigation }) => {
             paddingVertical: 8,
             paddingHorizontal: 12,
             marginRight: 10,
-          }} onPress={() => handleNavigate(item.id)} >
+          }} onPress={() => handleNavigate(item.id, item.stateName)} >
           <Text style={{
             color: Colors.primary,
             fontSize: 14,
@@ -191,6 +194,7 @@ const StateScreen = ({ route, navigation }) => {
         padding: 16,
         justifyContent: 'center'
       }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Country Name : {countryName}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,

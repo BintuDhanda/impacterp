@@ -12,7 +12,7 @@ const CountryScreen = ({ navigation }) => {
     GetCountryList();
   }, []);
   const GetCountryList = () => {
-    axios.get("http://192.168.1.11:5291/api/Country/get", {
+    axios.get("http://192.168.1.7:5291/api/Country/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const CountryScreen = ({ navigation }) => {
   const handleSaveCountry = () => {
     try {
       if (country.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/Country/put`, JSON.stringify(country), {
+        axios.put(`http://192.168.1.7:5291/api/Country/put`, JSON.stringify(country), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const CountryScreen = ({ navigation }) => {
           .catch(err => console.log("Country update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/Country/post`, JSON.stringify(country), {
+        axios.post(`http://192.168.1.7:5291/api/Country/post`, JSON.stringify(country), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const CountryScreen = ({ navigation }) => {
   }
 
   const handleDeleteCountry = (countryId) => {
-    axios.delete(`http://192.168.1.11:5291/api/Country/delete?Id=${countryId}`)
+    axios.delete(`http://192.168.1.7:5291/api/Country/delete?Id=${countryId}`)
       .then((result) => {
         console.log(result);
         GetCountryList();
@@ -88,12 +88,12 @@ const CountryScreen = ({ navigation }) => {
       .catch(err => console.error("Delete Error", err));
   };
 
-  const handleNavigate = (countryId) => {
-    navigation.navigate('StateScreen', { countryId: countryId })
+  const handleNavigate = (countryId,countryName) => {
+    navigation.navigate('StateScreen', { countryId: countryId, countryName: countryName })
   }
 
   const handleEditCountry = (countryId) => {
-    axios.get(`http://192.168.1.11:5291/api/Country/getById?Id=${countryId}`)
+    axios.get(`http://192.168.1.7:5291/api/Country/getById?Id=${countryId}`)
       .then((response) => {
         setCountry({
           Id: response.data.id,
@@ -156,7 +156,7 @@ const CountryScreen = ({ navigation }) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleNavigate(item.id)} >
+            }} onPress={() => handleNavigate(item.id,item.countryName)} >
             <Text style={{
               color: Colors.primary,
               fontSize: 14,

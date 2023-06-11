@@ -12,7 +12,7 @@ const QualificationScreen = () => {
     GetQualificationList();
   }, []);
   const GetQualificationList = () => {
-    axios.get("http://192.168.1.11:5291/api/Qualification/get", {
+    axios.get("http://192.168.1.7:5291/api/Qualification/get", {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -35,7 +35,7 @@ const QualificationScreen = () => {
   const handleSaveQualification = () => {
     try {
       if (qualification.Id !== 0) {
-        axios.put(`http://192.168.1.11:5291/api/Qualification/put`, JSON.stringify(qualification), {
+        axios.put(`http://192.168.1.7:5291/api/Qualification/put`, JSON.stringify(qualification), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -54,7 +54,7 @@ const QualificationScreen = () => {
           .catch(err => console.log("Qualification update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.11:5291/api/Qualification/post`, JSON.stringify(qualification), {
+        axios.post(`http://192.168.1.7:5291/api/Qualification/post`, JSON.stringify(qualification), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -80,7 +80,7 @@ const QualificationScreen = () => {
   }
 
   const handleDeleteQualification = (qualificationId) => {
-    axios.delete(`http://192.168.1.11:5291/api/Qualification/delete?Id=${qualificationId}`)
+    axios.delete(`http://192.168.1.7:5291/api/Qualification/delete?Id=${qualificationId}`)
       .then((result) => {
         console.log(result);
         GetQualificationList();
@@ -89,7 +89,7 @@ const QualificationScreen = () => {
   };
 
   const handleEditQualification = (qualificationId) => {
-    axios.get(`http://192.168.1.11:5291/api/Qualification/getById?Id=${qualificationId}`)
+    axios.get(`http://192.168.1.7:5291/api/Qualification/getById?Id=${qualificationId}`)
       .then((response) => {
         setQualification({
           Id: response.data.id,
