@@ -5,18 +5,19 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 
 const DayBookScreen = () => {
-    const [dayBook, setDayBook] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
+    const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
+    const [dayBookDebit, setDayBookDebit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
     const [accountData, setAccountData] = useState([]);
     const [dayBookList, setDayBookList] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [creditModalVisible, setCreditModalVisible] = useState(false);
+    const [debitModalVisible, setDebitModalVisible] = useState(false);
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
-    console.log(dayBook, "DAyBook")
     useEffect(() => {
         GetAccountList();
     }, []);
     const GetAccountList = () => {
-        axios.get('http://192.168.1.11:5291/api/Account/get', {
+        axios.get('http://192.168.1.7:5291/api/Account/get', {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -37,7 +38,7 @@ const DayBookScreen = () => {
 
     const fetchDayBooksByAccountId = async (accountId) => {
         try {
-            const response = await axios.get(`http://192.168.1.11:5291/api/DayBook/getDayBookByAccountId?Id=${accountId}`, {
+            const response = await axios.get(`http://192.168.1.7:5291/api/DayBook/getDayBookByAccountId?Id=${accountId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -55,8 +56,8 @@ const DayBookScreen = () => {
     };
 
 
-    const handleAddDayBook = () => {
-        setDayBook({
+    const handleAddCreditDayBook = () => {
+        setDayBookCredit({
             Id: 0,
             Particulars: "",
             Credit: 0,
@@ -64,11 +65,22 @@ const DayBookScreen = () => {
             IsActive: true,
             AccountId: "",
         });
-        setModalVisible(true);
+        setCreditModalVisible(true);
+    };
+    const handleAddDebitDayBook = () => {
+        setDayBookDebit({
+            Id: 0,
+            Particulars: "",
+            Credit: 0,
+            Debit: 0,
+            IsActive: true,
+            AccountId: "",
+        });
+        setDebitModalVisible(true);
     };
 
     const handleDeleteDayBook = (id) => {
-        axios.delete(`http://192.168.1.11:5291/api/DayBook/delete?Id=${id}`)
+        axios.delete(`http://192.168.1.7:5291/api/DayBook/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 fetchDayBooksByAccountId(result.data.accountId)
@@ -76,10 +88,10 @@ const DayBookScreen = () => {
             .catch(err => console.error("Delete Error", err));
     }
 
-    const handleSaveDayBook = async () => {
+    const handleSaveDayBookCredit = async () => {
         try {
             // if (dayBook.Id !== 0) {
-            //     await axios.put(`http://192.168.1.11:5291/api/DayBook/put`, JSON.stringify(dayBook), {
+            //     await axios.put(`http://192.168.1.7:5291/api/DayBook/put`, JSON.stringify(dayBook), {
             //         headers: {
             //             'Content-Type': 'application/json'
             //         }
@@ -88,7 +100,7 @@ const DayBookScreen = () => {
             //             if (response.status === 200) {
             //                 fetchDayBooksByAccountId(response.data.accountId);
             //                 Alert.alert('Sucess', 'DayBook Update successfully');
-            //                 setDayBook([{
+            //                 setDayBookCredit([{
             //                     "Id": 0,
             //                     "Particulars": "",
             //                     "Credit": 0,
@@ -100,44 +112,106 @@ const DayBookScreen = () => {
             //         })
             //         .catch(err => console.error("Update error in DayBook", err));
             // } else {
-            await axios.post('http://192.168.1.11:5291/api/DayBook/post', JSON.stringify(dayBook), {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        fetchDayBooksByAccountId(response.data.accountId);
-                        Alert.alert('Sucess', 'DayBook is Added Successfully')
-                        setDayBook({
-                            "Id": 0,
-                            "Particulars": "",
-                            "Credit": 0,
-                            "Debit": 0,
-                            "AccountId": "",
-                            "IsActive": true,
-                        });
+            if (dayBookCredit.Credit !== 0) {
+                await axios.post('http://192.168.1.7:5291/api/DayBook/post', JSON.stringify(dayBookCredit), {
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
                 })
+                    .then((response) => {
+                        if (response.status === 200) {
+                            fetchDayBooksByAccountId(response.data.accountId);
+                            Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
+                            setDayBookCredit({
+                                "Id": 0,
+                                "Particulars": "",
+                                "Credit": 0,
+                                "Debit": 0,
+                                "AccountId": "",
+                                "IsActive": true,
+                            });
+                        }
+                    })
+            }
             // }
-            setModalVisible(false);
+            setCreditModalVisible(false);
+        } catch (error) {
+            console.log('Error saving DayBook:', error);
+        }
+    };
+
+    const handleSaveDayBookDebit = async () => {
+        try {
+            // if (dayBook.Id !== 0) {
+            //     await axios.put(`http://192.168.1.7:5291/api/DayBook/put`, JSON.stringify(dayBook), {
+            //         headers: {
+            //             'Content-Type': 'application/json'
+            //         }
+            //     })
+            //         .then((response) => {
+            //             if (response.status === 200) {
+            //                 fetchDayBooksByAccountId(response.data.accountId);
+            //                 Alert.alert('Sucess', 'DayBook Update successfully');
+            //                 setDayBookCredit([{
+            //                     "Id": 0,
+            //                     "Particulars": "",
+            //                     "Credit": 0,
+            //                     "Debit": 0,
+            //                     "AccountId": "",
+            //                     "IsActive": true
+            //                 }]);
+            //             }
+            //         })
+            //         .catch(err => console.error("Update error in DayBook", err));
+            // } else {
+            if (dayBookDebit.Debit !== 0) {
+                await axios.post('http://192.168.1.7:5291/api/DayBook/post', JSON.stringify(dayBookDebit), {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then((response) => {
+                        if (response.status === 200) {
+                            fetchDayBooksByAccountId(response.data.accountId);
+                            Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
+                            setDayBookDebit({
+                                "Id": 0,
+                                "Particulars": "",
+                                "Credit": 0,
+                                "Debit": 0,
+                                "AccountId": "",
+                                "IsActive": true,
+                            });
+                        }
+                    })
+            }
+            // }
+            setDebitModalVisible(false);
         } catch (error) {
             console.log('Error saving DayBook:', error);
         }
     };
 
     const handleCloseModal = () => {
-        setModalVisible(false);
+        setCreditModalVisible(false);
+        setDebitModalVisible(false);
     };
 
-
+    const getFormattedDate = (datestring) => {
+        const datetimeString = datestring;
+        const date = new Date(datetimeString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
     const renderDayBookCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 10,
+            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
@@ -150,17 +224,17 @@ const DayBookScreen = () => {
                 <Text style={{ fontSize: 16 }}>Particulars : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
             </View>
-            <View style={{ flexDirection: 'row' }}>
+            {item.credit !== 0 ? (<View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Credit : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.credit}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
+            </View>) : null}
+            {item.debit !== 0 ? (<View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Debit : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.debit}</Text>
-            </View>
+            </View>) : null}
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Created At : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.createdAt}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Account : </Text>
@@ -189,6 +263,66 @@ const DayBookScreen = () => {
                 padding: 16,
                 justifyContent: 'center'
             }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                    <TouchableOpacity style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginTop: 10,
+                        marginRight: 3,
+                        alignSelf: 'flex-start',
+                    }} onPress={handleAddCreditDayBook}>
+                        <Text style={{
+                            color: Colors.background,
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                        }}>Credit DayBook Entry</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginTop: 10,
+                        alignSelf: 'flex-start',
+                    }} onPress={handleAddDebitDayBook}>
+                        <Text style={{
+                            color: Colors.background,
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                        }}>Debit DayBook Entry</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{
+                    backgroundColor: Colors.background,
+                    borderRadius: 10,
+                    padding: 10,
+                    marginBottom: 10,
+                    marginTop: 20,
+                    shadowColor: Colors.shadow,
+                    shadowOffset: { width: 10, height: 2 },
+                    shadowOpacity: 4,
+                    shadowRadius: 10,
+                    elevation: 10,
+                    borderWidth: 0.5,
+                    borderColor: Colors.primary,
+                }}>
+                    <TextInput
+                      style={{
+                        borderWidth: 1,
+                        borderColor: Colors.primary,
+                        borderRadius: 10,
+                        padding: 8,
+                        marginBottom: 20,
+                        height: 80,
+                        textAlignVertical: 'top',
+                    }}
+                    placeholder="From"
+                    value={dayBookCredit.Particulars}
+                    onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Particulars: text })}
+                    />
+                </View>
                 <Dropdown
                     style={[{
                         height: 50,
@@ -212,88 +346,30 @@ const DayBookScreen = () => {
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    placeholder={!isFocus ? 'Select item' : '...'}
+                    placeholder={!isFocus ? 'Select Account' : '...'}
                     searchPlaceholder="Search..."
                     value={value}
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     onChange={handleAccountSelect}
                 />
-                <TouchableOpacity style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                    alignSelf: 'flex-start',
-                }} onPress={handleAddDayBook}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>DayBook Entry</Text>
-                </TouchableOpacity>
+
                 <FlatList
                     data={dayBookList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderDayBookCard}
                 />
 
-                {modalVisible && (
-                    <Modal transparent visible={modalVisible}>
+                {creditModalVisible && (
+                    <Modal transparent visible={creditModalVisible}>
                         <View style={{
                             flex: 1,
                             backgroundColor: 'rgba(0, 0, 0, 0.5)',
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}>
-                            <View style={{
-                                backgroundColor: Colors.background,
-                                borderRadius: 10,
-                                padding: 20,
-                                width: '80%',
-                            }}>
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary,
-                                        borderRadius: 10,
-                                        padding: 8,
-                                        marginBottom: 20,
-                                        height: 80,
-                                        textAlignVertical: 'top',
-                                    }}
-                                    placeholder="Particulars"
-                                    multiline
-                                    value={dayBook.Particulars}
-                                    onChangeText={(text) => setDayBook({ ...dayBook, Particulars: text })}
-                                />
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary,
-                                        borderRadius: 10,
-                                        padding: 8,
-                                        marginBottom: 20,
-                                    }}
-                                    placeholder="Credit"
-                                    keyboardType='numeric'
-                                    value={dayBook.Credit}
-                                    onChangeText={(text) => setDayBook({ ...dayBook, Credit: text })}
-                                />
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary,
-                                        borderRadius: 10,
-                                        padding: 8,
-                                        marginBottom: 20,
-                                    }}
-                                    placeholder="Debit"
-                                    keyboardType='numeric'
-                                    value={dayBook.Debit}
-                                    onChangeText={(text) => setDayBook({ ...dayBook, Debit: text })}
-                                />
+                            <View style={{ backgroundColor: Colors.background, borderRadius: 10, padding: 20, width: '80%', }}>
+                                <Text style={{ fontSize: 20, marginBottom: 10, fontWeight: 'bold', color: Colors.shadow }}>Credit Entry</Text>
                                 <Dropdown
                                     style={[{
                                         height: 50,
@@ -301,6 +377,7 @@ const DayBookScreen = () => {
                                         borderWidth: 1,
                                         borderRadius: 10,
                                         paddingHorizontal: 8,
+                                        marginBottom: 20,
                                     }, isFocus && { borderColor: 'blue' }]}
                                     placeholderStyle={{ fontSize: 16, }}
                                     selectedTextStyle={{ fontSize: 16, }}
@@ -319,27 +396,151 @@ const DayBookScreen = () => {
                                     valueField="value"
                                     placeholder={!isFocus ? 'Select item' : '...'}
                                     searchPlaceholder="Search..."
-                                    value={dayBook.AccountId}
+                                    value={dayBookCredit.AccountId}
                                     onFocus={() => setIsFocus(true)}
                                     onBlur={() => setIsFocus(false)}
-                                    onChange={(value) => setDayBook({ ...dayBook, AccountId: value.value })}
+                                    onChange={(value) => setDayBookCredit({ ...dayBookCredit, AccountId: value.value })}
                                 />
-                                <View style={{
-                                    marginTop: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'flex-end',
-                                }}>
+                                <TextInput
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 10,
+                                        padding: 8,
+                                        marginBottom: 20,
+                                        height: 80,
+                                        textAlignVertical: 'top',
+                                    }}
+                                    placeholder="Particulars"
+                                    multiline
+                                    value={dayBookCredit.Particulars}
+                                    onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Particulars: text })}
+                                />
+                                <TextInput
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 10,
+                                        padding: 8,
+                                        marginBottom: 20,
+                                    }}
+                                    placeholder="Credit"
+                                    keyboardType='numeric'
+                                    value={dayBookCredit.Credit}
+                                    onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Credit: text })}
+                                />
+                                <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
                                     <TouchableOpacity style={{
                                         backgroundColor: Colors.primary,
                                         borderRadius: 5,
                                         paddingVertical: 8,
                                         paddingHorizontal: 12,
-                                    }} onPress={handleSaveDayBook}>
+                                    }} onPress={handleSaveDayBookCredit}>
                                         <Text style={{
                                             color: Colors.background,
                                             fontSize: 14,
                                             fontWeight: 'bold',
-                                        }}>{dayBook.Id === 0 ? 'Add' : 'Save'}</Text>
+                                        }}>{dayBookCredit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: '#f25252',
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginLeft: 10
+                                    }} onPress={handleCloseModal}>
+                                        <Text style={{
+                                            color: Colors.background,
+                                            fontSize: 14,
+                                            fontWeight: 'bold',
+                                        }}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                )}
+                {debitModalVisible && (
+                    <Modal transparent visible={debitModalVisible}>
+                        <View style={{
+                            flex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <View style={{ borderWidth: 1, padding: 10, borderRadius: 20 }}>
+                                <Text style={{ fontSize: 20, marginBottom: 10, color: Colors.shadow, fontWeight: 'bold' }}>Debit Entry</Text>
+                                <Dropdown
+                                    style={[{
+                                        height: 50,
+                                        borderColor: Colors.primary,
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        paddingHorizontal: 8,
+                                        marginBottom: 20,
+                                    }, isFocus && { borderColor: 'blue' }]}
+                                    placeholderStyle={{ fontSize: 16, }}
+                                    selectedTextStyle={{ fontSize: 16, }}
+                                    inputSearchStyle={{
+                                        height: 40,
+                                        fontSize: 16,
+                                    }}
+                                    iconStyle={{
+                                        width: 20,
+                                        height: 20,
+                                    }}
+                                    data={accountData}
+                                    search
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder={!isFocus ? 'Select item' : '...'}
+                                    searchPlaceholder="Search..."
+                                    value={setDayBookDebit.AccountId}
+                                    onFocus={() => setIsFocus(true)}
+                                    onBlur={() => setIsFocus(false)}
+                                    onChange={(value) => setDayBookDebit({ ...dayBookDebit, AccountId: value.value })}
+                                />
+                                <TextInput
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 10,
+                                        padding: 8,
+                                        marginBottom: 20,
+                                        height: 80,
+                                        textAlignVertical: 'top',
+                                    }}
+                                    placeholder="Particulars"
+                                    multiline
+                                    value={dayBookDebit.Particulars}
+                                    onChangeText={(text) => setDayBookDebit({ ...dayBookDebit, Particulars: text })}
+                                />
+                                <TextInput
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 10,
+                                        padding: 8,
+                                        marginBottom: 20,
+                                    }}
+                                    placeholder="Debit"
+                                    keyboardType='numeric'
+                                    value={dayBookDebit.Debit}
+                                    onChangeText={(text) => setDayBookDebit({ ...dayBookDebit, Debit: text })}
+                                />
+                                <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: Colors.primary,
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                    }} onPress={handleSaveDayBookDebit}>
+                                        <Text style={{
+                                            color: Colors.background,
+                                            fontSize: 14,
+                                            fontWeight: 'bold',
+                                        }}>{dayBookDebit.Id === 0 ? 'Add' : 'Save'}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{
                                         backgroundColor: '#f25252',
