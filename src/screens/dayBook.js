@@ -1,60 +1,73 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Button } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
 const DayBookScreen = () => {
+    const ToDate = new Date();
+    const FromDate = new Date();
+    FromDate.setDate(FromDate.getDate() - 7);
     const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
     const [dayBookDebit, setDayBookDebit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
-    const [accountData, setAccountData] = useState([]);
     const [dayBookList, setDayBookList] = useState([]);
     const [creditModalVisible, setCreditModalVisible] = useState(false);
     const [debitModalVisible, setDebitModalVisible] = useState(false);
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [fromDate, setFromDate] = useState(FromDate.toISOString().slice(0, 10).toString());
+    const [toDate, setToDate] = useState(ToDate.toISOString().slice(0, 10).toString());
+    const [take, setTake] = useState(10);
+    const [skip, setSkip] = useState(0);
+    const [accountList, setAccountList] = useState([]);
+    const [isEndReached, setIsEndReached] = useState(0);
     useEffect(() => {
-        GetAccountList();
+        if (dayBookList == 0) {
+            GetDayBookList();
+        }
+        if (accountList.length == 0) {
+            GetAccountList();
+        }
     }, []);
     const GetAccountList = () => {
         axios.get('http://192.168.1.7:5291/api/Account/get', {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                console.log(response.data, "Account list");
+                const accountArray = response.data.map((account) => ({
+                    value: account.id,
+                    label: account.accountName,
+                }));
+                setAccountList(accountArray);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+    const GetDayBookList = () => {
+        console.log(fromDate, "FromDate")
+        const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
+        setLoading(true);
+        axios.post('http://192.168.1.7:5291/api/DayBook/get', JSON.stringify(filter), {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
             },
         })
             .then((response) => {
-                console.log(response.data);
-                const AccountArray = response.data.map((account) => ({
-                    value: account.id,
-                    label: account.accountName,
-                }));
-                setAccountData(AccountArray);
+                console.log(response.data, "DayBook list")
+                setDayBookList(response.data);
+                setLoading(false);
             })
             .catch((error) => {
                 console.log(error);
             });
     }
-
-    const fetchDayBooksByAccountId = async (accountId) => {
-        try {
-            const response = await axios.get(`http://192.168.1.7:5291/api/DayBook/getDayBookByAccountId?Id=${accountId}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
-            setDayBookList(response.data);
-        } catch (error) {
-            console.log('Error fetching DayBooks:', error);
-        }
-    };
-    const handleAccountSelect = (account) => {
-        console.log(account, "Account")
-        setValue(account.value);
-        fetchDayBooksByAccountId(account.value);
-    };
-
 
     const handleAddCreditDayBook = () => {
         setDayBookCredit({
@@ -120,7 +133,7 @@ const DayBookScreen = () => {
                 })
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchDayBooksByAccountId(response.data.accountId);
+                            GetDayBookList();
                             Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
                             setDayBookCredit({
                                 "Id": 0,
@@ -172,7 +185,7 @@ const DayBookScreen = () => {
                 })
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchDayBooksByAccountId(response.data.accountId);
+                            GetDayBookList();
                             Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
                             setDayBookDebit({
                                 "Id": 0,
@@ -205,6 +218,52 @@ const DayBookScreen = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     }
+
+    const handleLoadMore = () => {
+        console.log("daybook", dayBookList)
+      if(!isEndReached)
+      {
+        setLoading(true)
+        console.log("Loader MOre fired")
+        
+        // Load more data
+        setSkip(skip + 10)
+        const filterOnScroll = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
+        console.log("filterOnScroll",filterOnScroll)
+        axios.post('http://192.168.1.7:5291/api/DayBook/get', JSON.stringify(filterOnScroll), {
+            headers: {
+                'Content-Type': 'application/json', // Example header
+                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+            },
+        })
+            .then((response) => {
+                console.log(response.data, "DayBookList HandleMore")
+                setDayBookList([...dayBookList, ...response.data]);
+                setLoading(false);
+                if(response.data.length===0)
+                {                 
+                    setIsEndReached(true)
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+      }
+      else
+      {
+        console.log("end")
+      }
+    };
+
+    const renderFooter = () => {
+        if (!loading) return null;
+        return (
+            <View style={{ paddingVertical: 20 }}>
+                <ActivityIndicator animating size="large" />
+            </View>
+        );
+    };
+
     const renderDayBookCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
@@ -220,6 +279,10 @@ const DayBookScreen = () => {
             borderWidth: 0.5,
             borderColor: Colors.primary,
         }}>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Id : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.id}</Text>
+            </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Particulars : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
@@ -308,58 +371,33 @@ const DayBookScreen = () => {
                     borderWidth: 0.5,
                     borderColor: Colors.primary,
                 }}>
-                    <TextInput
-                      style={{
-                        borderWidth: 1,
-                        borderColor: Colors.primary,
-                        borderRadius: 10,
-                        padding: 8,
-                        marginBottom: 20,
-                        height: 80,
-                        textAlignVertical: 'top',
-                    }}
-                    placeholder="From"
-                    value={dayBookCredit.Particulars}
-                    onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Particulars: text })}
-                    />
+                    <View style={{ flexDirection: 'row', paddingHorizontal: 16, paddingTop: 16 }}>
+                        {/* <TextInput
+                            placeholder="From Date"
+                            value={filter.From}
+                            onChangeText={(text) => setFilter({ ...filter, From: text })}
+                            style={{ flex: 1, marginRight: 8, padding: 8, borderWidth: 1, borderRadius: 4 }}
+                        />
+                        <TextInput
+                            placeholder="To Date"
+                            value={filter.To}
+                            onChangeText={(text) => setEndDate(text)}
+                            style={{ flex: 1, marginRight: 8, padding: 8, borderWidth: 1, borderRadius: 4 }}
+                        /> */}
+                        {/* <Button title="Search" onPress={handleSearch} /> */}
+                    </View>
                 </View>
-                <Dropdown
-                    style={[{
-                        height: 50,
-                        borderColor: Colors.primary,
-                        borderWidth: 0.5,
-                        borderRadius: 10,
-                        paddingHorizontal: 8,
-                    }, isFocus && { borderColor: 'blue' }]}
-                    placeholderStyle={{ fontSize: 16, }}
-                    selectedTextStyle={{ fontSize: 16, }}
-                    inputSearchStyle={{
-                        height: 40,
-                        fontSize: 16,
-                    }}
-                    iconStyle={{
-                        width: 20,
-                        height: 20,
-                    }}
-                    data={accountData}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? 'Select Account' : '...'}
-                    searchPlaceholder="Search..."
-                    value={value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={handleAccountSelect}
-                />
 
                 <FlatList
+                 style={{height: 500}}
                     data={dayBookList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderDayBookCard}
+                    ListFooterComponent={renderFooter}
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0.1}
                 />
-
+                 <Toast/>
                 {creditModalVisible && (
                     <Modal transparent visible={creditModalVisible}>
                         <View style={{
@@ -389,7 +427,7 @@ const DayBookScreen = () => {
                                         width: 20,
                                         height: 20,
                                     }}
-                                    data={accountData}
+                                    data={accountList}
                                     search
                                     maxHeight={300}
                                     labelField="label"
@@ -468,7 +506,7 @@ const DayBookScreen = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}>
-                            <View style={{ borderWidth: 1, padding: 10, borderRadius: 20 }}>
+                            <View style={{ backgroundColor: Colors.background, borderRadius: 10, padding: 20, width: '80%', }}>
                                 <Text style={{ fontSize: 20, marginBottom: 10, color: Colors.shadow, fontWeight: 'bold' }}>Debit Entry</Text>
                                 <Dropdown
                                     style={[{
@@ -489,7 +527,7 @@ const DayBookScreen = () => {
                                         width: 20,
                                         height: 20,
                                     }}
-                                    data={accountData}
+                                    data={accountList}
                                     search
                                     maxHeight={300}
                                     labelField="label"
