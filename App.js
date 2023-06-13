@@ -26,7 +26,7 @@ import AddressTypeScreen from './src/screens/addressTypeScreen';
 import EnterAccountScreen from './src/screens/enterAccountScreen';
 import AccountCategoryScreen from './src/screens/accountCategory';
 import AccountScreen from './src/screens/accountScreen';
-import DayBookScreen from './src/screens/dayBook';
+import DayBookScreen from './src/screens/dayBookScreen';
 import CityScreen from './src/screens/cityScreen';
 
 

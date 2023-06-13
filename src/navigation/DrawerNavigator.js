@@ -13,7 +13,7 @@ import AccountCategoryScreen from '../screens/accountCategory';
 import StateScreen from '../screens/stateScreen';
 import AccountScreen from '../screens/accountScreen';
 import CourseScreen from '../screens/courseScreen';
-import DayBookScreen from '../screens/dayBook';
+import DayBookScreen from '../screens/dayBookScreen';
 import CityScreen from '../screens/cityScreen';
 
 
