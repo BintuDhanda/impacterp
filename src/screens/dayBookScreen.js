@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const DayBookScreen = () => {
     const ToDate = new Date();
-    ToDate.setDate(ToDate.getDate()+1)
+    ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
     const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
@@ -429,32 +429,32 @@ const DayBookScreen = () => {
                                             onCancel={handleConfirmToDatePicker}
                                         />
                                     )}
-                                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
 
-                                    <TouchableOpacity style={{
-                                        backgroundColor: Colors.primary,
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                        marginRight: 3,
-                                    }} onPress={() => {
-                                        handleSearch();
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#f25252',
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                    }} onPress={() => {
-                                        setShowSearch(false);
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            handleSearch();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            setShowSearch(false);
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
                         </Modal>

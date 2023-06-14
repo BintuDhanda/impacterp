@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const UserScreen = () => {
+const UserScreen = ({navigation}) => {
   const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -11,6 +11,11 @@ const UserScreen = () => {
   useEffect(() => {
     GetUserList();
   }, []);
+
+  const handleNavigate = (userId) => {
+    navigation.navigate('StudentFormScreen', {userId : userId})
+  }
+
   const GetUserList = () => {
     axios.get("http://192.168.1.7:5291/api/User/get", {
       headers: {
@@ -127,7 +132,7 @@ const UserScreen = () => {
       }}>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ fontSize: 16 }}>User Password : </Text>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 , textAlignVertical: 'center'}}> ######## </Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, textAlignVertical: 'center' }}> ######## </Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ fontSize: 16 }}>User Mobile : </Text>
@@ -147,6 +152,20 @@ const UserScreen = () => {
               fontSize: 14,
               fontWeight: 'bold',
             }}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#ffff80',
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              marginRight: 10,
+            }} onPress={() => handleNavigate(item.id)} >
+            <Text style={{
+              color: Colors.primary,
+              fontSize: 14,
+              fontWeight: 'bold',
+            }}>Manage</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{

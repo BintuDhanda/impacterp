@@ -88,7 +88,7 @@ const CountryScreen = ({ navigation }) => {
       .catch(err => console.error("Delete Error", err));
   };
 
-  const handleNavigate = (countryId,countryName) => {
+  const handleNavigate = (countryId, countryName) => {
     navigation.navigate('StateScreen', { countryId: countryId, countryName: countryName })
   }
 
@@ -156,7 +156,7 @@ const CountryScreen = ({ navigation }) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleNavigate(item.id,item.countryName)} >
+            }} onPress={() => handleNavigate(item.id, item.countryName)} >
             <Text style={{
               color: Colors.primary,
               fontSize: 14,

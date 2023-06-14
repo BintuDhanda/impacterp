@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const CourseCategoryScreen = ({navigation}) => {
+const CourseCategoryScreen = ({ navigation }) => {
   const [courseCategory, setCourseCategory] = useState({ "Id": 0, "CourseCategoryName": "", "IsActive": true });
   const [courseCategoryList, setCourseCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -101,7 +101,7 @@ const CourseCategoryScreen = ({navigation}) => {
     setModalVisible(true);
   };
 
-  const handleNavigate = (courseCategoryId,courseCategoryName) => {
+  const handleNavigate = (courseCategoryId, courseCategoryName) => {
     navigation.navigate('CourseScreen', { courseCategoryId: courseCategoryId, courseCategoryName: courseCategoryName })
   }
 
@@ -154,7 +154,7 @@ const CourseCategoryScreen = ({navigation}) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleNavigate(item.id,item.courseCategoryName)} >
+            }} onPress={() => handleNavigate(item.id, item.courseCategoryName)} >
             <Text style={{
               color: Colors.primary,
               fontSize: 14,

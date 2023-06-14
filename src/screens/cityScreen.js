@@ -173,7 +173,7 @@ const CityScreen = ({ route }) => {
                 padding: 16,
                 justifyContent: 'center'
             }}>
-                <Text style={{fontSize: 20, fontWeight: 'bold'}}>State Name : {stateName}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>State Name : {stateName}</Text>
                 <TouchableOpacity style={{
                     backgroundColor: Colors.primary,
                     borderRadius: 5,

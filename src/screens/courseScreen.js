@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
-const CourseScreen = ({route, navigation}) => {
-  const {courseCategoryId, courseCategoryName} = route.params;
+const CourseScreen = ({ route, navigation }) => {
+  const { courseCategoryId, courseCategoryName } = route.params;
   const [course, setCourse] = useState({ "Id": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -119,7 +119,7 @@ const CourseScreen = ({route, navigation}) => {
     }
   };
 
-  const handleNavigate = (courseId,courseName) => {
+  const handleNavigate = (courseId, courseName) => {
     navigation.navigate('BatchScreen', { courseId: courseId, courseName: courseName })
   }
 
@@ -155,7 +155,7 @@ const CourseScreen = ({route, navigation}) => {
         <Text style={{ fontSize: 16 }}>Duration : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
       </View>
-      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
+      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{
           backgroundColor: '#5a67f2',
           borderRadius: 5,
@@ -206,7 +206,7 @@ const CourseScreen = ({route, navigation}) => {
         padding: 16,
         justifyContent: 'center'
       }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Name : {courseCategoryName}</Text>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Category Name : {courseCategoryName}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,

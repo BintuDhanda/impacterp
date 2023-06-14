@@ -33,17 +33,13 @@ const HomeScreen = () => {
             <Text style={styles.title}>Qualification</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CountryScreen')}>
-          <Icon name="map-marker" size={50} color={Colors.primary} style={styles.icon} />
+            <Icon name="map-marker" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Location</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseCategoryScreen')}>
             <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Course Category</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.card} onPress={() => handleIconPress('BatchScreen')}>
-            <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Batch</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AddressTypeScreen')}>
             <Icon name="map" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Address Type</Text>

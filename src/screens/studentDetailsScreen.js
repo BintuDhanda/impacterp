@@ -6,7 +6,7 @@ import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const StudentDetailsScreen = () => {
+const StudentDetailsScreen = ({navigation}) => {
     const [studentDetailsList, setStudentDetailsList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
@@ -14,24 +14,50 @@ const StudentDetailsScreen = () => {
 
     useEffect(() => {
         setLoading(true);
-        fetchStudentDetailsByUserId();
+        GetStudentList();
     }, [])
+
+    const handleNavigate = () => {
+        navigation.navigate('StudentFormScreen')
+    }
+
+    const GetStudentList = () => {
+        axios.get('http://192.168.1.7:5291/api/StudentDetails/get', {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                console.log(response.data, "StudentDetails list");
+                const studentDetailsArray = response.data.map((studentDetails) => ({
+                    value: studentDetails.id,
+                    label: studentDetails.firstName+" "+studentDetails.lastName,
+                    father: studentDetails.fatherName,
+                    mother: studentDetails.motherName
+                }));
+                setStudentDetailsList(studentDetailsArray);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
 
     const fetchStudentDetailsByUserId = async () => {
         try {
-          const response = await axios.get(`http://192.168.1.7:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
-            headers: {
-              'Content-Type': 'application/json', // Example header
-              'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-          });
-          setLoading(false);
-          setStudentDetailsList(response.data);
-          console.log(studentDetailsList, 'studentDetails')
+            const response = await axios.get(`http://192.168.1.7:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
+                headers: {
+                    'Content-Type': 'application/json', // Example header
+                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+                },
+            });
+            setLoading(false);
+            setStudentDetailsList(response.data);
+            console.log(studentDetailsList, 'studentDetails')
         } catch (error) {
-          console.log('Error fetching StudentDetails:', error);
+            console.log('Error fetching StudentDetails:', error);
         }
-      };
+    };
 
     const handleDeleteStudentDetails = (id) => {
         axios.delete(`http://192.168.1.7:5291/api/StudentDetails/delete?Id=${id}`)
@@ -76,39 +102,20 @@ const StudentDetailsScreen = () => {
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>First Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>{item.firstName}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Last Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.lastName}</Text>
+                <Text style={{ fontSize: 20 }}>Student Name : </Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>{item.label}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 20 }}>Father Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.fatherName}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.father}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 20 }}>Mother Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.motherName}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.mother}</Text>
             </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Gender : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.gender}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Height : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.studentHeight}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Weight : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.studentWeight}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Body Remarks : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.bodyRemark}</Text>
-            </View>
+        
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{ 
+                <TouchableOpacity style={{
                     backgroundColor: '#f25252',
                     borderRadius: 5,
                     paddingVertical: 8,
@@ -128,10 +135,26 @@ const StudentDetailsScreen = () => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                        <TouchableOpacity style={{
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            marginTop: 10,
+                            marginRight: 3,
+                            alignSelf: 'flex-start',
+                        }} onPress={handleNavigate}>
+                            <Text style={{
+                                color: Colors.background,
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                            }}>Add Student</Text>
+                        </TouchableOpacity>
+                    </View>
                     <FlatList
                         data={studentDetailsList}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item) => item.value.toString()}
                         showsVerticalScrollIndicator={false}
                         renderItem={renderStudentDetailsCard}
                         ListFooterComponent={renderFooter}

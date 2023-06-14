@@ -7,20 +7,20 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const BatchScreen = ({ route }) => {
     const { courseId, courseName } = route.params;
-    const [batch, setBatch] = useState({ "Id": 0, "BatchName": "","Code": "","StartDate": "","EndDate": "", "IsActive": true, "CourseId": courseId });
+    const [batch, setBatch] = useState({ "Id": 0, "BatchName": "", "Code": "", "StartDate": "", "EndDate": "", "IsActive": true, "CourseId": courseId });
     const [batchList, setBatchList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
-    const [selectStartDate, setSelectStartDate] = useState();
-    const [selectToDate, setSelectToDate] = useState("")
+    const [selectStartDate, setSelectStartDate] = useState(new Date());
+    const [selectEndDate, setSelectEndDate] = useState(new Date())
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showToDatePicker, setShowToDatePicker] = useState(false);
+    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
     console.log(batch, "Batch")
 
-    const handleFromDateChange = (event, date) => {
+    const handleStartDateChange = (event, date) => {
         if (date !== undefined) {
             setSelectStartDate(date);
-            setBatch({...batch, StartDate: date})
+            setBatch({ ...batch, StartDate: date })
         }
         setShowDatePicker(false);
     };
@@ -28,23 +28,24 @@ const BatchScreen = ({ route }) => {
     const handleOpenStartDatePicker = () => {
         setShowDatePicker(true);
     };
-    const handleConfirmFromDatePicker = () => {
+    const handleConfirmStartDatePicker = () => {
         setShowDatePicker(false);
     };
 
     const handleToDateChange = (event, date) => {
         if (date !== undefined) {
-            setSelectToDate(date);
+            setSelectEndDate(date);
+            setBatch({ ...batch, EndDate: date })
         }
-        setShowToDatePicker(false);
+        setShowEndDatePicker(false);
     };
 
-    const handleOpenToDatePicker = () => {
-        setShowToDatePicker(true);
+    const handleOpenEndDatePicker = () => {
+        setShowEndDatePicker(true);
     };
 
     const handleConfirmToDatePicker = () => {
-        setShowToDatePicker(false);
+        setShowEndDatePicker(false);
     };
 
     useEffect(() => {
@@ -175,8 +176,6 @@ const BatchScreen = ({ route }) => {
 
     const renderBatchCard = ({ item }) => (
         <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: Colors.background,
             borderRadius: 10,
@@ -191,11 +190,23 @@ const BatchScreen = ({ route }) => {
             borderWidth: 0.5,
             borderColor: Colors.primary
         }}>
-            <Text style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-            }}>{item.batchName}</Text>
             <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Batch Code : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.code}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Start Date : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.startDate)}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>End Date : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.endDate)}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
                 <TouchableOpacity style={{
                     backgroundColor: '#5a67f2',
                     borderRadius: 5,
@@ -231,7 +242,7 @@ const BatchScreen = ({ route }) => {
                 padding: 16,
                 justifyContent: 'center'
             }}>
-                <Text style={{fontSize: 20, fontWeight: 'bold'}}>Course Name : {courseName}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Name : {courseName}</Text>
                 <TouchableOpacity style={{
                     backgroundColor: Colors.primary,
                     borderRadius: 5,
@@ -272,40 +283,84 @@ const BatchScreen = ({ route }) => {
                                         borderColor: Colors.primary,
                                         borderRadius: 8,
                                         padding: 8,
+                                        marginBottom: 10,
                                     }}
                                     placeholder="Batch Name"
                                     value={batch.BatchName}
                                     onChangeText={(text) => setBatch({ ...batch, BatchName: text })}
                                 />
-                                <View style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        marginBottom: 10,
-                                        paddingHorizontal: 10,
+                                <TextInput
+                                    style={{
                                         borderWidth: 1,
                                         borderColor: Colors.primary,
                                         borderRadius: 8,
-                                    }}>
-                                        <TouchableOpacity onPress={handleOpenStartDatePicker}>
-                                            <Icon name={'calendar'} size={25} />
-                                        </TouchableOpacity>
-                                        <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                                            value={batch.StartDate}
-                                            placeholder="Select Start date"
-                                            editable={false}
-                                        />
+                                        padding: 8,
+                                        marginBottom: 10,
+                                    }}
+                                    placeholder="Batch Code"
+                                    value={batch.Code.toString()}
+                                    keyboardType='numeric'
+                                    onChangeText={(text) => setBatch({ ...batch, Code: text })}
+                                />
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginBottom: 10,
+                                    paddingHorizontal: 10,
+                                    borderWidth: 1,
+                                    borderColor: Colors.primary,
+                                    borderRadius: 8,
+                                }}>
+                                    <TouchableOpacity onPress={handleOpenStartDatePicker}>
+                                        <Icon name={'calendar'} size={25} />
+                                    </TouchableOpacity>
+                                    <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                        value={batch.StartDate === "" ? ("Select Start Date") : (getFormattedDate(batch.StartDate))}
+                                        placeholder="Select Start date"
+                                        editable={false}
+                                    />
 
-                                    </View>
-                                    {showDatePicker && (
-                                        <DateTimePicker
-                                            value={new Date()}
-                                            mode="date"
-                                            display="default"
-                                            onChange={handleFromDateChange}
-                                            onConfirm={handleConfirmFromDatePicker}
-                                            onCancel={handleConfirmFromDatePicker}
-                                        />
-                                    )}
+                                </View>
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={selectStartDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleStartDateChange}
+                                        onConfirm={handleConfirmStartDatePicker}
+                                        onCancel={handleConfirmStartDatePicker}
+                                    />
+                                )}
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    marginBottom: 10,
+                                    paddingHorizontal: 10,
+                                    borderWidth: 1,
+                                    borderColor: Colors.primary,
+                                    borderRadius: 8,
+                                }}>
+                                    <TouchableOpacity onPress={handleOpenEndDatePicker}>
+                                        <Icon name={'calendar'} size={25} />
+                                    </TouchableOpacity>
+                                    <TextInput
+                                        style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                        value={batch.EndDate === "" ? "Select End Date" : getFormattedDate(batch.EndDate)}
+                                        placeholder="Select End date"
+                                        editable={false}
+                                    />
+
+                                </View>
+                                {showEndDatePicker && (
+                                    <DateTimePicker
+                                        value={selectEndDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleToDateChange}
+                                        onConfirm={handleConfirmToDatePicker}
+                                        onCancel={handleConfirmToDatePicker}
+                                    />
+                                )}
                                 <View style={{
                                     marginTop: 10,
                                     flexDirection: 'row',

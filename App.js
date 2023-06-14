@@ -30,6 +30,7 @@ import DayBookScreen from './src/screens/dayBookScreen';
 import CityScreen from './src/screens/cityScreen';
 import StudentDetailsScreen from './src/screens/studentDetailsScreen';
 import BatchScreen from './src/screens/batchScreen';
+import StudentFormScreen from './src/screens/student/studentFormScreen';
 
 
 let isLogedIn = true;
@@ -46,6 +47,7 @@ function App() {
             {/* <Stack.Screen name="HomeScreen" component={DrawerNavigator} /> */}
             <Stack.Screen name="HomeScreen" options={{ title: 'Home' }} component={HomeScreen} />
             <Stack.Screen name="UserScreen" options={{ title: 'User' }} component={UserScreen} />
+            <Stack.Screen name="StudentFormScreen" options={{title: 'Student Form'}} component={StudentFormScreen} />
             <Stack.Screen name="RolesScreen" options={{ title: 'Roles' }} component={RoleScreen} />
             <Stack.Screen name="StudentDetailsScreen" options={{title: 'Student Detail'}} component={StudentDetailsScreen} />
             <Stack.Screen name="QualificationScreen" options={{ title: 'Qualification' }} component={QualificationScreen} />
