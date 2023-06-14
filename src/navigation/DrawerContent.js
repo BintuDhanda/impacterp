@@ -52,29 +52,8 @@ const DrawerContent = (props) => {
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => props.navigation.navigate('StateScreen')}>
-              <Text style={styles.title}>State</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.drawerItem}>
-            <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => props.navigation.navigate('CityScreen')}>
-              <Text style={styles.title}>City</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.drawerItem}>
-            <Icon name="rocket" size={20} color="#900" />
             <TouchableOpacity onPress={() => props.navigation.navigate('CourseCategoryScreen')}>
               <Text style={styles.title}>Course Category</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.drawerItem}>
-            <Icon name="rocket" size={20} color="#900" />
-            <TouchableOpacity onPress={() => props.navigation.navigate('CourseScreen')}>
-              <Text style={styles.title}>Course</Text>
             </TouchableOpacity>
           </View>
 
@@ -90,7 +69,6 @@ const DrawerContent = (props) => {
               <Text style={styles.title}>Address Type</Text>
             </TouchableOpacity>
           </View>
-
 
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />

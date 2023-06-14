@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const CourseCategoryScreen = () => {
+const CourseCategoryScreen = ({navigation}) => {
   const [courseCategory, setCourseCategory] = useState({ "Id": 0, "CourseCategoryName": "", "IsActive": true });
   const [courseCategoryList, setCourseCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -97,9 +97,13 @@ const CourseCategoryScreen = () => {
           IsActive: response.data.isActive
         })
       })
-      .catch(error => console.log('CourseCategory Get By Id :', error))
+      .catch(error => console.error('CourseCategory Get By Id :', error))
     setModalVisible(true);
   };
+
+  const handleNavigate = (courseCategoryId,courseCategoryName) => {
+    navigation.navigate('CourseScreen', { courseCategoryId: courseCategoryId, courseCategoryName: courseCategoryName })
+  }
 
   const handleClose = () => {
     setModalVisible(false);
@@ -142,6 +146,22 @@ const CourseCategoryScreen = () => {
               fontWeight: 'bold',
             }}>Edit</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#ffff80',
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              marginRight: 10,
+            }} onPress={() => handleNavigate(item.id,item.courseCategoryName)} >
+            <Text style={{
+              color: Colors.primary,
+              fontSize: 14,
+              fontWeight: 'bold',
+            }}>Manage</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={{
               backgroundColor: '#f25252',

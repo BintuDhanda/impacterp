@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const DayBookScreen = () => {
     const ToDate = new Date();
+    ToDate.setDate(ToDate.getDate()+1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
     const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
@@ -28,11 +29,10 @@ const DayBookScreen = () => {
     const [isEndReached, setIsEndReached] = useState(true);
 
     const [selectFromDate, setSelectFromDate] = useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
-    const [selectToDate, setSelectToDate] = useState(new Date())
+    const [selectToDate, setSelectToDate] = useState(new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000))
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
-
-    console.log("Daybook List", dayBookList)
+    const [showSearch, setShowSearch] = useState(false);
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
@@ -69,6 +69,7 @@ const DayBookScreen = () => {
         setFromDate(getFormattedDate(selectFromDate));
         setToDate(getFormattedDate(selectToDate));
         setSkip(0);
+        setShowSearch(false);
     };
 
     useEffect(() => {
@@ -97,11 +98,10 @@ const DayBookScreen = () => {
                 setAccountList(accountArray);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
             });
     }
     const GetDayBookList = () => {
-        console.log(fromDate, "FromDate")
         setLoading(true);
         const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
         axios.post('http://192.168.1.7:5291/api/DayBook/get', JSON.stringify(filter), {
@@ -111,12 +111,11 @@ const DayBookScreen = () => {
             },
         })
             .then((response) => {
-                console.log("Response data", response)
                 setLoading(false);
                 if (response.data.length >= 0) {
                     setIsEndReached(false);
                     setDayBookList([...dayBookList, ...response.data])
-                } 
+                }
                 if (response.data.length === 0) {
                     setIsEndReached(true);
                     Toast.show({
@@ -130,7 +129,7 @@ const DayBookScreen = () => {
             })
             .catch((error) => {
                 setLoading(false);
-                console.log(error);
+                console.error(error);
             });
     }
 
@@ -161,7 +160,8 @@ const DayBookScreen = () => {
         axios.delete(`http://192.168.1.7:5291/api/DayBook/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
-                fetchDayBooksByAccountId(result.data.accountId)
+                setDayBookList([]);
+                setSkip(0);
             })
             .catch(err => console.error("Delete Error", err));
     }
@@ -177,7 +177,7 @@ const DayBookScreen = () => {
                     .then((response) => {
                         if (response.status === 200) {
                             setDayBookList([]);
-                            GetDayBookList();
+                            setSkip(0);
                             Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
                             setDayBookCredit({
                                 "Id": 0,
@@ -192,7 +192,7 @@ const DayBookScreen = () => {
             }
             setCreditModalVisible(false);
         } catch (error) {
-            console.log('Error saving DayBook:', error);
+            console.error('Error saving DayBook:', error);
         }
     };
 
@@ -207,7 +207,7 @@ const DayBookScreen = () => {
                     .then((response) => {
                         if (response.status === 200) {
                             setDayBookList([]);
-                            GetDayBookList();
+                            setSkip(0);
                             Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
                             setDayBookDebit({
                                 "Id": 0,
@@ -222,7 +222,7 @@ const DayBookScreen = () => {
             }
             setDebitModalVisible(false);
         } catch (error) {
-            console.log('Error saving DayBook:', error);
+            console.error('Error saving DayBook:', error);
         }
     };
 
@@ -272,10 +272,6 @@ const DayBookScreen = () => {
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Id : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.id}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Particulars : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
             </View>
@@ -316,6 +312,12 @@ const DayBookScreen = () => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+                    <TouchableOpacity onPress={() => { setShowSearch(true); }}>
+                        <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
+                            <TextInput style={{ flex: 1, borderRadius: 10, borderColor: Colors.primary, marginRight: 10, borderWidth: 0.5, fontSize: 16, paddingHorizontal: 20 }} editable={false} placeholder="Search..." />
+                            <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
+                        </View>
+                    </TouchableOpacity>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
                         <TouchableOpacity style={{
                             backgroundColor: Colors.primary,
@@ -347,100 +349,121 @@ const DayBookScreen = () => {
                             }}>Debit DayBook Entry</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{
-                        backgroundColor: Colors.background,
-                        borderRadius: 10,
-                        padding: 10,
-                        marginBottom: 10,
-                        shadowColor: Colors.shadow,
-                        shadowOffset: { width: 10, height: 2 },
-                        shadowOpacity: 4,
-                        shadowRadius: 10,
-                        elevation: 10,
-                        borderWidth: 0.5,
-                        borderColor: Colors.primary,
-                    }}>
-                        <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginBottom: 10,
-                            paddingHorizontal: 10,
-                            borderWidth: 1,
-                            borderColor: Colors.primary,
-                            borderRadius: 8,
-                        }}>
-                            <TouchableOpacity onPress={handleOpenFromDatePicker}>
-                                <Icon name={'calendar'} size={25} />
-                            </TouchableOpacity>
-                            <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                                value={getFormattedDate(selectFromDate)}
-                                placeholder="Select From date"
-                                editable={false}
-                            />
+                    {showSearch && (
+                        <Modal transparent visible={showSearch}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 10,
+                                    marginBottom: 10,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                    borderWidth: 0.5,
+                                    borderColor: Colors.primary,
+                                }}>
+                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginBottom: 10,
+                                        paddingHorizontal: 10,
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 8,
+                                    }}>
+                                        <TouchableOpacity onPress={handleOpenFromDatePicker}>
+                                            <Icon name={'calendar'} size={25} />
+                                        </TouchableOpacity>
+                                        <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                            value={getFormattedDate(selectFromDate)}
+                                            placeholder="Select From date"
+                                            editable={false}
+                                        />
 
-                        </View>
-                        {showDatePicker && (
-                            <DateTimePicker
-                                value={selectFromDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleFromDateChange}
-                                onConfirm={handleConfirmFromDatePicker}
-                                onCancel={handleConfirmFromDatePicker}
-                            />
-                        )}
+                                    </View>
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={selectFromDate}
+                                            mode="date"
+                                            display="default"
+                                            onChange={handleFromDateChange}
+                                            onConfirm={handleConfirmFromDatePicker}
+                                            onCancel={handleConfirmFromDatePicker}
+                                        />
+                                    )}
 
-                        <Text style={{ fontSize: 16, marginBottom: 5 }}>To Date :</Text>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginBottom: 10,
-                            paddingHorizontal: 10,
-                            borderWidth: 1,
-                            borderColor: Colors.primary,
-                            borderRadius: 8,
-                        }}>
-                            <TouchableOpacity onPress={handleOpenToDatePicker}>
-                                <Icon name={'calendar'} size={25} />
-                            </TouchableOpacity>
-                            <TextInput
-                                style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                                value={getFormattedDate(selectToDate)}
-                                placeholder="Select To date"
-                                editable={false}
-                            />
+                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>To Date :</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginBottom: 10,
+                                        paddingHorizontal: 10,
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 8,
+                                    }}>
+                                        <TouchableOpacity onPress={handleOpenToDatePicker}>
+                                            <Icon name={'calendar'} size={25} />
+                                        </TouchableOpacity>
+                                        <TextInput
+                                            style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                            value={getFormattedDate(selectToDate)}
+                                            placeholder="Select To date"
+                                            editable={false}
+                                        />
 
-                        </View>
-                        {showToDatePicker && (
-                            <DateTimePicker
-                                value={selectToDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleToDateChange}
-                                onConfirm={handleConfirmToDatePicker}
-                                onCancel={handleConfirmToDatePicker}
-                            />
-                        )}
+                                    </View>
+                                    {showToDatePicker && (
+                                        <DateTimePicker
+                                            value={selectToDate}
+                                            mode="date"
+                                            display="default"
+                                            onChange={handleToDateChange}
+                                            onConfirm={handleConfirmToDatePicker}
+                                            onCancel={handleConfirmToDatePicker}
+                                        />
+                                    )}
+                                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
 
-                        <TouchableOpacity style={{
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            marginTop: 10,
-                            marginRight: 3,
-                            alignSelf: 'center',
-                        }} onPress={() => {
-                            handleSearch();
-                        }}>
-                            <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
-                        </TouchableOpacity>
-                    </View>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: Colors.primary,
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                        marginRight: 3,
+                                    }} onPress={() => {
+                                        handleSearch();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: '#f25252',
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                    }} onPress={() => {
+                                        setShowSearch(false);
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
 
                     <FlatList
                         data={dayBookList}
                         keyExtractor={(item) => item.id.toString()}
+                        showsVerticalScrollIndicator={false}
                         renderItem={renderDayBookCard}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
@@ -485,7 +508,7 @@ const DayBookScreen = () => {
                                         maxHeight={300}
                                         labelField="label"
                                         valueField="value"
-                                        placeholder={!isFocus ? 'Select item' : '...'}
+                                        placeholder={!isFocus ? 'Select Account' : '...'}
                                         searchPlaceholder="Search..."
                                         value={dayBookCredit.AccountId}
                                         onFocus={() => setIsFocus(true)}
@@ -585,7 +608,7 @@ const DayBookScreen = () => {
                                         maxHeight={300}
                                         labelField="label"
                                         valueField="value"
-                                        placeholder={!isFocus ? 'Select item' : '...'}
+                                        placeholder={!isFocus ? 'Select Account' : '...'}
                                         searchPlaceholder="Search..."
                                         value={setDayBookDebit.AccountId}
                                         onFocus={() => setIsFocus(true)}

@@ -1,43 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 
-const CourseScreen = () => {
-  const [course, setCourse] = useState({ "Id": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": "" });
-  const [courseCategoryData, setCourseCategoryData] = useState([]);
+const CourseScreen = ({route, navigation}) => {
+  const {courseCategoryId, courseCategoryName} = route.params;
+  const [course, setCourse] = useState({ "Id": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
 
   useEffect(() => {
-    GetCourseCategoryList();
+    fetchCoursesByCourseCategoryId(courseCategoryId);
   }, []);
 
-  console.log(course, "course")
-  const GetCourseCategoryList = () => {
-    axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
-      .then((response) => {
-        console.log(response.data);
-        const courseCategoryArray = response.data.map((courseCategory) => ({
-          value: courseCategory.id,
-          label: courseCategory.courseCategoryName,
-        }));
-        setCourseCategoryData(courseCategoryArray);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
 
-  const fetchCoursesByCourseCategoryId = async (courseCategoryId) => {
+
+  const fetchCoursesByCourseCategoryId = async () => {
     try {
       const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
         headers: {
@@ -46,16 +24,10 @@ const CourseScreen = () => {
         },
       });
       setCourseList(response.data);
-      console.log(courseList, 'courseList')
     } catch (error) {
       console.log('Error fetching Courses:', error);
     }
   };
-  const handleCourseCategorySelect = (courseCategory) => {
-    setValue(courseCategory.value);
-    fetchCoursesByCourseCategoryId(courseCategory.value);
-  };
-
 
   const handleAddCourse = () => {
     setCourse({
@@ -64,7 +36,7 @@ const CourseScreen = () => {
       Fees: "",
       Duration: "",
       IsActive: true,
-      CourseCategoryId: ""
+      CourseCategoryId: courseCategoryId
     });
     setModalVisible(true);
   };
@@ -114,7 +86,7 @@ const CourseScreen = () => {
                 "CourseName": "",
                 "Fees": "",
                 "Duration": "",
-                "CourseCategoryId": "",
+                "CourseCategoryId": courseCategoryId,
                 "IsActive": true
               });
             }
@@ -135,7 +107,7 @@ const CourseScreen = () => {
                 "CourseName": "",
                 "Fees": "",
                 "Duration": "",
-                "CourseCategoryId": "",
+                "CourseCategoryId": courseCategoryId,
                 "IsActive": true
               });
             }
@@ -143,9 +115,13 @@ const CourseScreen = () => {
       }
       setModalVisible(false);
     } catch (error) {
-      console.log('Error saving Course:', error);
+      console.error('Error saving Course:', error);
     }
   };
+
+  const handleNavigate = (courseId,courseName) => {
+    navigation.navigate('BatchScreen', { courseId: courseId, courseName: courseName })
+  }
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -172,7 +148,7 @@ const CourseScreen = () => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.courseName}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Fees : </Text>
+        <Text style={{ fontSize: 16 }}>Course Fees : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.fees}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
@@ -193,6 +169,21 @@ const CourseScreen = () => {
             fontWeight: 'bold',
           }}>Edit</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={{
+          backgroundColor: '#ffff80',
+          borderRadius: 5,
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          marginRight: 10,
+        }} onPress={() => handleNavigate(item.id, item.courseName)}>
+          <Text style={{
+            color: Colors.primary,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}>Manage</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,
@@ -215,36 +206,7 @@ const CourseScreen = () => {
         padding: 16,
         justifyContent: 'center'
       }}>
-        <Dropdown
-          style={[{
-            height: 50,
-            borderColor: Colors.primary,
-            borderWidth: 0.5,
-            borderRadius: 8,
-            paddingHorizontal: 8,
-          }, isFocus && { borderColor: 'blue' }]}
-          placeholderStyle={{ fontSize: 16, }}
-          selectedTextStyle={{ fontSize: 16, }}
-          inputSearchStyle={{
-            height: 40,
-            fontSize: 16,
-          }}
-          iconStyle={{
-            width: 20,
-            height: 20,
-          }}
-          data={courseCategoryData}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select Course Category' : '...'}
-          searchPlaceholder="Search..."
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={handleCourseCategorySelect}
-        />
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Name : {courseCategoryName}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
@@ -316,36 +278,7 @@ const CourseScreen = () => {
                   value={course.Duration}
                   onChangeText={(text) => setCourse({ ...course, Duration: text })}
                 />
-                <Dropdown
-                  style={[{
-                    height: 50,
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    borderRadius: 8,
-                    paddingHorizontal: 8,
-                  }, isFocus && { borderColor: 'blue' }]}
-                  placeholderStyle={{ fontSize: 16, }}
-                  selectedTextStyle={{ fontSize: 16, }}
-                  inputSearchStyle={{
-                    height: 40,
-                    fontSize: 16,
-                  }}
-                  iconStyle={{
-                    width: 20,
-                    height: 20,
-                  }}
-                  data={courseCategoryData}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? 'Select item' : '...'}
-                  searchPlaceholder="Search..."
-                  value={course.CourseCategoryId}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(value) => setCourse({ ...course, CourseCategoryId: value.value })}
-                />
+
                 <View style={{
                   marginTop: 10,
                   flexDirection: 'row',

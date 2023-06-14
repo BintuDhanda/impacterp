@@ -10,11 +10,9 @@ import CourseCategoryScreen from '../screens/courseCategory';
 import AddressTypeScreen from '../screens/addressTypeScreen';
 import EnterAccountScreen from '../screens/enterAccountScreen';
 import AccountCategoryScreen from '../screens/accountCategory';
-import StateScreen from '../screens/stateScreen';
 import AccountScreen from '../screens/accountScreen';
 import CourseScreen from '../screens/courseScreen';
 import DayBookScreen from '../screens/dayBookScreen';
-import CityScreen from '../screens/cityScreen';
 
 
 const Drawer = createDrawerNavigator();
@@ -28,10 +26,7 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="RolesScreen" component={RoleScreen} />
         <Drawer.Screen name="QualificationScreen" component={QualificationScreen} />
         <Drawer.Screen name="CountryScreen" component={CountryScreen} />
-        <Drawer.Screen name="StateScreen" component={StateScreen} />
-        <Drawer.Screen name="CityScreen" component={CityScreen} />
         <Drawer.Screen name="CourseCategoryScreen" component={CourseCategoryScreen} />
-        <Drawer.Screen name="CourseScreen" component={CourseScreen} />
         <Drawer.Screen name="AddressTypeScreen" component={AddressTypeScreen} />
         <Drawer.Screen name="EnterAccountScreen" component={EnterAccountScreen} />
         <Drawer.Screen name="AccountCategoryScreen" component={AccountCategoryScreen} />

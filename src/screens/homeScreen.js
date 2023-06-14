@@ -24,7 +24,7 @@ const HomeScreen = () => {
             <Icon name="key" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Roles</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentsScreen')}>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentDetailsScreen')}>
             <Icon name="graduation-cap" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Students</Text>
           </TouchableOpacity>
@@ -40,14 +40,10 @@ const HomeScreen = () => {
             <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Course Category</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CourseScreen')}>
-            <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Course</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('BatchScreen')}>
+          {/* <TouchableOpacity style={styles.card} onPress={() => handleIconPress('BatchScreen')}>
             <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Batch</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AddressTypeScreen')}>
             <Icon name="map" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Address Type</Text>

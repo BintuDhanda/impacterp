@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, A
 import Colors from '../constants/Colors';
 
 const UserScreen = () => {
-  const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "UserEmail": "", "IsActive": true });
+  const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -21,14 +21,13 @@ const UserScreen = () => {
         console.log(result.data)
         setUserList(result.data)
       })
-      .catch(err => console.log('Get User error :', err))
+      .catch(err => console.error('Get User error :', err))
   }
   const handleAddUser = () => {
     setUser({
       Id: 0,
       UserMobile: "",
       UserPassword: "",
-      UserEmail: "",
       IsActive: true,
     });
     setModalVisible(true);
@@ -49,13 +48,12 @@ const UserScreen = () => {
               setUser({
                 "Id": 0,
                 "UserMobile": "",
-                "UserEmail": "",
                 "UserPassword": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.log("User update error : ", err));
+          .catch(err => console.error("User update error : ", err));
       }
       else {
         axios.post(`http://192.168.1.7:5291/api/User/post`, JSON.stringify(user), {
@@ -70,18 +68,17 @@ const UserScreen = () => {
               setUser({
                 "Id": 0,
                 "UserMobile": "",
-                "UserEmail": "",
                 "UserPassword": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.log('User Add error :', err));
+          .catch(err => console.error('User Add error :', err));
       }
       setModalVisible(false);
     }
     catch (error) {
-      console.log('Error saving User:', error);
+      console.error('Error saving User:', error);
     }
   }
 
@@ -101,11 +98,10 @@ const UserScreen = () => {
           Id: response.data.id,
           UserMobile: response.data.userMobile,
           UserPassword: response.data.userPassword,
-          UserEmail: response.data.userEmail,
           IsActive: response.data.isActive
         })
       })
-      .catch(error => console.log('User Get By Id :', error))
+      .catch(error => console.error('User Get By Id :', error))
     setModalVisible(true);
   };
 
@@ -187,7 +183,7 @@ const UserScreen = () => {
             fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
-          }}>Add Account Category</Text>
+          }}>Add User</Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
