@@ -3,110 +3,101 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 
-const UserScreen = ({navigation}) => {
-  const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
-  const [userList, setUserList] = useState([]);
+const FeeTypeScreen = () => {
+  const [feeType, setFeeType] = useState({ "Id": 0, "FeeTypeName": "", "IsActive": true });
+  const [feeTypeList, setFeeTypeList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    GetUserList();
+    GetFeeTypeList();
   }, []);
-
-  const handleNavigate = (userId) => {
-    navigation.navigate('StudentFormScreen', {userId : userId})
-  }
-
-  const GetUserList = () => {
-    axios.get("http://192.168.1.7:5291/api/User/get", {
+  const GetFeeTypeList = () => {
+    axios.get("http://192.168.1.7:5291/api/FeeType/get", {
       headers: {
         'Content-Type': 'application/json'
       }
     })
       .then((result) => {
         console.log(result.data)
-        setUserList(result.data)
+        setFeeTypeList(result.data)
       })
-      .catch(err => console.error('Get User error :', err))
+      .catch(err => console.log('Get FeeType error :', err))
   }
-  const handleAddUser = () => {
-    setUser({
+  const handleAddFeeType = () => {
+    setFeeType({
       Id: 0,
-      UserMobile: "",
-      UserPassword: "",
+      FeeTypeName: "",
       IsActive: true,
     });
     setModalVisible(true);
   };
 
-  const handleSaveUser = () => {
+  const handleSaveFeeType = () => {
     try {
-      if (user.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/User/put`, JSON.stringify(user), {
+      if (feeType.Id !== 0) {
+        axios.put(`http://192.168.1.7:5291/api/FeeType/put`, JSON.stringify(feeType), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              GetUserList();
-              Alert.alert('Sucees', 'Update User Successfully')
-              setUser({
+              GetFeeTypeList();
+              Alert.alert('Sucees', 'Update FeeType Successfully')
+              setFeeType({
                 "Id": 0,
-                "UserMobile": "",
-                "UserPassword": "",
+                "FeeTypeName": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.error("User update error : ", err));
+          .catch(err => console.log("FeeType update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/User/post`, JSON.stringify(user), {
+        axios.post(`http://192.168.1.7:5291/api/FeeType/post`, JSON.stringify(feeType), {
           headers: {
             'Content-Type': 'application/json'
           }
         })
           .then((response) => {
             if (response.status === 200) {
-              GetUserList();
-              Alert.alert('Success', 'Add User Successfully')
-              setUser({
+              GetFeeTypeList();
+              Alert.alert('Success', 'Add FeeType Successfully')
+              setFeeType({
                 "Id": 0,
-                "UserMobile": "",
-                "UserPassword": "",
+                "FeeTypeName": "",
                 "IsActive": true
               })
             }
           })
-          .catch(err => console.error('User Add error :', err));
+          .catch(err => console.log('FeeType Add error :', err));
       }
       setModalVisible(false);
     }
     catch (error) {
-      console.error('Error saving User:', error);
+      console.log('Error saving FeeType:', error);
     }
   }
 
-  const handleDeleteUser = (userId) => {
-    axios.delete(`http://192.168.1.7:5291/api/User/delete?Id=${userId}`)
+  const handleDeleteFeeType = (feeTypeId) => {
+    axios.delete(`http://192.168.1.7:5291/api/FeeType/delete?Id=${feeTypeId}`)
       .then((result) => {
         console.log(result);
-        GetUserList();
+        GetFeeTypeList();
       })
       .catch(err => console.error("Delete Error", err));
   };
 
-  const handleEditUser = (userId) => {
-    axios.get(`http://192.168.1.7:5291/api/User/getById?Id=${userId}`)
+  const handleEditFeeType = (feeTypeId) => {
+    axios.get(`http://192.168.1.7:5291/api/FeeType/getById?Id=${feeTypeId}`)
       .then((response) => {
-        setUser({
+        setFeeType({
           Id: response.data.id,
-          UserMobile: response.data.userMobile,
-          UserPassword: response.data.userPassword,
+          FeeTypeName: response.data.feeTypeName,
           IsActive: response.data.isActive
         })
       })
-      .catch(error => console.error('User Get By Id :', error))
+      .catch(error => console.log('FeeType Get By Id :', error))
     setModalVisible(true);
   };
 
@@ -114,9 +105,11 @@ const UserScreen = ({navigation}) => {
     setModalVisible(false);
   }
 
-  const renderUserCard = ({ item }) => {
+  const renderFeeTypeCard = ({ item }) => {
     return (
       <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: Colors.background,
         borderRadius: 10,
@@ -127,18 +120,14 @@ const UserScreen = ({navigation}) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
         borderColor: Colors.primary,
+        borderWidth: 0.5,
       }}>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ fontSize: 16 }}>User Password : </Text>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, textAlignVertical: 'center' }}> ######## </Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ fontSize: 16 }}>User Mobile : </Text>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.userMobile}</Text>
-        </View>
-        <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+        <Text style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+        }}>{item.feeTypeName}</Text>
+        <View style={{ flexDirection: 'row', }}>
           <TouchableOpacity
             style={{
               backgroundColor: '#5a67f2',
@@ -146,27 +135,13 @@ const UserScreen = ({navigation}) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleEditUser(item.id)} >
+            }} onPress={() => handleEditFeeType(item.id)} >
             <Text style={{
               color: Colors.background,
               fontSize: 14,
               fontWeight: 'bold',
             }}>Edit</Text>
           </TouchableOpacity>
-          {item.isStudentCreated!==true?(<TouchableOpacity
-            style={{
-              backgroundColor: '#ffff80',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleNavigate(item.id)} >
-            <Text style={{
-              color: Colors.primary,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Student Create</Text>
-          </TouchableOpacity>):null}
           <TouchableOpacity
             style={{
               backgroundColor: '#f25252',
@@ -174,7 +149,7 @@ const UserScreen = ({navigation}) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
             }}
-            onPress={() => handleDeleteUser(item.id)}
+            onPress={() => handleDeleteFeeType(item.id)}
           >
             <Text style={{
               color: Colors.background,
@@ -196,13 +171,13 @@ const UserScreen = ({navigation}) => {
           paddingVertical: 10,
           paddingHorizontal: 20,
           marginBottom: 20,
-        }} onPress={handleAddUser}>
+        }} onPress={handleAddFeeType}>
           <Text style={{
             color: Colors.background,
             fontSize: 16,
             fontWeight: 'bold',
             textAlign: 'center',
-          }}>Add User</Text>
+          }}>Add Fee Type</Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
@@ -217,72 +192,61 @@ const UserScreen = ({navigation}) => {
               borderRadius: 10,
               padding: 20,
               width: '80%',
+              marginBottom: 20,
             }}>
               <TextInput
                 style={{
+                  width: '100%',
+                  height: 40,
                   borderWidth: 1,
                   borderColor: Colors.primary,
-                  borderRadius: 8,
-                  marginBottom: 20,
-                  padding: 8,
+                  marginBottom: 10,
+                  paddingHorizontal: 10,
                 }}
-                placeholder="User Mobile"
-                value={user.UserMobile}
-                keyboardType='numeric'
-                maxLength={10}
-                onChangeText={(text) => setUser({ ...user, UserMobile: text })}
+                placeholder="Fee Type Name"
+                value={feeType.FeeTypeName}
+                onChangeText={(text) => setFeeType({ ...feeType, FeeTypeName: text })}
               />
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: Colors.primary,
-                  borderRadius: 8,
-                  marginBottom: 20,
-                  padding: 8,
-                }}
-                placeholder="User Password"
-                value={user.UserPassword}
-                onChangeText={(text) => setUser({ ...user, UserPassword: text })}
-              />
-              <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 5,
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                }} onPress={handleSaveUser}>
-                  <Text style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                  }}>{user.Id !== 0 ? 'Save' : 'Add'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginLeft: 10,
-                  }}
-                  onPress={handleClose}
-                >
-                  <Text style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                  }}>Close</Text>
-                </TouchableOpacity>
-              </View>
+
+              <TouchableOpacity style={{
+                backgroundColor: Colors.primary,
+                borderRadius: 5,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                marginBottom: 10,
+              }} onPress={handleSaveFeeType}>
+                <Text style={{
+                  color: Colors.background,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>{feeType.Id !== 0 ? 'Save' : 'Add'}</Text>
+              </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#f25252',
+                borderRadius: 5,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+              }}
+              onPress={handleClose}
+            >
+              <Text style={{
+                color: Colors.background,
+                fontSize: 16,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>Close</Text>
+            </TouchableOpacity>
           </View>
         </Modal>
 
         <FlatList
-          data={userList}
-          renderItem={renderUserCard}
+          data={feeTypeList}
+          renderItem={renderFeeTypeCard}
           keyExtractor={(item) => item.id.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
+          contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>
     </ScrollView>
@@ -353,10 +317,10 @@ const UserScreen = ({navigation}) => {
 //     fontWeight: 'bold',
 //     textAlign: 'center',
 //   },
-//   userList: {
+//   feeTypeList: {
 //     flexGrow: 1,
 //   },
-//   userCard: {
+//   feeTypeCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -370,7 +334,7 @@ const UserScreen = ({navigation}) => {
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   userName: {
+//   feeTypeName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },
@@ -397,4 +361,4 @@ const UserScreen = ({navigation}) => {
 //   },
 // });
 
-export default UserScreen;
+export default FeeTypeScreen;

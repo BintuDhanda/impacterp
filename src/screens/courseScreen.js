@@ -155,7 +155,7 @@ const CourseScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16 }}>Duration : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
       </View>
-      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
         <TouchableOpacity style={{
           backgroundColor: '#5a67f2',
           borderRadius: 5,
@@ -210,15 +210,15 @@ const CourseScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
           marginTop: 10,
-          alignSelf: 'flex-start',
         }} onPress={handleAddCourse}>
           <Text style={{
             color: Colors.background,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 'bold',
+            textAlign: 'center',
           }}>Add Course</Text>
         </TouchableOpacity>
         <FlatList

@@ -244,17 +244,18 @@ const BatchScreen = ({ route }) => {
             }}>
                 <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Name : {courseName}</Text>
                 <TouchableOpacity style={{
+                    flex: 1,
                     backgroundColor: Colors.primary,
                     borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    paddingHorizontal: 20,
                     marginTop: 10,
-                    alignSelf: 'flex-start',
                 }} onPress={handleAddBatch}>
                     <Text style={{
                         color: Colors.background,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: 'bold',
+                        textAlign: 'center',
                     }}>Add Batch</Text>
                 </TouchableOpacity>
                 <FlatList

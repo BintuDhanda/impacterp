@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import axios from 'axios';
 
-const StudentFormScreen = ({route, navigation }) => {
+const StudentFormScreen = ({ route, navigation }) => {
 
-    const {userId} = route.params;
+    const { userId, studentId } = route.params;
+    console.log(studentId == undefined ? 0 : studentId, "studentId")
     const [formData, setFormData] = useState({
-        "Id": 0,
+        "Id": studentId == undefined ? 0 : studentId,
         "FirstName": "",
         "LastName": "",
         "FatherName": "",
@@ -14,10 +16,18 @@ const StudentFormScreen = ({route, navigation }) => {
         "Gender": "",
         "StudentHeight": "",
         "StudentWeight": "",
-        "BodyRemarks": "",
+        "BodyRemark": "",
         "UserId": userId,
         "IsActive": true,
     });
+
+    console.log(formData,"Formdata")
+    useEffect(()=>{
+        if(formData.Id !==0){
+            handleEditStudentDetails();
+        }
+    },[])
+
     const handleInputChange = (name, value) => {
         setFormData((prevFormData) => ({
             ...prevFormData,
@@ -37,10 +47,34 @@ const StudentFormScreen = ({route, navigation }) => {
         setShowGenderDropdown(false);
     };
 
-    const handleSaveStudentDetails = () => {
+    const handleEditStudentDetails = () => {
+        axios.get(`http://192.168.1.7:5291/api/StudentDetails/getById?Id=${studentId}`)
+            .then((result) => {
+                console.log(result.data,"studentDetailsById");
+                setFormData(
+                    {
+                        Id: result.data.id,
+                        FirstName: result.data.firstName,
+                        LastName: result.data.lastName,
+                        FatherName: result.data.fatherName,
+                        MotherName: result.data.motherName,
+                        Gender: result.data.gender,
+                        StudentHeight: result.data.studentHeight,
+                        StudentWeight: result.data.studentWeight,
+                        BodyRemark: result.data.bodyRemark,
+                        UserId: result.data.userId,
+                        IsActive: result.data.isActive
+                    }
+                );
+            })
+            .catch(err => console.error("Get By Id Error", err));
+    };
+
+    const handleSaveStudentDetails = async () => {
         try {
             if (formData.Id !== 0) {
-                axios.put(`http://192.168.1.7:5291/api/StudentDetails/put`, JSON.stringify(formData), {
+                console.log(JSON.stringify(formData), "Form data request")
+                await axios.put(`http://192.168.1.7:5291/api/StudentDetails/put`, JSON.stringify(formData), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -48,7 +82,7 @@ const StudentFormScreen = ({route, navigation }) => {
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Student Successfully')
-                            setUser({
+                            setFormData({
                                 "Id": 0,
                                 "FirstName": "",
                                 "LastName": "",
@@ -57,7 +91,7 @@ const StudentFormScreen = ({route, navigation }) => {
                                 "Gender": "",
                                 "StudentHeight": "",
                                 "StudentWeight": "",
-                                "BodyRemarks": "",
+                                "BodyRemark": "",
                                 "UserId": userId,
                                 "IsActive": true,
                             })
@@ -67,14 +101,13 @@ const StudentFormScreen = ({route, navigation }) => {
                     .catch(err => console.error("Student Details update error : ", err));
             }
             else {
-                axios.post(`http://192.168.1.7:5291/api/StudentDetails/post`, JSON.stringify(user), {
+                await axios.post(`http://192.168.1.7:5291/api/StudentDetails/post`, JSON.stringify(formData), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
                     .then((response) => {
                         if (response.status === 200) {
-                            GetUserList();
                             Alert.alert('Success', 'Add Student Details Successfully')
                             setUser({
                                 "Id": 0,
@@ -85,7 +118,7 @@ const StudentFormScreen = ({route, navigation }) => {
                                 "Gender": "",
                                 "StudentHeight": "",
                                 "StudentWeight": "",
-                                "BodyRemarks": "",
+                                "BodyRemark": "",
                                 "UserId": userId,
                                 "IsActive": true,
                             })
@@ -120,7 +153,7 @@ const StudentFormScreen = ({route, navigation }) => {
                     <TextInput
                         style={styles.input}
                         value={formData.LastName}
-                        onChangeText={(value) =>  handleInputChange('LastName', value )}
+                        onChangeText={(value) => handleInputChange('LastName', value)}
                         placeholder="Enter last name"
                     />
 
@@ -167,8 +200,8 @@ const StudentFormScreen = ({route, navigation }) => {
                     <Text style={styles.label}>Height:</Text>
                     <TextInput
                         style={styles.input}
-                        value={formData.StudentHeight}
-                        onChangeText={(value) => { 'Height', value }}
+                        value={formData.StudentHeight.toString()}
+                        onChangeText={(value) => setFormData({...formData, StudentHeight: isNaN(parseInt(value)) ? "" : parseInt(value)})}
                         placeholder="Enter height"
                         keyboardType="numeric"
                     />
@@ -176,8 +209,8 @@ const StudentFormScreen = ({route, navigation }) => {
                     <Text style={styles.label}>Weight:</Text>
                     <TextInput
                         style={styles.input}
-                        value={formData.StudentWeight}
-                        onChangeText={(value) => { 'Weight', value }}
+                        value={formData.StudentWeight.toString()}
+                        onChangeText={(value) => setFormData({...formData, StudentWeight: isNaN(parseInt(value)) ? "" : parseInt(value)}) }
                         placeholder="Enter weight"
                         keyboardType="numeric"
                     />
@@ -185,8 +218,8 @@ const StudentFormScreen = ({route, navigation }) => {
                     <Text style={styles.label}>Body Remarks:</Text>
                     <TextInput
                         style={[styles.input, styles.textArea]}
-                        value={formData.BodyRemarks}
-                        onChangeText={(value) => { 'BodyRemarks', value }}
+                        value={formData.BodyRemark}
+                        onChangeText={(value) => handleInputChange('BodyRemark', value)}
                         placeholder="Enter body remarks"
                         multiline
                     />

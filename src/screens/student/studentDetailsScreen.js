@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
-import Colors from '../constants/Colors';
+import Colors from '../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const StudentDetailsScreen = ({navigation}) => {
+const StudentDetailsScreen = ({ navigation }) => {
     const [studentDetailsList, setStudentDetailsList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
@@ -17,8 +17,8 @@ const StudentDetailsScreen = ({navigation}) => {
         GetStudentList();
     }, [])
 
-    const handleNavigate = () => {
-        navigation.navigate('StudentFormScreen')
+    const handleNavigate = (studentId) => {
+        navigation.navigate('StudentFormScreen', { studentId: studentId })
     }
 
     const GetStudentList = () => {
@@ -31,9 +31,10 @@ const StudentDetailsScreen = ({navigation}) => {
                 console.log(response.data, "StudentDetails list");
                 const studentDetailsArray = response.data.map((studentDetails) => ({
                     value: studentDetails.id,
-                    label: studentDetails.firstName+" "+studentDetails.lastName,
+                    label: studentDetails.firstName + " " + studentDetails.lastName,
                     father: studentDetails.fatherName,
-                    mother: studentDetails.motherName
+                    mother: studentDetails.motherName,
+                    mobile: studentDetails.mobile
                 }));
                 setStudentDetailsList(studentDetailsArray);
                 setLoading(false);
@@ -102,19 +103,37 @@ const StudentDetailsScreen = ({navigation}) => {
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Student Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>{item.label}</Text>
+                <Text style={{ fontSize: 16 }}>Student Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.label}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Father Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.father}</Text>
+                <Text style={{ fontSize: 16 }}>Father Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.father}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 20 }}>Mother Name : </Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, }}>{item.mother}</Text>
+                <Text style={{ fontSize: 16 }}>Mother Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mother}</Text>
             </View>
-        
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Mobile : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
+            </View>
+
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: '#5a67f2',
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Edit</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',
                     borderRadius: 5,
@@ -135,23 +154,7 @@ const StudentDetailsScreen = ({navigation}) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
-                        <TouchableOpacity style={{
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            marginTop: 10,
-                            marginRight: 3,
-                            alignSelf: 'flex-start',
-                        }} onPress={handleNavigate}>
-                            <Text style={{
-                                color: Colors.background,
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                            }}>Add Student</Text>
-                        </TouchableOpacity>
-                    </View>
+
                     <FlatList
                         data={studentDetailsList}
                         keyExtractor={(item) => item.value.toString()}

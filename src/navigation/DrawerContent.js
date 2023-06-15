@@ -21,7 +21,7 @@ const DrawerContent = (props) => {
               <Text style={styles.title}>Home</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.drawerItem}>
             <Icon name="rocket" size={20} color="#900" />
             <TouchableOpacity onPress={() => props.navigation.navigate('UserScreen')}>
@@ -54,6 +54,13 @@ const DrawerContent = (props) => {
             <Icon name="rocket" size={20} color="#900" />
             <TouchableOpacity onPress={() => props.navigation.navigate('CourseCategoryScreen')}>
               <Text style={styles.title}>Course Category</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.drawerItem}>
+            <Icon name="rocket" size={20} color="#900" />
+            <TouchableOpacity onPress={() => props.navigation.navigate('FeesTypeScreen')}>
+              <Text style={styles.title}>Fees Type</Text>
             </TouchableOpacity>
           </View>
 

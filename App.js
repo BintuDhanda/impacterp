@@ -28,9 +28,10 @@ import AccountCategoryScreen from './src/screens/accountCategory';
 import AccountScreen from './src/screens/accountScreen';
 import DayBookScreen from './src/screens/dayBookScreen';
 import CityScreen from './src/screens/cityScreen';
-import StudentDetailsScreen from './src/screens/studentDetailsScreen';
+import StudentDetailsScreen from './src/screens/student/studentDetailsScreen';
 import BatchScreen from './src/screens/batchScreen';
 import StudentFormScreen from './src/screens/student/studentFormScreen';
+import FeeTypeScreen from './src/screens/feeTypeScreen';
 
 
 let isLogedIn = true;
@@ -57,6 +58,7 @@ function App() {
             <Stack.Screen name="CourseScreen" options={{ title: 'Course' }} component={CourseScreen} />
             <Stack.Screen name="BatchScreen" options={{title: 'Batch'}} component={BatchScreen} />
             <Stack.Screen name="AddressTypeScreen" options={{ title: 'Address Type' }} component={AddressTypeScreen} />
+            <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type'}} component={FeeTypeScreen} />
             <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
             <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
             <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />

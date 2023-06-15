@@ -44,6 +44,10 @@ const HomeScreen = () => {
             <Icon name="map" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Address Type</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('FeeTypeScreen')}>
+            <Icon name="dollar" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Fees Type</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('EnterAccountScreen')}>
             <Icon name="bank" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Enter Account</Text>
