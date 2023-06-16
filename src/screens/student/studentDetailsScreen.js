@@ -21,6 +21,10 @@ const StudentDetailsScreen = ({ navigation }) => {
         navigation.navigate('StudentFormScreen', { studentId: studentId })
     }
 
+    const handleAddAddressNavigate = (studentId) => {
+        navigation.navigate('StudentAddressScreen', {studentId : studentId})
+    }
+
     const GetStudentList = () => {
         axios.get('http://192.168.1.7:5291/api/StudentDetails/get', {
             headers: {
@@ -133,6 +137,20 @@ const StudentDetailsScreen = ({ navigation }) => {
                         fontSize: 14,
                         fontWeight: 'bold',
                     }}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleAddAddressNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Add Address</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',

@@ -32,6 +32,7 @@ import StudentDetailsScreen from './src/screens/student/studentDetailsScreen';
 import BatchScreen from './src/screens/batchScreen';
 import StudentFormScreen from './src/screens/student/studentFormScreen';
 import FeeTypeScreen from './src/screens/feeTypeScreen';
+import StudentAddressScreen from './src/screens/student/studentAddressScreen';
 
 
 let isLogedIn = true;
@@ -54,16 +55,17 @@ function App() {
             <Stack.Screen name="QualificationScreen" options={{ title: 'Qualification' }} component={QualificationScreen} />
             <Stack.Screen name="CountryScreen" options={{ title: 'Country' }} component={CountryScreen} />
             <Stack.Screen name="StateScreen" options={{ title: 'State' }} component={StateScreen} />
+            <Stack.Screen name="CityScreen" options={{ title: 'City' }} component={CityScreen} />
             <Stack.Screen name="CourseCategoryScreen" options={{ title: 'Course Category' }} component={CourseCategoryScreen} />
             <Stack.Screen name="CourseScreen" options={{ title: 'Course' }} component={CourseScreen} />
             <Stack.Screen name="BatchScreen" options={{title: 'Batch'}} component={BatchScreen} />
             <Stack.Screen name="AddressTypeScreen" options={{ title: 'Address Type' }} component={AddressTypeScreen} />
+            <Stack.Screen name="StudentAddressScreen" options={{ title: 'Address'}} component={StudentAddressScreen} />
             <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type'}} component={FeeTypeScreen} />
             <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
             <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
             <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
             <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
-            <Stack.Screen name="CityScreen" options={{ title: 'City' }} component={CityScreen} />
           </Stack.Navigator>
         </NavigationContainer>)
         :

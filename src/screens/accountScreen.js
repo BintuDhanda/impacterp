@@ -298,7 +298,7 @@ const AccountScreen = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  placeholder={!isFocus ? 'Select item' : '...'}
+                  placeholder={!isFocus ? 'Select Account Category' : '...'}
                   searchPlaceholder="Search..."
                   value={account.AccCategoryId}
                   onFocus={() => setIsFocus(true)}
