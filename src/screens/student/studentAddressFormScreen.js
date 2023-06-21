@@ -198,7 +198,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
                   "IsActive": true,
                   "CreatedAt": null
                 })
-                navigation.navigate('Home')
+                navigation.navigate('HomeScreen')
               }
             })
             .catch(err => console.error('Address Add error :', err));

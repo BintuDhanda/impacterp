@@ -1,46 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 
-const StudentTokenScreen = ({route, navigation}) => {
+const StudentBatchScreen = ({route, navigation}) => {
   const {studentId} = route.params;
-  const [tokenList, setTokenList] = useState([]);
+  const [batchList, setBatchList] = useState([]);
+  
   useFocusEffect(
     React.useCallback(() => {
-      GetStudentTokenByStudentId();
+      GetStudentBatchByStudentId();
     }, [])
   );
 
-  const GetStudentTokenByStudentId = async () => {
-    try {
-      console.log(studentId, "studentId")
-      const response = await axios.get(`http://192.168.1.7:5291/api/StudentToken/getStudentTokenByStudentId?StudentId=${studentId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
+  const GetStudentBatchByStudentId = () => {
+    axios.get(`http://192.168.1.7:5291/api/StudentBatch/getStudentBatchByStudentId?Id=${studentId}`, {
+      headers: {
+        'Content-Type': 'application/json', // Example header
+        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+      },
+    })
+      .then((response) => {
+        console.log(response.data);
+        setBatchList(response.data);
+      })
+      .catch((error) => {
+        console.error(error, "Get Student Batch By Student Id Error");
       });
-      setTokenList(response.data);
-    } catch (error) {
-      console.error('Error fetching Student Token List:', error);
-    }
-  };
-
-  const handleAddStudentTokenNavigate = () => {
-    navigation.navigate('StudentTokenFormScreen', {studentId: studentId})
-  };
-
-  const handleEditStudentTokenNavigate = (tokenId,batchName) => {
-    navigation.navigate('StudentTokenFormScreen', {studentId: studentId, tokenId: tokenId, batchName: batchName})
   }
 
-  const handleDeleteToken = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentToken/delete?Id=${id}`)
+  const handleAddStudentBatchNavigate = () => {
+    navigation.navigate('StudentBatchFormScreen', {studentId: studentId})
+  };
+
+  const handleEditStudentBatchNavigate = (batchId) => {
+    navigation.navigate('StudentBatchFormScreen', {studentId: studentId, batchId: batchId})
+  }
+
+  const handleDeleteStudentBatch = (id) => {
+    axios.delete(`http://192.168.1.7:5291/api/StudentBatch/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
-        GetStudentTokenByStudentId();
+        GetStudentBatchByStudentId();
       })
       .catch(err => console.error("Delete Error", err));
   }
@@ -74,17 +76,17 @@ const StudentTokenScreen = ({route, navigation}) => {
         <Text style={{ fontSize: 16 }}>Batch Name : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
       </View>
-      {item.validFrom === null ? null : (<View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Valid From : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.validFrom)}</Text>
-      </View>) }
-      {item.validUpto === null ? null : (<View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Valid UpTo : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.validUpto)}</Text>
-      </View>)}
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Token Status : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.isActive === true ? "Active" : "InActive"}</Text>
+        <Text style={{ fontSize: 16 }}>Date Of Join : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.dateOfJoin)}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Batch Start Date : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.batchStartDate)}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Batch End Date : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.batchEndDate)}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{
@@ -93,7 +95,7 @@ const StudentTokenScreen = ({route, navigation}) => {
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditStudentTokenNavigate(item.id,item.batchName)}>
+        }} onPress={() => handleEditStudentBatchNavigate(item.id,item.batchName)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -105,7 +107,7 @@ const StudentTokenScreen = ({route, navigation}) => {
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteToken(item.id)}>
+        }} onPress={() => handleDeleteStudentBatch(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -128,16 +130,16 @@ const StudentTokenScreen = ({route, navigation}) => {
           paddingVertical: 10,
           paddingHorizontal: 20,
           marginBottom: 20,
-        }} onPress={handleAddStudentTokenNavigate}>
+        }} onPress={handleAddStudentBatchNavigate}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
             fontWeight: 'bold',
             textAlign: 'center'
-          }}>Apply Token</Text>
+          }}>Add Batch</Text>
         </TouchableOpacity>
         <FlatList
-          data={tokenList}
+          data={batchList}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderTokenCard}
         />
@@ -146,7 +148,7 @@ const StudentTokenScreen = ({route, navigation}) => {
   );
 };
 
-export default StudentTokenScreen;
+export default StudentBatchScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -200,7 +202,7 @@ export default StudentTokenScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   tokenCard: {
+//   batchCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -215,7 +217,7 @@ export default StudentTokenScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   tokenName: {
+//   batchName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

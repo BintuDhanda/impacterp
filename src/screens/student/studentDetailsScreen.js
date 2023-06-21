@@ -30,6 +30,9 @@ const StudentDetailsScreen = ({ navigation }) => {
     const handleAddStudentTokenNavigate = (studentId) => {
         navigation.navigate('StudentTokenScreen', { studentId: studentId })
     }
+    const handleAddStudentBatchNavigate = (studentId) => {
+        navigation.navigate('StudentBatchScreen', { studentId: studentId })
+    }
 
     const GetStudentList = () => {
         axios.get('http://192.168.1.7:5291/api/StudentDetails/get', {
@@ -187,6 +190,20 @@ const StudentDetailsScreen = ({ navigation }) => {
                         fontSize: 14,
                         fontWeight: 'bold',
                     }}>Token</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleAddStudentBatchNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Batch</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',

@@ -130,7 +130,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                                 "IsActive": true,
                                 "CreatedAt": null,
                             })
-                            navigation.navigate('Home')
+                            navigation.navigate('HomeScreen')
                         }
                     })
                     .catch(err => console.error('Qualification Add error :', err));
@@ -280,7 +280,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                         }}
                         value={studentQualification.Grade}
                         onChangeText={(value) => handleInputChange('Grade', value)}
-                        placeholder="Enter Subject"
+                        placeholder="Enter Grade"
                     />
 
                     <TouchableOpacity style={{

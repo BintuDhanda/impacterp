@@ -37,6 +37,9 @@ import AddressScreen from './src/screens/student/studentAddressScreen';
 import StudentQualificationScreen from './src/screens/student/qualification/studentQualificationScreen';
 import StudentQualificationFormScreen from './src/screens/student/qualification/studentQualificationFormScreen';
 import StudentTokenScreen from './src/screens/student/token/studentTokenScreen';
+import StudentTokenFormScreen from './src/screens/student/token/studentTokenFormScreen';
+import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchScreen';
+import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
 
 
 let isLogedIn = true;
@@ -69,6 +72,9 @@ function App() {
             <Stack.Screen name="StudentQualificationScreen" options={{title: 'Student Qualification'}} component={StudentQualificationScreen} />
             <Stack.Screen name="StudentQualificationFormScreen" options={{title: 'Student Qualification Form'}} component={StudentQualificationFormScreen} />
             <Stack.Screen name="StudentTokenScreen" options={{title: 'Student Token'}} component={StudentTokenScreen} />
+            <Stack.Screen name="StudentTokenFormScreen" options={{title: 'Student Token Form'}} component={StudentTokenFormScreen} />
+            <Stack.Screen name="StudentBatchScreen" options={{title: 'Student Batch'}} component={StudentBatchScreen} />
+            <Stack.Screen name="StudentBatchFormScreen" options={{title: 'Student Batch Form'}} component={StudentBatchFormScreen} />
             <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type'}} component={FeeTypeScreen} />
             <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
             <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
