@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
-import Colors from '../../constants/Colors';
+import Colors from '../../../constants/Colors';
+import { useFocusEffect } from '@react-navigation/native';
 
-const AddressScreen = ({route,navigation}) => {
+const StudentQualificationScreen = ({route,navigation}) => {
   const {studentId} = route.params;
-  const [addressList, setAddressList] = useState([]);
+  const [qualificationList, setQualificationList] = useState([]);
   
-  useEffect(() => {
-    GetStudentAddressByStudentId();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      GetStudentQualificationByStudentId();
+    }, [])
+  );
 
-  const GetStudentAddressByStudentId = () => {
-    axios.get(`http://192.168.1.7:5291/api/StudentAddress/getStudentAddressbyStudentId?Id=${studentId}`, {
+  const GetStudentQualificationByStudentId = () => {
+    axios.get(`http://192.168.1.7:5291/api/StudentQualification/getStudentQualificationByStudentId?Id=${studentId}`, {
       headers: {
         'Content-Type': 'application/json', // Example header
         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -20,28 +23,28 @@ const AddressScreen = ({route,navigation}) => {
     })
       .then((response) => {
         console.log(response.data);
-        setAddressList(response.data);
+        setQualificationList(response.data);
       })
       .catch((error) => {
-        console.error(error, "Get Student Address By Student Id Error");
+        console.error(error, "Get Student Qualification By Student Id Error");
       });
   }
 
-  const handleDeleteStudentAddress= (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentAddress/delete?Id=${id}`)
+  const handleDeleteStudentQualification= (id) => {
+    axios.delete(`http://192.168.1.7:5291/api/StudentQualification/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
-        GetStudentAddressByStudentId();
+        GetStudentQualificationByStudentId();
       })
       .catch(err => console.error("Delete Error", err));
   }
 
-  const handleAddAddressNavigate = () => {
-    navigation.navigate('StudentAddressFormScreen', {studentId: studentId})
+  const handleAddQualificationNavigate = () => {
+    navigation.navigate('StudentQualificationFormScreen', {studentId: studentId})
   }
 
-  const handleEditAddressNavigate = (addressId) => {
-    navigation.navigate('StudentAddressFormScreen', {studentId: studentId,addressId: addressId})
+  const handleEditQualificationNavigate = (qualificationId) => {
+    navigation.navigate('StudentQualificationFormScreen', {studentId: studentId,qualificationId: qualificationId})
   }
 
   const renderTokenCard = ({ item }) => (
@@ -61,28 +64,28 @@ const AddressScreen = ({route,navigation}) => {
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Address Type : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.addressType}</Text>
+        <Text style={{ fontSize: 16 }}>Qualification Name : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.qualificationName}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Address : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.address}</Text>
+        <Text style={{ fontSize: 16 }}>Subject : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.subject}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Country : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.country}</Text>
+        <Text style={{ fontSize: 16 }}>Maximum Marks : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.maximumMark}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>State : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.state}</Text>
+        <Text style={{ fontSize: 16 }}>Marks Obtain : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.marksObtain}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>City : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.city}</Text>
+        <Text style={{ fontSize: 16 }}>Percentage : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.percentage}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Pincode : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.pincode}</Text>
+        <Text style={{ fontSize: 16 }}>Grade : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.grade}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{
@@ -91,7 +94,7 @@ const AddressScreen = ({route,navigation}) => {
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditAddressNavigate(item.id)}>
+        }} onPress={() => handleEditQualificationNavigate(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -103,7 +106,7 @@ const AddressScreen = ({route,navigation}) => {
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteStudentAddress(item.id)}>
+        }} onPress={() => handleDeleteStudentQualification(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -126,16 +129,16 @@ const AddressScreen = ({route,navigation}) => {
           paddingVertical: 10,
           paddingHorizontal: 20,
           marginBottom: 20,
-        }} onPress={handleAddAddressNavigate}>
+        }} onPress={handleAddQualificationNavigate}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
             fontWeight: 'bold',
             textAlign: 'center'
-          }}>Add Address</Text>
+          }}>Add Qualification</Text>
         </TouchableOpacity>
         <FlatList
-          data={addressList}
+          data={qualificationList}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderTokenCard}
         />
@@ -144,7 +147,7 @@ const AddressScreen = ({route,navigation}) => {
   );
 };
 
-export default AddressScreen;
+export default StudentQualificationScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -198,7 +201,7 @@ export default AddressScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   addressCard: {
+//   qualificationCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -213,7 +216,7 @@ export default AddressScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   addressName: {
+//   qualificationName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

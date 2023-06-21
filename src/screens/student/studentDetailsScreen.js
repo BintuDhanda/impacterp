@@ -22,7 +22,13 @@ const StudentDetailsScreen = ({ navigation }) => {
     }
 
     const handleAddAddressNavigate = (studentId) => {
-        navigation.navigate('StudentAddressScreen', {studentId : studentId})
+        navigation.navigate('AddressScreen', { studentId: studentId })
+    }
+    const handleAddStudentQualificationNavigate = (studentId) => {
+        navigation.navigate('StudentQualificationScreen', { studentId: studentId })
+    }
+    const handleAddStudentTokenNavigate = (studentId) => {
+        navigation.navigate('StudentTokenScreen', { studentId: studentId })
     }
 
     const GetStudentList = () => {
@@ -123,7 +129,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
             </View>
 
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                 <TouchableOpacity
                     style={{
                         backgroundColor: '#5a67f2',
@@ -150,7 +156,37 @@ const StudentDetailsScreen = ({ navigation }) => {
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
-                    }}>Add Address</Text>
+                    }}>Address</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleAddStudentQualificationNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Qualification</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: Colors.primary,
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleAddStudentTokenNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Token</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',
@@ -165,7 +201,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                     }}>Delete</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </View >
     );
 
     return (

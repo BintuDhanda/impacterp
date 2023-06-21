@@ -32,7 +32,11 @@ import StudentDetailsScreen from './src/screens/student/studentDetailsScreen';
 import BatchScreen from './src/screens/batchScreen';
 import StudentFormScreen from './src/screens/student/studentFormScreen';
 import FeeTypeScreen from './src/screens/feeTypeScreen';
-import StudentAddressScreen from './src/screens/student/studentAddressScreen';
+import StudentAddressFormScreen from './src/screens/student/studentAddressFormScreen';
+import AddressScreen from './src/screens/student/studentAddressScreen';
+import StudentQualificationScreen from './src/screens/student/qualification/studentQualificationScreen';
+import StudentQualificationFormScreen from './src/screens/student/qualification/studentQualificationFormScreen';
+import StudentTokenScreen from './src/screens/student/token/studentTokenScreen';
 
 
 let isLogedIn = true;
@@ -60,7 +64,11 @@ function App() {
             <Stack.Screen name="CourseScreen" options={{ title: 'Course' }} component={CourseScreen} />
             <Stack.Screen name="BatchScreen" options={{title: 'Batch'}} component={BatchScreen} />
             <Stack.Screen name="AddressTypeScreen" options={{ title: 'Address Type' }} component={AddressTypeScreen} />
-            <Stack.Screen name="StudentAddressScreen" options={{ title: 'Address'}} component={StudentAddressScreen} />
+            <Stack.Screen name="AddressScreen" options={{title: 'Student Address'}} component={AddressScreen} />
+            <Stack.Screen name="StudentAddressFormScreen" options={{ title: 'Student Address Form'}} component={StudentAddressFormScreen} />
+            <Stack.Screen name="StudentQualificationScreen" options={{title: 'Student Qualification'}} component={StudentQualificationScreen} />
+            <Stack.Screen name="StudentQualificationFormScreen" options={{title: 'Student Qualification Form'}} component={StudentQualificationFormScreen} />
+            <Stack.Screen name="StudentTokenScreen" options={{title: 'Student Token'}} component={StudentTokenScreen} />
             <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type'}} component={FeeTypeScreen} />
             <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
             <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
