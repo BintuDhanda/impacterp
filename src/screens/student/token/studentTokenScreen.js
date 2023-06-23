@@ -35,6 +35,9 @@ const StudentTokenScreen = ({route, navigation}) => {
   const handleEditStudentTokenNavigate = (tokenId,batchName) => {
     navigation.navigate('StudentTokenFormScreen', {studentId: studentId, tokenId: tokenId, batchName: batchName})
   }
+  const handleStudentTokenFeesNavigate = (studentTokenId) => {
+    navigation.navigate('StudentTokenFeesScreen', {studentId: studentId, studentTokenId: studentTokenId})
+  }
 
   const handleDeleteToken = (id) => {
     axios.delete(`http://192.168.1.7:5291/api/StudentToken/delete?Id=${id}`)
@@ -99,6 +102,19 @@ const StudentTokenScreen = ({route, navigation}) => {
             fontSize: 14,
             fontWeight: 'bold',
           }}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          backgroundColor: Colors.primary,
+          borderRadius: 5,
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          marginRight: 10,
+        }} onPress={() => handleStudentTokenFeesNavigate(item.id)}>
+          <Text style={{
+            color: Colors.background,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}>Token Fees</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
           backgroundColor: '#f25252',
