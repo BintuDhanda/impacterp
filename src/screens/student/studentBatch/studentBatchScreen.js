@@ -37,6 +37,9 @@ const StudentBatchScreen = ({route, navigation}) => {
   const handleEditStudentBatchNavigate = (batchId) => {
     navigation.navigate('StudentBatchFormScreen', {studentId: studentId, batchId: batchId})
   }
+  const handleBatchFeeNavigate = (studentBatchId) => {
+    navigation.navigate('StudentBatchFeesScreen', {studentId: studentId, studentBatchId: studentBatchId})
+  }
 
   const handleDeleteStudentBatch = (id) => {
     axios.delete(`http://192.168.1.7:5291/api/StudentBatch/delete?Id=${id}`)
@@ -95,12 +98,25 @@ const StudentBatchScreen = ({route, navigation}) => {
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditStudentBatchNavigate(item.id,item.batchName)}>
+        }} onPress={() => handleEditStudentBatchNavigate(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
             fontWeight: 'bold',
           }}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          backgroundColor: Colors.primary,
+          borderRadius: 5,
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          marginRight: 10,
+        }} onPress={() => handleBatchFeeNavigate(item.id)}>
+          <Text style={{
+            color: Colors.background,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}>Batch Fee</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
           backgroundColor: '#f25252',

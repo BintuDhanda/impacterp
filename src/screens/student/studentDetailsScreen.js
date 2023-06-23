@@ -132,21 +132,8 @@ const StudentDetailsScreen = ({ navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
             </View>
 
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: '#5a67f2',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => handleNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Edit</Text>
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                
                 <TouchableOpacity
                     style={{
                         backgroundColor: Colors.primary,
@@ -175,8 +162,6 @@ const StudentDetailsScreen = ({ navigation }) => {
                         fontWeight: 'bold',
                     }}>Qualification</Text>
                 </TouchableOpacity>
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                 <TouchableOpacity
                     style={{
                         backgroundColor: Colors.primary,
@@ -197,13 +182,28 @@ const StudentDetailsScreen = ({ navigation }) => {
                         borderRadius: 5,
                         paddingVertical: 8,
                         paddingHorizontal: 12,
-                        marginRight: 10,
                     }} onPress={() => handleAddStudentBatchNavigate(item.value)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
                     }}>Batch</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+            <TouchableOpacity
+                    style={{
+                        backgroundColor: '#5a67f2',
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',
