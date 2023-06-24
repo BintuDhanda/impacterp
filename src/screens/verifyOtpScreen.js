@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Post as httpPost } from '../constants/httpService';
+import Toast from 'react-native-toast-message';
+import { sendOTP } from '../constants/smsService';
+import Colors from '../constants/Colors';
 
-const VerifyOTPScreen = ({ navigation }) => {
+const VerifyOTPScreen = ({ route, navigation }) => {
+  const {verifyOtp,mobile} = route.params;
   const [otp, setOtp] = useState('');
+  const [password, setPassword] = useState('');
+  const [count, setCount] = useState(1)
   const [timer, setTimer] = useState(60);
   const [showResend, setShowResend] = useState(false);
 
@@ -26,14 +33,37 @@ const VerifyOTPScreen = ({ navigation }) => {
 
   const handleConfirmOtp = () => {
     // Update the isLogedIn state to true
+    if(otp === verifyOtp){
+      // get user token api call
+      httpPost("User/login",{userMobile: mobile, userPassword: password})
+    }
     isLogedIn = true;
     // Navigate to the HomeScreen
     navigation.navigate('HomeScreen');
   };
 
   const handleResendOtp = () => {
-    setTimer(60);
-    setShowResend(false);
+    setCount(count+1)
+    console.log(count, "Count")
+    if(3 >= 3){
+      Toast.show({
+        type: 'error',
+        text1: 'No Send More Otp You Reached Limit already',
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+    });
+    }
+    else{
+      sendOTP(verifyOtp, mobile).then((res) => {
+        console.log(res.data, "Response otp")
+            if (res.status == 200) {
+              setTimer(60);
+              setShowResend(false);
+            }
+        }
+    ).catch(err => console.error("Send Otp Error : ", err))
+    }
   };
 
   return (
@@ -52,7 +82,7 @@ const VerifyOTPScreen = ({ navigation }) => {
           </View>
           <View style={{
             flexDirection: 'row',
-            borderBottomColor: '#ccc',
+            borderBottomColor: Colors.primary,
             borderBottomWidth: 1,
             paddingBottom: 8,
             marginBottom: 25
@@ -67,13 +97,28 @@ const VerifyOTPScreen = ({ navigation }) => {
               maxLength={4}
             />
           </View>
+          <View style={{
+            flexDirection: 'row',
+            borderBottomColor: Colors.primary,
+            borderBottomWidth: 1,
+            paddingBottom: 8,
+            marginBottom: 25
+          }}>
+            <Icon name="verified" style={{ marginRight: 5 }} size={20} color="#666" />
+            <TextInput
+              style={{ flex: 1, paddingVertical: 0 }}
+              placeholder="Enter Password"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+            />
+          </View>
           {showResend ? (
-            <TouchableOpacity style={{ backgroundColor: '#e60000', padding: 20, borderRadius: 10, marginBottom: 30, }} onPress={handleResendOtp}>
-              <Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#fff', }}>Resend OTP</Text>
+            <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleResendOtp}>
+              <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Resend OTP</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={{ backgroundColor: '#e60000', padding: 20, borderRadius: 10, marginBottom: 30, }} onPress={handleConfirmOtp}>
-              <Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#fff', }}>Confirm OTP</Text>
+            <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleConfirmOtp}>
+              <Text style={{ textAlign: 'center', fontSize: 10, color: '#fff', }}>Confirm OTP</Text>
             </TouchableOpacity>
           )}
           <View
@@ -84,6 +129,7 @@ const VerifyOTPScreen = ({ navigation }) => {
             }}>
             <Text>or resend in {timer} Seconds.</Text>
           </View>
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </View>
       </SafeAreaView>
     </ScrollView>

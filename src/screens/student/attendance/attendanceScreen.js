@@ -3,42 +3,48 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
-import Colors from '../constants/Colors';
+import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const DayBookScreen = () => {
+const AttendanceScreen = ({ route }) => {
+    const { studentId } = route.params;
     const ToDate = new Date();
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
-    const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
-    const [dayBookDebit, setDayBookDebit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
-    const [dayBookList, setDayBookList] = useState([]);
-    const [creditModalVisible, setCreditModalVisible] = useState(false);
+    const [attendance, setAttendance] = useState({ "Id": 0, "BatchId": "", "AttendanceType": "", "IsActive": true, "StudentId": studentId });
+    const [attendanceDebit, setAttendanceDebit] = useState({ "Id": 0, "BatchId": "", "AttendanceType": "", "IsActive": true, "StudentId": "" });
+    const [attendanceList, setAttendanceList] = useState([]);
+    const [attendanceModalVisible, setAttendanceModalVisible] = useState(false);
     const [debitModalVisible, setDebitModalVisible] = useState(false);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
-    const [isFocus, setIsFocus] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fromDate, setFromDate] = useState(FromDate.toISOString().slice(0, 10).toString());
     const [toDate, setToDate] = useState(ToDate.toISOString().slice(0, 10).toString());
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
-    const [accountList, setAccountList] = useState([]);
     const [isEndReached, setIsEndReached] = useState(true);
 
     const [selectFromDate, setSelectFromDate] = useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
     const [selectToDate, setSelectToDate] = useState(new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000))
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
-    const [showSearch, setShowSearch] = useState(true);
+    const [showSearch, setShowSearch] = useState(false);
+
+    const [courseCategoryList, setCourseCategoryList] = useState([]);
+    const [courseList, setCourseList] = useState([]);
+    const [batchList, setBatchList] = useState([]);
+
+    const [value, setValue] = useState(null);
+    const [courseValue, setCourseValue] = useState(null);
+    const [batchValue, setBatchValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
             setSelectFromDate(date);
-            setFromDate(getFormattedDate(date));
-            setSkip(0);
         }
         setShowDatePicker(false);
     };
@@ -53,8 +59,6 @@ const DayBookScreen = () => {
     const handleToDateChange = (event, date) => {
         if (date !== undefined) {
             setSelectToDate(date);
-            setToDate(getFormattedDate(date));
-            setSkip(0);
         }
         setShowToDatePicker(false);
     };
@@ -69,56 +73,112 @@ const DayBookScreen = () => {
 
     // Function to handle button press
     const handleSearch = () => {
-        setDayBookList([]);
+        setAttendanceList([]);
+        setFromDate(getFormattedDate(selectFromDate));
+        setToDate(getFormattedDate(selectToDate));
         setSkip(0);
-        GetDayBookList();
         setShowSearch(false);
     };
 
     useEffect(() => {
-        if (accountList.length == 0) {
-            GetAccountList();
+        setLoading(true);
+        GetAttendanceList();
+    }, [skip])
+
+    useEffect(() => {
+        if (courseCategoryList.length === 0) {
+            GetCourseCategoryList();
         }
     }, []);
 
-    // useEffect(() => {
-    //     setLoading(true);
-    //     GetDayBookList();
-    // }, [skip])
-
-    const GetAccountList = () => {
-        axios.get('http://192.168.1.3:5291/api/Account/get', {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                console.log(response.data, "Account list");
-                const accountArray = response.data.map((account) => ({
-                    value: account.id,
-                    label: account.accountName,
-                }));
-                setAccountList(accountArray);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }
-    const GetDayBookList = () => {
-        setLoading(true);
-        const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "Mobile": "" }
-        axios.post('http://192.168.1.3:5291/api/DayBook/get', JSON.stringify(filter), {
+    const GetCourseCategoryList = () => {
+        axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
             },
         })
             .then((response) => {
+                console.log(response.data);
+                setCourseCategoryList(response.data);
+            })
+            .catch((error) => {
+                console.error(error, "Get CourseCategory List Error");
+            });
+    }
+
+    const fetchCourseByCourseCategoryId = async (courseCategoryId) => {
+        try {
+            console.log(courseCategoryId, "courseCategoryId")
+            const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
+                headers: {
+                    'Content-Type': 'application/json', // Example header
+                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+                },
+            });
+            setCourseList(response.data);
+        } catch (error) {
+            console.error('Error fetching Course:', error);
+        }
+    };
+
+    const fetchBatchByCourseId = async (courseId) => {
+        try {
+            console.log(courseId, "courseCategoryId")
+            const response = await axios.get(`http://192.168.1.7:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
+                headers: {
+                    'Content-Type': 'application/json', // Example header
+                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+                },
+            });
+            setBatchList(response.data);
+        } catch (error) {
+            console.error('Error fetching Batch:', error);
+        }
+    };
+    const handleCourseCategorySelect = (courseCategory) => {
+        setValue(courseCategory.id);
+        fetchCourseByCourseCategoryId(courseCategory.id);
+    };
+
+    const handleCourseSelect = (course) => {
+        setCourseValue(course.id);
+        fetchBatchByCourseId(course.id);
+    };
+
+    const handleBatchSelect = (batch) => {
+        setAttendance({ ...attendance, BatchId: batch.id })
+        setBatchValue(batch.id)
+    }
+
+    const [showAttendanceTypeDropdown, setShowAttendanceTypeDropdown] = useState(false);
+    const toggleAttendanceTypeDropdown = () => {
+        setShowAttendanceTypeDropdown(!showAttendanceTypeDropdown);
+    };
+
+    const selectAttendanceType = (selectedAttendanceType) => {
+        setAttendance((prevAttendance) => ({
+            ...prevAttendance,
+            AttendanceType: selectedAttendanceType,
+        }));
+        setShowAttendanceTypeDropdown(false);
+    };
+
+    const GetAttendanceList = () => {
+        setLoading(true);
+        const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
+        axios.post(`http://192.168.1.7:5291/api/Attendance/getAttendanceByStudentId?StudentId=${studentId}`, JSON.stringify(filter), {
+            headers: {
+                'Content-Type': 'application/json', // Example header
+                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+            },
+        })
+            .then((response) => {
+                console.log(attendanceList, "AttendanceList")
                 setLoading(false);
                 if (response.data.length >= 0) {
                     setIsEndReached(false);
-                    setDayBookList([...dayBookList, ...response.data])
-                    setSkip(skip + 10)
+                    setAttendanceList([...attendanceList, ...response.data])
                 }
                 if (response.data.length === 0) {
                     setIsEndReached(true);
@@ -133,92 +193,112 @@ const DayBookScreen = () => {
             })
             .catch((error) => {
                 setLoading(false);
-                console.error('Get DayBook List Error : ', error);
+                console.error(error);
             });
     }
 
-    const handleAddCreditDayBook = () => {
-        setDayBookCredit({
+    const handleAddAttendance = () => {
+        setAttendance({
             Id: 0,
-            Particulars: "",
-            Credit: 0,
-            Debit: 0,
+            BatchId: "",
+            AttendanceType: "",
             IsActive: true,
-            AccountId: "",
+            StudentId: studentId,
         });
-        setCreditModalVisible(true);
+        setAttendanceModalVisible(true);
     };
-    const handleAddDebitDayBook = () => {
-        setDayBookDebit({
+    const handleAddDebitAttendance = () => {
+        setAttendanceDebit({
             Id: 0,
-            Particulars: "",
+            BatchId: "",
             Credit: 0,
             Debit: 0,
             IsActive: true,
-            AccountId: "",
+            StudentId: "",
         });
         setDebitModalVisible(true);
     };
 
-    const handleDeleteDayBook = (id) => {
-        axios.delete(`http://192.168.1.3:5291/api/DayBook/delete?Id=${id}`)
+    const handleDeleteAttendance = (id) => {
+        axios.delete(`http://192.168.1.7:5291/api/Attendance/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
-                setDayBookList([]);
+                setAttendanceList([]);
                 setSkip(0);
             })
             .catch(err => console.error("Delete Error", err));
     }
 
-    const handleSaveDayBookCredit = async () => {
+    const handleSaveAttendance = async () => {
         try {
-            if (dayBookCredit.Credit !== 0) {
-                await axios.post('http://192.168.1.3:5291/api/DayBook/post', JSON.stringify(dayBookCredit), {
+            if (attendance.Id !== 0) {
+                await axios.put('http://192.168.1.7:5291/api/Attendance/put', JSON.stringify(attendance), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
                     .then((response) => {
                         if (response.status === 200) {
-                            setDayBookList([]);
+                            setAttendanceList([]);
                             setSkip(0);
-                            Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
-                            setDayBookCredit({
+                            Alert.alert('Sucess', 'Attendance Credit is Updated Successfully')
+                            setAttendance({
                                 "Id": 0,
-                                "Particulars": "",
-                                "Credit": 0,
-                                "Debit": 0,
-                                "AccountId": "",
+                                "BatchId": "",
+                                "AttendanceType": "",
+                                "StudentId": studentId,
                                 "IsActive": true,
                             });
                         }
                     })
+                    setAttendanceModalVisible(false);
             }
-            setCreditModalVisible(false);
-        } catch (error) {
-            console.error('Error saving DayBook:', error);
-        }
-    };
-
-    const handleSaveDayBookDebit = async () => {
-        try {
-            if (dayBookDebit.Debit !== 0) {
-                await axios.post('http://192.168.1.3:5291/api/DayBook/post', JSON.stringify(dayBookDebit), {
+            else{
+                console.error(attendance, "Attendance")
+                await axios.post('http://192.168.1.7:5291/api/Attendance/post', JSON.stringify(attendance), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
                     .then((response) => {
                         if (response.status === 200) {
-                            setDayBookList([]);
+                            setAttendanceList([]);
                             setSkip(0);
-                            Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
-                            setDayBookDebit({
+                            Alert.alert('Sucess', 'Attendance Credit is Added Successfully')
+                            setAttendance({
                                 "Id": 0,
-                                "Particulars": "",
-                                "Credit": 0,
-                                "Debit": 0,
-                                "AccountId": "",
+                                "BatchId": "",
+                                "AttendanceType": "",
+                                "StudentId": studentId,
+                                "IsActive": true,
+                            });
+                        }
+                    })
+                    setAttendanceModalVisible(false);
+            }
+        } catch (error) {
+            console.error('Error saving Attendance:', error);
+        }
+    };
+
+    const handleSaveAttendanceDebit = async () => {
+        try {
+            if (attendanceDebit.Debit !== 0) {
+                await axios.post('http://192.168.1.7:5291/api/Attendance/post', JSON.stringify(attendanceDebit), {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then((response) => {
+                        if (response.status === 200) {
+                            setAttendanceList([]);
+                            setSkip(0);
+                            Alert.alert('Sucess', 'Attendance Debit is Added Successfully')
+                            setAttendanceDebit({
+                                "Id": 0,
+                                "BatchId": "",
+                                "AttendanceType": studentId,
+                                "StudentId": "",
                                 "IsActive": true,
                             });
                         }
@@ -226,12 +306,12 @@ const DayBookScreen = () => {
             }
             setDebitModalVisible(false);
         } catch (error) {
-            console.error('Error saving DayBook:', error);
+            console.error('Error saving Attendance:', error);
         }
     };
 
     const handleCloseModal = () => {
-        setCreditModalVisible(false);
+        setAttendanceModalVisible(false);
         setDebitModalVisible(false);
     };
 
@@ -244,11 +324,10 @@ const DayBookScreen = () => {
         return `${year}-${month}-${day}`;
     }
 
-    const handleLoadMore = () => {
+    const handleLoadMore = async () => {
         console.log("Execute Handle More function")
         if (!isEndReached) {
-            // setSkip(skip + 10)
-            GetDayBookList();
+            setSkip(skip + 10)
         }
     };
 
@@ -261,7 +340,7 @@ const DayBookScreen = () => {
         );
     };
 
-    const renderDayBookCard = ({ item }) => (
+    const renderAttendanceCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
             borderRadius: 10,
@@ -273,28 +352,20 @@ const DayBookScreen = () => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 0.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Particulars : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
-            </View>
-            {item.credit !== 0 ? (<View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Credit : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.credit}</Text>
-            </View>) : null}
-            {item.debit !== 0 ? (<View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Debit : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.debit}</Text>
-            </View>) : null}
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Created At : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
+                <Text style={{ fontSize: 16 }}>BatchName : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Account : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.account}</Text>
+                <Text style={{ fontSize: 16 }}>Attendance Type : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.attendanceType}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Punch Time : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.punchTime)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                 <TouchableOpacity style={{
@@ -302,7 +373,7 @@ const DayBookScreen = () => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => handleDeleteDayBook(item.id)}>
+                }} onPress={() => handleDeleteAttendance(item.id)}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -319,7 +390,7 @@ const DayBookScreen = () => {
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
                     <TouchableOpacity onPress={() => { setShowSearch(true); }}>
                         <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
-                            <TextInput style={{ flex: 1, borderRadius: 10, borderColor: Colors.primary, marginRight: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }} editable={false} placeholder="Search..." />
+                            <TextInput style={{ flex: 1, borderRadius: 10, borderColor: Colors.primary, marginRight: 10, borderWidth: 0.5, fontSize: 16, paddingHorizontal: 20 }} editable={false} placeholder="Search..." />
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>
                     </TouchableOpacity>
@@ -332,12 +403,12 @@ const DayBookScreen = () => {
                             marginTop: 10,
                             marginRight: 3,
                             alignSelf: 'flex-start',
-                        }} onPress={handleAddCreditDayBook}>
+                        }} onPress={handleAddAttendance}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
                                 fontWeight: 'bold',
-                            }}>Credit DayBook Entry</Text>
+                            }}>Attendance</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{
                             backgroundColor: Colors.primary,
@@ -346,12 +417,12 @@ const DayBookScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             alignSelf: 'flex-start',
-                        }} onPress={handleAddDebitDayBook}>
+                        }} onPress={handleAddDebitAttendance}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
                                 fontWeight: 'bold',
-                            }}>Debit DayBook Entry</Text>
+                            }}>Debit Attendance Entry</Text>
                         </TouchableOpacity>
                     </View>
                     {showSearch && (
@@ -466,10 +537,10 @@ const DayBookScreen = () => {
                     )}
 
                     <FlatList
-                        data={dayBookList}
+                        data={attendanceList}
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={renderDayBookCard}
+                        renderItem={renderAttendanceCard}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();
@@ -479,8 +550,8 @@ const DayBookScreen = () => {
 
                     <Toast ref={(ref) => Toast.setRef(ref)} />
 
-                    {creditModalVisible && (
-                        <Modal transparent visible={creditModalVisible}>
+                    {attendanceModalVisible && (
+                        <Modal transparent visible={attendanceModalVisible}>
                             <View style={{
                                 flex: 1,
                                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -489,6 +560,7 @@ const DayBookScreen = () => {
                             }}>
                                 <View style={{ backgroundColor: Colors.background, borderRadius: 10, padding: 20, width: '80%', }}>
                                     <Text style={{ fontSize: 20, marginBottom: 10, fontWeight: 'bold', color: Colors.shadow }}>Credit Entry</Text>
+                                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Select Course Category :</Text>
                                     <Dropdown
                                         style={[{
                                             height: 50,
@@ -496,7 +568,7 @@ const DayBookScreen = () => {
                                             borderWidth: 1,
                                             borderRadius: 10,
                                             paddingHorizontal: 8,
-                                            marginBottom: 20,
+                                            marginBottom: 10,
                                         }, isFocus && { borderColor: 'blue' }]}
                                         placeholderStyle={{ fontSize: 16, }}
                                         selectedTextStyle={{ fontSize: 16, }}
@@ -508,58 +580,138 @@ const DayBookScreen = () => {
                                             width: 20,
                                             height: 20,
                                         }}
-                                        data={accountList}
+                                        data={courseCategoryList}
                                         search
                                         maxHeight={300}
-                                        labelField="label"
-                                        valueField="value"
-                                        placeholder={!isFocus ? 'Select Account' : '...'}
+                                        labelField="courseCategoryName"
+                                        valueField="id"
+                                        placeholder={!isFocus ? 'Select Course Category' : '...'}
                                         searchPlaceholder="Search..."
-                                        value={dayBookCredit.AccountId}
+                                        value={value}
                                         onFocus={() => setIsFocus(true)}
                                         onBlur={() => setIsFocus(false)}
-                                        onChange={(value) => setDayBookCredit({ ...dayBookCredit, AccountId: value.value })}
+                                        onChange={handleCourseCategorySelect}
                                     />
-                                    <TextInput
+
+                                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Select Course :</Text>
+                                    <Dropdown
+                                        style={[{
+                                            height: 50,
+                                            borderColor: Colors.primary,
+                                            borderWidth: 1,
+                                            borderRadius: 10,
+                                            paddingHorizontal: 8,
+                                            marginBottom: 10
+                                        }, isFocus && { borderColor: 'blue' }]}
+                                        placeholderStyle={{ fontSize: 16, }}
+                                        selectedTextStyle={{ fontSize: 16, }}
+                                        inputSearchStyle={{
+                                            height: 40,
+                                            fontSize: 16,
+                                        }}
+                                        iconStyle={{
+                                            width: 20,
+                                            height: 20,
+                                        }}
+                                        data={courseList}
+                                        search
+                                        maxHeight={300}
+                                        labelField="courseName"
+                                        valueField="id"
+                                        placeholder={!isFocus ? 'Select Course' : '...'}
+                                        searchPlaceholder="Search..."
+                                        value={courseValue}
+                                        onFocus={() => setIsFocus(true)}
+                                        onBlur={() => setIsFocus(false)}
+                                        onChange={handleCourseSelect}
+                                    />
+
+                                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Select Batch :</Text>
+                                    <Dropdown
+                                        style={[{
+                                            height: 50,
+                                            borderColor: Colors.primary,
+                                            borderWidth: 1,
+                                            borderRadius: 10,
+                                            paddingHorizontal: 8,
+                                        }, isFocus && { borderColor: 'blue' }]}
+                                        placeholderStyle={{ fontSize: 16, }}
+                                        selectedTextStyle={{ fontSize: 16, }}
+                                        inputSearchStyle={{
+                                            height: 40,
+                                            fontSize: 16,
+                                        }}
+                                        iconStyle={{
+                                            width: 20,
+                                            height: 20,
+                                        }}
+                                        data={batchList}
+                                        search
+                                        maxHeight={300}
+                                        labelField="batchName"
+                                        valueField="id"
+                                        placeholder={!isFocus ? 'Select Batch' : '...'}
+                                        searchPlaceholder="Search..."
+                                        value={batchValue}
+                                        onFocus={() => setIsFocus(true)}
+                                        onBlur={() => setIsFocus(false)}
+                                        onChange={handleBatchSelect}
+                                    />
+                                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Attendance Type:</Text>
+                                    <TouchableOpacity
                                         style={{
                                             borderWidth: 1,
                                             borderColor: Colors.primary,
-                                            borderRadius: 10,
-                                            padding: 8,
-                                            marginBottom: 20,
-                                            height: 80,
-                                            textAlignVertical: 'top',
+                                            borderRadius: 5,
+                                            paddingHorizontal: 10,
+                                            paddingVertical: 8,
+                                            marginBottom: 10,
+                                            position: 'relative',
+                                            zIndex: 1,
                                         }}
-                                        placeholder="Particulars"
-                                        multiline
-                                        value={dayBookCredit.Particulars}
-                                        onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Particulars: text })}
-                                    />
-                                    <TextInput
-                                        style={{
-                                            borderWidth: 1,
-                                            borderColor: Colors.primary,
-                                            borderRadius: 10,
-                                            padding: 8,
-                                            marginBottom: 20,
-                                        }}
-                                        placeholder="Credit"
-                                        keyboardType='numeric'
-                                        value={dayBookCredit.Credit}
-                                        onChangeText={(text) => setDayBookCredit({ ...dayBookCredit, Credit: text })}
-                                    />
+                                        onPress={toggleAttendanceTypeDropdown}
+                                    >
+                                        <Text style={{ fontSize: 16, }}>{attendance.AttendanceType || 'Select Attendance Type'}</Text>
+                                        {showAttendanceTypeDropdown && (
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: 40,
+                                                left: 0,
+                                                right: 0,
+                                                borderWidth: 1,
+                                                borderColor: Colors.primary,
+                                                backgroundColor: Colors.background,
+                                                borderRadius: 5,
+                                                padding: 10,
+                                                marginTop: 5,
+                                            }}>
+                                                <TouchableOpacity
+                                                    style={{ paddingVertical: 8, }}
+                                                    onPress={() => selectAttendanceType('CheckedIn')}
+                                                >
+                                                    <Text style={{ fontSize: 16, }}>CheckedIn</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={{ paddingVertical: 8, }}
+                                                    onPress={() => selectAttendanceType('CheckedOut')}
+                                                >
+                                                    <Text style={{ fontSize: 16, }}>CheckedOut</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+                                    </TouchableOpacity>
                                     <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
                                         <TouchableOpacity style={{
                                             backgroundColor: Colors.primary,
                                             borderRadius: 5,
                                             paddingVertical: 8,
                                             paddingHorizontal: 12,
-                                        }} onPress={handleSaveDayBookCredit}>
+                                        }} onPress={handleSaveAttendance}>
                                             <Text style={{
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{dayBookCredit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{attendance.Id === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -588,38 +740,6 @@ const DayBookScreen = () => {
                                 alignItems: 'center',
                             }}>
                                 <View style={{ backgroundColor: Colors.background, borderRadius: 10, padding: 20, width: '80%', }}>
-                                    <Text style={{ fontSize: 20, marginBottom: 10, color: Colors.shadow, fontWeight: 'bold' }}>Debit Entry</Text>
-                                    <Dropdown
-                                        style={[{
-                                            height: 50,
-                                            borderColor: Colors.primary,
-                                            borderWidth: 1,
-                                            borderRadius: 10,
-                                            paddingHorizontal: 8,
-                                            marginBottom: 20,
-                                        }, isFocus && { borderColor: 'blue' }]}
-                                        placeholderStyle={{ fontSize: 16, }}
-                                        selectedTextStyle={{ fontSize: 16, }}
-                                        inputSearchStyle={{
-                                            height: 40,
-                                            fontSize: 16,
-                                        }}
-                                        iconStyle={{
-                                            width: 20,
-                                            height: 20,
-                                        }}
-                                        data={accountList}
-                                        search
-                                        maxHeight={300}
-                                        labelField="label"
-                                        valueField="value"
-                                        placeholder={!isFocus ? 'Select Account' : '...'}
-                                        searchPlaceholder="Search..."
-                                        value={setDayBookDebit.AccountId}
-                                        onFocus={() => setIsFocus(true)}
-                                        onBlur={() => setIsFocus(false)}
-                                        onChange={(value) => setDayBookDebit({ ...dayBookDebit, AccountId: value.value })}
-                                    />
                                     <TextInput
                                         style={{
                                             borderWidth: 1,
@@ -630,10 +750,10 @@ const DayBookScreen = () => {
                                             height: 80,
                                             textAlignVertical: 'top',
                                         }}
-                                        placeholder="Particulars"
+                                        placeholder="BatchId"
                                         multiline
-                                        value={dayBookDebit.Particulars}
-                                        onChangeText={(text) => setDayBookDebit({ ...dayBookDebit, Particulars: text })}
+                                        value={attendanceDebit.BatchId}
+                                        onChangeText={(text) => setAttendanceDebit({ ...attendanceDebit, BatchId: text })}
                                     />
                                     <TextInput
                                         style={{
@@ -645,8 +765,8 @@ const DayBookScreen = () => {
                                         }}
                                         placeholder="Debit"
                                         keyboardType='numeric'
-                                        value={dayBookDebit.Debit}
-                                        onChangeText={(text) => setDayBookDebit({ ...dayBookDebit, Debit: text })}
+                                        value={attendanceDebit.Debit}
+                                        onChangeText={(text) => setAttendanceDebit({ ...attendanceDebit, Debit: text })}
                                     />
                                     <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
                                         <TouchableOpacity style={{
@@ -654,12 +774,12 @@ const DayBookScreen = () => {
                                             borderRadius: 5,
                                             paddingVertical: 8,
                                             paddingHorizontal: 12,
-                                        }} onPress={handleSaveDayBookDebit}>
+                                        }} onPress={handleSaveAttendanceDebit}>
                                             <Text style={{
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{dayBookDebit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{attendanceDebit.Id === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -685,7 +805,7 @@ const DayBookScreen = () => {
     );
 };
 
-export default DayBookScreen;
+export default AttendanceScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -739,7 +859,7 @@ export default DayBookScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   dayBookCard: {
+//   attendanceCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -754,7 +874,7 @@ export default DayBookScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   dayBookName: {
+//   attendanceName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

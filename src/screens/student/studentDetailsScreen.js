@@ -33,6 +33,9 @@ const StudentDetailsScreen = ({ navigation }) => {
     const handleAddStudentBatchNavigate = (studentId) => {
         navigation.navigate('StudentBatchScreen', { studentId: studentId })
     }
+    const handleAttendanceNavigate = (studentId) => {
+        navigation.navigate('AttendanceScreen', { studentId: studentId })
+    }
 
     const GetStudentList = () => {
         axios.get('http://192.168.1.7:5291/api/StudentDetails/get', {
@@ -133,7 +136,7 @@ const StudentDetailsScreen = ({ navigation }) => {
             </View>
 
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                
+
                 <TouchableOpacity
                     style={{
                         backgroundColor: Colors.primary,
@@ -191,7 +194,21 @@ const StudentDetailsScreen = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-            <TouchableOpacity
+                <TouchableOpacity
+                    style={{
+                        backgroundColor: '#5a67f2',
+                        borderRadius: 5,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        marginRight: 10,
+                    }} onPress={() => handleAttendanceNavigate(item.value)} >
+                    <Text style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                    }}>Attendance</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                     style={{
                         backgroundColor: '#5a67f2',
                         borderRadius: 5,

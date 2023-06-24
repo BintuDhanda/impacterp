@@ -1,30 +1,115 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Animated, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {Post as httpPost} from '../constants/httpService';
 
-const UserScreen = ({navigation}) => {
+const UserScreen = ({ navigation }) => {
+  const ToDate = new Date();
+  ToDate.setDate(ToDate.getDate() + 1)
+  const FromDate = new Date();
+  FromDate.setDate(FromDate.getDate() - 7);
+  const moveToRight = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const [isFocus, setIsFocus] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fromDate, setFromDate] = useState(FromDate.toISOString().slice(0, 10).toString());
+  const [toDate, setToDate] = useState(ToDate.toISOString().slice(0, 10).toString());
+  const [take, setTake] = useState(10);
+  const [skip, setSkip] = useState(0);
+  const [mobile, setMobile] = useState("");
+  const [isEndReached, setIsEndReached] = useState(true);
+
+  const [selectFromDate, setSelectFromDate] = useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
+  const [selectToDate, setSelectToDate] = useState(new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000))
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showToDatePicker, setShowToDatePicker] = useState(false);
+  const [showSearch, setShowSearch] = useState(true);
+
   const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   setLoading(true);
+  //   GetUserList();
+  // }, [skip]);
+
+  const handleFromDateChange = (event, date) => {
+    if (date !== undefined) {
+      setSelectFromDate(date);
+      setFromDate(getFormattedDate(date));
+    }
+    setShowDatePicker(false);
+  };
+
+  const handleOpenFromDatePicker = () => {
+    setShowDatePicker(true);
+  };
+  const handleConfirmFromDatePicker = () => {
+    setShowDatePicker(false);
+  };
+
+  const handleToDateChange = (event, date) => {
+    if (date !== undefined) {
+      setSelectToDate(date);
+      setToDate(getFormattedDate(date));
+    }
+    setShowToDatePicker(false);
+  };
+
+  const handleOpenToDatePicker = () => {
+    setShowToDatePicker(true);
+  };
+
+  const handleConfirmToDatePicker = () => {
+    setShowToDatePicker(false);
+  };
+
+  // Function to handle button press
+  const handleSearch = () => {
+    setUserList([]);
+    setSkip(0);
     GetUserList();
-  }, []);
+    setShowSearch(false);
+    console.log(selectFromDate, selectToDate, skip)
+  };
 
   const handleNavigate = (userId) => {
-    navigation.navigate('StudentFormScreen', {userId : userId})
+    navigation.navigate('StudentFormScreens', { userId: userId })
+  }
+
+
+  const test = ()=>{
+    httpPost.Post('User/get',filter).then((result)=>{
+
+    }).catch()
   }
 
   const GetUserList = () => {
-    axios.get("http://192.168.1.7:5291/api/User/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    setLoading(true);
+    const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "Mobile": mobile }
+    httpPost("User/get", filter)
       .then((result) => {
-        console.log(result.data)
-        setUserList(result.data)
+        setLoading(false);
+        if (result.data.length >= 0) {
+          setIsEndReached(false);
+          setUserList([...userList, ...result.data])
+          setSkip(skip + 10)
+        }
+        if (result.data.length === 0) {
+          setIsEndReached(true);
+          Toast.show({
+            type: 'info',
+            text1: 'No records found',
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        }
       })
       .catch(err => console.error('Get User error :', err))
   }
@@ -41,7 +126,7 @@ const UserScreen = ({navigation}) => {
   const handleSaveUser = () => {
     try {
       if (user.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/User/put`, JSON.stringify(user), {
+        axios.put(`http://192.168.1.3:5291/api/User/put`, JSON.stringify(user), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -61,7 +146,7 @@ const UserScreen = ({navigation}) => {
           .catch(err => console.error("User update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/User/post`, JSON.stringify(user), {
+        axios.post(`http://192.168.1.3:5291/api/User/post`, JSON.stringify(user), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -88,7 +173,7 @@ const UserScreen = ({navigation}) => {
   }
 
   const handleDeleteUser = (userId) => {
-    axios.delete(`http://192.168.1.7:5291/api/User/delete?Id=${userId}`)
+    axios.delete(`http://192.168.1.3:5291/api/User/delete?Id=${userId}`)
       .then((result) => {
         console.log(result);
         GetUserList();
@@ -97,7 +182,7 @@ const UserScreen = ({navigation}) => {
   };
 
   const handleEditUser = (userId) => {
-    axios.get(`http://192.168.1.7:5291/api/User/getById?Id=${userId}`)
+    axios.get(`http://192.168.1.3:5291/api/User/getById?Id=${userId}`)
       .then((response) => {
         setUser({
           Id: response.data.id,
@@ -114,6 +199,32 @@ const UserScreen = ({navigation}) => {
     setModalVisible(false);
   }
 
+  const handleLoadMore = async () => {
+    console.log("Execute Handle More function")
+    if (!isEndReached) {
+      // setSkip(skip + 10)
+      GetUserList();
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator animating size="large" />
+      </View>
+    );
+  };
+
+  const getFormattedDate = (datestring) => {
+    const datetimeString = datestring;
+    const date = new Date(datetimeString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
+
   const renderUserCard = ({ item }) => {
     return (
       <View style={{
@@ -127,7 +238,7 @@ const UserScreen = ({navigation}) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
+        borderWidth: 1,
         borderColor: Colors.primary,
       }}>
         <View style={{ flexDirection: 'row' }}>
@@ -153,7 +264,7 @@ const UserScreen = ({navigation}) => {
               fontWeight: 'bold',
             }}>Edit</Text>
           </TouchableOpacity>
-          {item.isStudentCreated!==true?(<TouchableOpacity
+          {item.isStudentCreated !== true ? (<TouchableOpacity
             style={{
               backgroundColor: '#ffff80',
               borderRadius: 5,
@@ -166,7 +277,7 @@ const UserScreen = ({navigation}) => {
               fontSize: 14,
               fontWeight: 'bold',
             }}>Student Create</Text>
-          </TouchableOpacity>):null}
+          </TouchableOpacity>) : null}
           <TouchableOpacity
             style={{
               backgroundColor: '#f25252',
@@ -190,100 +301,241 @@ const UserScreen = ({navigation}) => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={{ flex: 1, padding: 20, }}>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          marginBottom: 20,
-        }} onPress={handleAddUser}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 16,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>Add User</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+          <TouchableOpacity onPress={() => { setShowSearch(true); }}>
+            <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+              <TextInput style={{ flex: 1, fontWeight: 'bold'}} editable={false} placeholder="Search..." />
+              <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }} onPress={handleAddUser}>
+            <Text style={{
+              color: Colors.background,
+              fontSize: 16,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>Add User</Text>
+          </TouchableOpacity>
 
-        <Modal visible={modalVisible} animationType="slide" transparent>
-          <View style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}>
+          {showSearch && (
+            <Modal transparent visible={showSearch}>
+              <View style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <View style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 10,
+                  marginBottom: 10,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                  borderWidth: 0.5,
+                  borderColor: Colors.primary,
+                }}>
+                  <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
+                  <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                  }}>
+                    <TouchableOpacity onPress={handleOpenFromDatePicker}>
+                      <Icon name={'calendar'} size={25} />
+                    </TouchableOpacity>
+                    <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                      value={getFormattedDate(selectFromDate)}
+                      placeholder="Select From date"
+                      editable={false}
+                    />
+
+                  </View>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={selectFromDate}
+                      mode="date"
+                      display="default"
+                      onChange={handleFromDateChange}
+                      onConfirm={handleConfirmFromDatePicker}
+                      onCancel={handleConfirmFromDatePicker}
+                    />
+                  )}
+
+                  <Text style={{ fontSize: 16, marginBottom: 5 }}>To Date :</Text>
+                  <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                  }}>
+                    <TouchableOpacity onPress={handleOpenToDatePicker}>
+                      <Icon name={'calendar'} size={25} />
+                    </TouchableOpacity>
+                    <TextInput
+                      style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                      value={getFormattedDate(selectToDate)}
+                      placeholder="Select To date"
+                      editable={false}
+                    />
+
+                  </View>
+                  {showToDatePicker && (
+                    <DateTimePicker
+                      value={selectToDate}
+                      mode="date"
+                      display="default"
+                      onChange={handleToDateChange}
+                      onConfirm={handleConfirmToDatePicker}
+                      onCancel={handleConfirmToDatePicker}
+                    />
+                  )}
+                  <TextInput
+                    style={{
+                      borderWidth: 1,
+                      borderColor: Colors.primary,
+                      borderRadius: 8,
+                      marginBottom: 20,
+                      padding: 8,
+                    }}
+                    placeholder="Mobile"
+                    value={mobile}
+                    keyboardType='numeric'
+                    maxLength={10}
+                    onChangeText={(text) => setMobile(text)}
+                  />
+                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                    <TouchableOpacity style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }} onPress={() => {
+                      handleSearch();
+                    }}>
+                      <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }} onPress={() => {
+                      setShowSearch(false);
+                    }}>
+                      <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          )}
+
+          <FlatList
+            data={userList}
+            keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+            renderItem={renderUserCard}
+            ListFooterComponent={renderFooter}
+            onEndReached={() => {
+              handleLoadMore();
+            }}
+            onEndReachedThreshold={0.1}
+          // contentContainerStyle={{ flexGrow: 1, }}
+          />
+
+          <Toast ref={(ref) => Toast.setRef(ref)} />
+
+          <Modal visible={modalVisible} animationType="slide" transparent>
             <View style={{
-              backgroundColor: Colors.background,
-              borderRadius: 10,
-              padding: 20,
-              width: '80%',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}>
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: Colors.primary,
-                  borderRadius: 8,
-                  marginBottom: 20,
-                  padding: 8,
-                }}
-                placeholder="User Mobile"
-                value={user.UserMobile}
-                keyboardType='numeric'
-                maxLength={10}
-                onChangeText={(text) => setUser({ ...user, UserMobile: text })}
-              />
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: Colors.primary,
-                  borderRadius: 8,
-                  marginBottom: 20,
-                  padding: 8,
-                }}
-                placeholder="User Password"
-                value={user.UserPassword}
-                onChangeText={(text) => setUser({ ...user, UserPassword: text })}
-              />
-              <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 5,
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                }} onPress={handleSaveUser}>
-                  <Text style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                  }}>{user.Id !== 0 ? 'Save' : 'Add'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 20,
+                width: '80%',
+              }}>
+                <TextInput
                   style={{
-                    backgroundColor: '#f25252',
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    marginBottom: 20,
+                    padding: 8,
+                  }}
+                  placeholder="User Mobile"
+                  value={user.UserMobile}
+                  keyboardType='numeric'
+                  maxLength={10}
+                  onChangeText={(text) => setUser({ ...user, UserMobile: text })}
+                />
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    marginBottom: 20,
+                    padding: 8,
+                  }}
+                  placeholder="User Password"
+                  value={user.UserPassword}
+                  onChangeText={(text) => setUser({ ...user, UserPassword: text })}
+                />
+                <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                    marginLeft: 10,
-                  }}
-                  onPress={handleClose}
-                >
-                  <Text style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                  }}>Close</Text>
-                </TouchableOpacity>
+                  }} onPress={handleSaveUser}>
+                    <Text style={{
+                      color: Colors.background,
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                    }}>{user.Id !== 0 ? 'Save' : 'Add'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginLeft: 10,
+                    }}
+                    onPress={handleClose}
+                  >
+                    <Text style={{
+                      color: Colors.background,
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                    }}>Close</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-
-        <FlatList
-          data={userList}
-          renderItem={renderUserCard}
-          keyExtractor={(item) => item.id.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
-        />
+          </Modal>
+        </Animated.View>
       </View>
     </ScrollView>
   );

@@ -1,6 +1,10 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native'
 import Icon from 'react-native-vector-icons/AntDesign';
+import { Post as httpPost } from '../constants/httpService';
+import Toast from 'react-native-toast-message';
+import { sendOTP } from '../constants/smsService';
 
 const LogInScreen = ({ navigation }) => {
 
@@ -8,8 +12,55 @@ const LogInScreen = ({ navigation }) => {
 
     const handleLogin = () => {
         // Handle login logic
-        navigation.navigate('VerifyOTPScreen')
+        //navigation.navigate('VerifyOTPScreen')
+
+        //check if user exists or not
+        httpPost(`User/IsExists/`, { Mobile: phone }).then((res) => {
+            if (res.data == false) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'User dose not exist',
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            }
+            else {
+                //send otp 
+                //navigatin with otp
+                let otp = Math.floor(1000 + Math.random() * 9000);
+                console.log(otp, "Otp")
+                let msg = 'Dear Student, Your Registration OTP is 1234 Mobile No. 9050546000 Impact Academy, Hisar'
+                sendOTP(otp, phone).then((res) => {
+                    console.log(res.data, "Response otp")
+                        if (res.status == 200) {
+                            navigation.navigate("VerifyOTPScreen", { mobile: phone, verifyOtp: otp })
+                        }
+                    }
+                ).catch(err => console.error("Send Otp Error : ", err))
+
+            }
+        }).catch(err => console.error("IsExist Error : ", err))
+
     };
+
+
+    // const sendOTP = () =>{
+    //     let otp = 1234;
+    //     let user = 'impactcampus';
+    //     let password = 'K9F2HDNY';
+    //     let mobile ='9416669174';
+    //     let sid ='IMPHSR';
+    //     let msg =`Dear Student, Your Registration OTP is ${otp} Mobile No. 9050546000 Impact Academy, Hisar`;
+    //     axios.get(`http://www.getwaysms.com/vendorsms/pushsms.aspx?user=${user}&password=${password}&msisdn=${mobile}&sid=${sid}&msg=${msg}&fl=0&gwid=2)`)
+    //     .then((res)=>{
+    //         if(res.status==200)
+    //         {
+    //             navigation.navigate('VerifyOTPScreen', {verifyotp: otp})
+    //         }
+    //     })
+    // }
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
@@ -45,6 +96,7 @@ const LogInScreen = ({ navigation }) => {
                     <TouchableOpacity style={{ backgroundColor: '#e60000', padding: 20, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
                         <Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#fff', }}>Login</Text>
                     </TouchableOpacity>
+                    <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View>
             </SafeAreaView>
         </ScrollView>

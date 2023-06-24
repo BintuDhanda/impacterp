@@ -42,9 +42,10 @@ import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchS
 import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
 import StudentBatchFeesScreen from './src/screens/student/studentBatch/studentBatchFeesScreen';
 import StudentTokenFeesScreen from './src/screens/student/token/studentTokenFeesScreen';
+import AttendanceScreen from './src/screens/student/attendance/attendanceScreen';
 
 
-let isLogedIn = true;
+let isLogedIn = false;
 
 const Stack = createStackNavigator();
 
@@ -77,6 +78,7 @@ function App() {
             <Stack.Screen name="StudentTokenFormScreen" options={{title: 'Student Token Form'}} component={StudentTokenFormScreen} />
             <Stack.Screen name="StudentTokenFeesScreen" options={{title: 'Student Token Fees'}} component={StudentTokenFeesScreen} />
             <Stack.Screen name="StudentBatchScreen" options={{title: 'Student Batch'}} component={StudentBatchScreen} />
+            <Stack.Screen name="AttendanceScreen" options={{title: 'Attendance'}} component={AttendanceScreen} />
             <Stack.Screen name="StudentBatchFormScreen" options={{title: 'Student Batch Form'}} component={StudentBatchFormScreen} />
             <Stack.Screen name="StudentBatchFeesScreen" options={{title: 'Student Batch Fee'}} component={StudentBatchFeesScreen} />
             <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type'}} component={FeeTypeScreen} />
