@@ -5,6 +5,9 @@ import { Post as httpPost } from '../constants/httpService';
 import Toast from 'react-native-toast-message';
 import { sendOTP } from '../constants/smsService';
 import Colors from '../constants/Colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {UserContext} from '../../App';
+import { useContext } from 'react';
 
 const VerifyOTPScreen = ({ route, navigation }) => {
   const {verifyOtp,mobile} = route.params;
@@ -13,6 +16,7 @@ const VerifyOTPScreen = ({ route, navigation }) => {
   const [count, setCount] = useState(1)
   const [timer, setTimer] = useState(60);
   const [showResend, setShowResend] = useState(false);
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     let interval;
@@ -33,19 +37,24 @@ const VerifyOTPScreen = ({ route, navigation }) => {
 
   const handleConfirmOtp = () => {
     // Update the isLogedIn state to true
-    if(otp === verifyOtp){
+    console.log(otp,verifyOtp)
+    if(otp == verifyOtp){
       // get user token api call
-      httpPost("User/login",{userMobile: mobile, userPassword: password})
+      httpPost("User/login",{userMobile: mobile, userPassword: password}).then((response)=> {
+        console.log(response.data, "Response")
+        if(response.status === 200){
+         AsyncStorage.setItem('user',JSON.stringify(response.data));
+         setUser(response.data);
+        }
+      })
     }
-    isLogedIn = true;
     // Navigate to the HomeScreen
-    navigation.navigate('HomeScreen');
-  };
+     };
 
   const handleResendOtp = () => {
     setCount(count+1)
     console.log(count, "Count")
-    if(3 >= 3){
+    if(count >= 3){
       Toast.show({
         type: 'error',
         text1: 'No Send More Otp You Reached Limit already',
@@ -118,7 +127,7 @@ const VerifyOTPScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleConfirmOtp}>
-              <Text style={{ textAlign: 'center', fontSize: 10, color: '#fff', }}>Confirm OTP</Text>
+              <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Confirm OTP</Text>
             </TouchableOpacity>
           )}
           <View

@@ -1,16 +1,24 @@
-import React from 'react';
+import React,{useContext } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../constants/Colors';
+import { UserContext } from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
+  const { user, setUser } = useContext(UserContext);
   const navigation = useNavigation();
   const windowWidth = Dimensions.get('window').width;
 
   const handleIconPress = (screenName) => {
     navigation.navigate(screenName);
   };
+
+  const handleLogOut = () => {
+    AsyncStorage.removeItem(user);
+    setUser(null);
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -53,6 +61,11 @@ const HomeScreen = () => {
             <Text style={styles.title}>Enter Account</Text>
           </TouchableOpacity>
         </View>
+          <View style={{justifyContent:"center", marginTop: 30}}>
+            <TouchableOpacity onPress={handleLogOut}>
+            <Text style={{color: '#1c8adb',fontSize: 16}}>LogOut</Text>
+            </TouchableOpacity>
+          </View>
       </View>
     </ScrollView>
   );

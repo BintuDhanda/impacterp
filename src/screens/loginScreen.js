@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { Post as httpPost } from '../constants/httpService';
 import Toast from 'react-native-toast-message';
 import { sendOTP } from '../constants/smsService';
+import Colors from '../constants/Colors';
 
 const LogInScreen = ({ navigation }) => {
 
@@ -78,12 +79,12 @@ const LogInScreen = ({ navigation }) => {
                     </View>
                     <View style={{
                         flexDirection: 'row',
-                        borderBottomColor: '#ccc',
+                        borderBottomColor: Colors.primary,
                         borderBottomWidth: 1,
                         paddingBottom: 8,
                         marginBottom: 25
                     }}>
-                        <Icon name="phone" style={{ marginRight: 5 }} size={20} color="#666" />
+                        <Icon name="phone" style={{ marginRight: 5 }} size={20} color= "#666" />
                         <TextInput
                             placeholder="Phone No."
                             style={{ flex: 1, paddingVertical: 0 }}
@@ -93,8 +94,8 @@ const LogInScreen = ({ navigation }) => {
                             onChangeText={(text) => setPhone(text)}
                         />
                     </View>
-                    <TouchableOpacity style={{ backgroundColor: '#e60000', padding: 20, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
-                        <Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#fff', }}>Login</Text>
+                    <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
+                        <Text style={{ textAlign: 'center',  fontSize: 16, color: '#fff', }}>Login</Text>
                     </TouchableOpacity>
                     <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View>
