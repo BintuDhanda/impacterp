@@ -15,7 +15,7 @@ const StudentBatchScreen = ({route, navigation}) => {
   );
 
   const GetStudentBatchByStudentId = () => {
-    axios.get(`http://192.168.1.7:5291/api/StudentBatch/getStudentBatchByStudentId?Id=${studentId}`, {
+    axios.get(`http://192.168.1.3:5291/api/StudentBatch/getStudentBatchByStudentId?Id=${studentId}`, {
       headers: {
         'Content-Type': 'application/json', // Example header
         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -42,7 +42,7 @@ const StudentBatchScreen = ({route, navigation}) => {
   }
 
   const handleDeleteStudentBatch = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentBatch/delete?Id=${id}`)
+    axios.delete(`http://192.168.1.3:5291/api/StudentBatch/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         GetStudentBatchByStudentId();
@@ -90,6 +90,10 @@ const StudentBatchScreen = ({route, navigation}) => {
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Batch End Date : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.batchEndDate)}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Registration Number : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.registrationNumber}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{
@@ -156,7 +160,7 @@ const StudentBatchScreen = ({route, navigation}) => {
         </TouchableOpacity>
         <FlatList
           data={batchList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.studentBatchId.toString()}
           renderItem={renderTokenCard}
         />
       </View>

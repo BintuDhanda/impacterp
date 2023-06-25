@@ -38,7 +38,7 @@ const StudentDetailsScreen = ({ navigation }) => {
     }
 
     const GetStudentList = () => {
-        axios.get('http://192.168.1.7:5291/api/StudentDetails/get', {
+        axios.get('http://192.168.1.3:5291/api/StudentDetails/get', {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -62,7 +62,7 @@ const StudentDetailsScreen = ({ navigation }) => {
 
     const fetchStudentDetailsByUserId = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.7:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
+            const response = await axios.get(`http://192.168.1.3:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -77,7 +77,7 @@ const StudentDetailsScreen = ({ navigation }) => {
     };
 
     const handleDeleteStudentDetails = (id) => {
-        axios.delete(`http://192.168.1.7:5291/api/StudentDetails/delete?Id=${id}`)
+        axios.delete(`http://192.168.1.3:5291/api/StudentDetails/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 fetchStudentDetailsByUserId();

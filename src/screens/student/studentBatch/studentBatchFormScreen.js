@@ -17,6 +17,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
         "BatchFee": "",
         "StudentId": studentId,
         "BatchId": "",
+        "RegistrationNumber": "",
         "IsActive": true,
         "CreatedAt": null,
     });
@@ -28,7 +29,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const [courseValue, setCourseValue] = useState(null);
     const [batchValue, setBatchValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
-    const [selectDateOfJoin, setSelectDateOfJoin] = useState(new Date ());
+    const [selectDateOfJoin, setSelectDateOfJoin] = useState(new Date());
     const [selectBatchStartDate, setSelectBatchStartDate] = useState(new Date());
     const [selectBatchEndDate, setSelectBatchEndDate] = useState(new Date());
     const [showDateOfJoinPicker, setShowDateOfJoinPicker] = useState(false);
@@ -93,7 +94,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     };
 
     const GetBatchById = () => {
-        axios.get(`http://192.168.1.7:5291/api/StudentBatch/getById?Id=${batchId}`, {
+        axios.get(`http://192.168.1.3:5291/api/StudentBatch/getById?Id=${batchId}`, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -107,6 +108,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                     BatchEndDate: response.data.batchEndDate,
                     BatchFee: response.data.batchFee,
                     BatchId: response.data.batchId,
+                    RegistrationNumber: response.data.registrationNumber,
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
@@ -117,7 +119,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const handleSaveStudentBatch = async () => {
         try {
             if (studentBatch.Id !== 0) {
-                await axios.put(`http://192.168.1.7:5291/api/StudentBatch/put`, JSON.stringify(studentBatch), {
+                await axios.put(`http://192.168.1.3:5291/api/StudentBatch/put`, JSON.stringify(studentBatch), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -133,6 +135,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                                 "BatchFee": "",
                                 "StudentId": studentId,
                                 "BatchId": "",
+                                "RegistrationNumber": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
                             })
@@ -143,7 +146,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             }
             else {
                 console.log(studentBatch, "studentBatch")
-                await axios.post(`http://192.168.1.7:5291/api/StudentBatch/post`, JSON.stringify(studentBatch), {
+                await axios.post(`http://192.168.1.3:5291/api/StudentBatch/post`, JSON.stringify(studentBatch), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -159,6 +162,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                                 "BatchFee": "",
                                 "StudentId": studentId,
                                 "BatchId": "",
+                                "RegistrationNumber": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
                             })
@@ -174,7 +178,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     }
 
     const GetCourseCategoryList = () => {
-        axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
+        axios.get('http://192.168.1.3:5291/api/CourseCategory/get', {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -192,7 +196,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const fetchCourseByCourseCategoryId = async (courseCategoryId) => {
         try {
             console.log(courseCategoryId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
+            const response = await axios.get(`http://192.168.1.3:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -207,7 +211,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const fetchBatchByCourseId = async (courseId) => {
         try {
             console.log(courseId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.7:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
+            const response = await axios.get(`http://192.168.1.3:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -251,6 +255,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             "BatchFee": "",
             "StudentId": studentId,
             "BatchId": "",
+            "RegistrationNumber": "",
             "IsActive": true,
             "CreatedAt": null,
         })
@@ -437,6 +442,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                             borderWidth: 1,
                             borderRadius: 10,
                             paddingHorizontal: 8,
+                            marginBottom: 10
                         }, isFocus && { borderColor: 'blue' }]}
                         placeholderStyle={{ fontSize: 16, }}
                         selectedTextStyle={{ fontSize: 16, }}
@@ -459,6 +465,22 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
                         onChange={handleBatchSelect}
+                    />
+
+                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Registration Number :</Text>
+                    <TextInput
+                        style={{
+                            borderWidth: 1,
+                            borderColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingHorizontal: 10,
+                            paddingVertical: 8,
+                            marginBottom: 10,
+                            fontSize: 16,
+                        }}
+                        value={studentBatch.RegistrationNumber}
+                        onChangeText={(value) => setStudentBatch({ ...studentBatch, RegistrationNumber: value })}
+                        placeholder="Enter Registeration Number"
                     />
 
                     <TouchableOpacity style={{

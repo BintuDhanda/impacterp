@@ -92,7 +92,7 @@ const AttendanceScreen = ({ route }) => {
     }, []);
 
     const GetCourseCategoryList = () => {
-        axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
+        axios.get('http://192.168.1.3:5291/api/CourseCategory/get', {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -110,7 +110,7 @@ const AttendanceScreen = ({ route }) => {
     const fetchCourseByCourseCategoryId = async (courseCategoryId) => {
         try {
             console.log(courseCategoryId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
+            const response = await axios.get(`http://192.168.1.3:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -125,7 +125,7 @@ const AttendanceScreen = ({ route }) => {
     const fetchBatchByCourseId = async (courseId) => {
         try {
             console.log(courseId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.7:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
+            const response = await axios.get(`http://192.168.1.3:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
                 headers: {
                     'Content-Type': 'application/json', // Example header
                     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -167,7 +167,7 @@ const AttendanceScreen = ({ route }) => {
     const GetAttendanceList = () => {
         setLoading(true);
         const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
-        axios.post(`http://192.168.1.7:5291/api/Attendance/getAttendanceByStudentId?StudentId=${studentId}`, JSON.stringify(filter), {
+        axios.post(`http://192.168.1.3:5291/api/Attendance/getAttendanceByStudentId?StudentId=${studentId}`, JSON.stringify(filter), {
             headers: {
                 'Content-Type': 'application/json', // Example header
                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
@@ -220,7 +220,7 @@ const AttendanceScreen = ({ route }) => {
     };
 
     const handleDeleteAttendance = (id) => {
-        axios.delete(`http://192.168.1.7:5291/api/Attendance/delete?Id=${id}`)
+        axios.delete(`http://192.168.1.3:5291/api/Attendance/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 setAttendanceList([]);
@@ -232,7 +232,7 @@ const AttendanceScreen = ({ route }) => {
     const handleSaveAttendance = async () => {
         try {
             if (attendance.Id !== 0) {
-                await axios.put('http://192.168.1.7:5291/api/Attendance/put', JSON.stringify(attendance), {
+                await axios.put('http://192.168.1.3:5291/api/Attendance/put', JSON.stringify(attendance), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -255,7 +255,7 @@ const AttendanceScreen = ({ route }) => {
             }
             else{
                 console.error(attendance, "Attendance")
-                await axios.post('http://192.168.1.7:5291/api/Attendance/post', JSON.stringify(attendance), {
+                await axios.post('http://192.168.1.3:5291/api/Attendance/post', JSON.stringify(attendance), {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -284,7 +284,7 @@ const AttendanceScreen = ({ route }) => {
     const handleSaveAttendanceDebit = async () => {
         try {
             if (attendanceDebit.Debit !== 0) {
-                await axios.post('http://192.168.1.7:5291/api/Attendance/post', JSON.stringify(attendanceDebit), {
+                await axios.post('http://192.168.1.3:5291/api/Attendance/post', JSON.stringify(attendanceDebit), {
                     headers: {
                         'Content-Type': 'application/json'
                     }

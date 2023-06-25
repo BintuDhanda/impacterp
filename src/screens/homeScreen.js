@@ -1,4 +1,4 @@
-import React,{useContext } from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
@@ -60,12 +60,20 @@ const HomeScreen = () => {
             <Icon name="bank" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Enter Account</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('FeeCollectionScreen')}>
+            <Icon name="money" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Fee Collection</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AttendanceScreen')}>
+            <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Attendance</Text>
+          </TouchableOpacity>
         </View>
-          <View style={{justifyContent:"center", marginTop: 30}}>
-            <TouchableOpacity onPress={handleLogOut}>
-            <Text style={{color: '#1c8adb',fontSize: 16}}>LogOut</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={{ justifyContent: "center", marginTop: 30 }}>
+          <TouchableOpacity onPress={handleLogOut}>
+            <Text style={{ color: '#1c8adb', fontSize: 16 }}>LogOut</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );

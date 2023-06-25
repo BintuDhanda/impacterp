@@ -42,7 +42,7 @@ import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchS
 import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
 import StudentBatchFeesScreen from './src/screens/student/studentBatch/studentBatchFeesScreen';
 import StudentTokenFeesScreen from './src/screens/student/token/studentTokenFeesScreen';
-import AttendanceScreen from './src/screens/student/attendance/attendanceScreen';
+import AttendanceScreen from './src/screens/attendanceScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 

@@ -81,6 +81,9 @@ const UserScreen = ({ navigation }) => {
   const handleNavigate = (userId) => {
     navigation.navigate('StudentFormScreens', { userId: userId })
   }
+  const handleManageNavigate = (userId) => {
+    navigation.navigate('AsignRoleScreen', { userId: userId })
+  }
 
 
   const test = ()=>{
@@ -263,6 +266,20 @@ const UserScreen = ({ navigation }) => {
               fontSize: 14,
               fontWeight: 'bold',
             }}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#ffff80',
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              marginRight: 10,
+            }} onPress={() => handleManageNavigate(item.id)} >
+            <Text style={{
+              color: Colors.primary,
+              fontSize: 14,
+              fontWeight: 'bold',
+            }}>Manage</Text>
           </TouchableOpacity>
           {item.isStudentCreated !== true ? (<TouchableOpacity
             style={{
