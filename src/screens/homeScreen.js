@@ -60,9 +60,13 @@ const HomeScreen = () => {
             <Icon name="bank" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Enter Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('FeeCollectionScreen')}>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentBatchFeesScreen')}>
             <Icon name="money" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Fee Collection</Text>
+            <Text style={styles.title}>Fees Collection</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('StudentTokenFeesScreen')}>
+            <Icon name="credit-card" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Token Fees</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AttendanceScreen')}>
             <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />

@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import Colors from '../constants/Colors';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost } from '../constants/httpService';
+import { Post as httpPost,Delete as httpDelete } from '../constants/httpService';
 
-const AttendanceScreen = () => {
+const AttendanceScreen = ({navigation}) => {
     const [attendance, setAttendance] = useState({ "Id": 0, "AttendanceType": "", "RegistrationNumber": "", "IsActive": true });
     const [attendanceList, setAttendanceList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
@@ -19,8 +17,6 @@ const AttendanceScreen = () => {
     const [isEndReached, setIsEndReached] = useState(true);
 
     const handleHistory = () => {
-        setAttendanceList([]);
-        setSkip(0);
         if (attendance.RegistrationNumber === "") {
             Toast.show({
                 type: 'error',
@@ -31,19 +27,14 @@ const AttendanceScreen = () => {
             });
         }
         else {
-            GetAttendanceList();
+            navigation.navigate("AttendanceHistoryScreen", {registrationNumber: attendance.RegistrationNumber})
         }
     };
 
     const GetAttendanceList = () => {
         setLoading(true);
         const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
-        axios.post('http://192.168.1.3:5291/api/Attendance/getAttendanceByRegistrationNumber', JSON.stringify(filter), {
-            headers: {
-                'Content-Type': 'application/json', // Example header
-                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-        })
+        httpPost("Attendance/getAttendanceByRegistrationNumber", filter)
             .then((response) => {
                 console.log(attendanceList, "AttendanceList")
                 setLoading(false);
@@ -82,31 +73,20 @@ const AttendanceScreen = () => {
                 });
             }
             else {
-                axios.post('http://192.168.1.3:5291/api/Attendance/post', JSON.stringify({ "Id": 0, "AttendanceType": "CheckedIn", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true }), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                httpPost("Attendance/post", { "Id": 0, "AttendanceType": "CheckedIn", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true })
                     .then((response) => {
                         if (response.status === 200) {
                             setAttendanceList([]);
                             setSkip(0);
                             Alert.alert('Sucess', 'Attendance is Added Successfully')
                             setLoading(true);
-                            const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 }
-                            axios.post('http://192.168.1.3:5291/api/Attendance/getAttendanceByRegistrationNumber', JSON.stringify(filter), {
-                                headers: {
-                                    'Content-Type': 'application/json', // Example header
-                                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                                },
-                            })
+                            httpPost("Attendance/getAttendanceByRegistrationNumber", { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 })
                                 .then((response) => {
                                     console.log(attendanceList, "AttendanceList")
                                     setLoading(false);
                                     if (response.data.length >= 0) {
                                         setIsEndReached(false);
-                                        setAttendanceList([...attendanceList, ...response.data]);
-                                        setSkip(skip + 10);
+                                        setAttendanceList(response.data);
                                     }
                                     if (response.data.length === 0) {
                                         setIsEndReached(true);
@@ -121,7 +101,7 @@ const AttendanceScreen = () => {
                                 })
                                 .catch((error) => {
                                     setLoading(false);
-                                    console.error(error);
+                                    console.error('Error in Get Attendance after Add CheckedIn',error);
                                 });
                         }
                     })
@@ -143,31 +123,21 @@ const AttendanceScreen = () => {
                 });
             }
             else {
-                axios.post('http://192.168.1.3:5291/api/Attendance/post', JSON.stringify({ "Id": 0, "AttendanceType": "CheckedOut", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true }), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                httpPost("Attendance/post", { "Id": 0, "AttendanceType": "CheckedOut", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true })
                     .then((response) => {
                         if (response.status === 200) {
                             setAttendanceList([]);
                             setSkip(0);
                             Alert.alert('Sucess', 'Attendance is Added Successfully')
                             setLoading(true);
-                            const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 }
-                            axios.post('http://192.168.1.3:5291/api/Attendance/getAttendanceByRegistrationNumber', JSON.stringify(filter), {
-                                headers: {
-                                    'Content-Type': 'application/json', // Example header
-                                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                                },
-                            })
+                            httpPost("Attendance/getAttendanceByRegistrationNumber", { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 })
                                 .then((response) => {
                                     console.log(attendanceList, "AttendanceList")
                                     setLoading(false);
                                     if (response.data.length >= 0) {
                                         setIsEndReached(false);
-                                        setAttendanceList([...attendanceList, ...response.data]);
-                                        setSkip(skip + 10);
+                                        setAttendanceList(response.data);
+                                        setSkip(skip+10)
                                     }
                                     if (response.data.length === 0) {
                                         setIsEndReached(true);
@@ -182,7 +152,7 @@ const AttendanceScreen = () => {
                                 })
                                 .catch((error) => {
                                     setLoading(false);
-                                    console.error(error);
+                                    console.error('Error in Get Attendance after Add CheckedOut', error);
                                 });
                         }
                     })
@@ -193,26 +163,20 @@ const AttendanceScreen = () => {
     };
 
     const handleDeleteAttendance = (id) => {
-        axios.delete(`http://192.168.1.3:5291/api/Attendance/delete?Id=${id}`)
+        httpDelete(`Attendance/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 setAttendanceList([]);
                 setSkip(0);
                 setLoading(true);
-                const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 }
-                axios.post('http://192.168.1.3:5291/api/Attendance/getAttendanceByRegistrationNumber', JSON.stringify(filter), {
-                    headers: {
-                        'Content-Type': 'application/json', // Example header
-                        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                    },
-                })
+                httpPost("Attendance/getAttendanceByRegistrationNumber", { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 })
                     .then((response) => {
                         console.log(attendanceList, "AttendanceList")
                         setLoading(false);
                         if (response.data.length >= 0) {
+                            setAttendanceList([]);
                             setIsEndReached(false);
                             setAttendanceList(response.data);
-                            setSkip(skip + 10);
                         }
                         if (response.data.length === 0) {
                             setIsEndReached(true);
@@ -233,30 +197,6 @@ const AttendanceScreen = () => {
             .catch(err => console.error("Delete Error", err));
     }
 
-    const handleSaveAttendance = async () => {
-
-        await axios.post('http://192.168.1.3:5291/api/Attendance/post', JSON.stringify({ "Id": 0, "AttendanceType": "", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true }), {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                if (response.status === 200) {
-                    setAttendanceList([]);
-                    setSkip(0);
-                    Alert.alert('Sucess', 'Attendance is Added Successfully')
-                    GetAttendanceList();
-                    setAttendance({
-                        "Id": 0,
-                        "AttendanceType": "",
-                        "RegistrationNumber": "",
-                        "IsActive": true,
-                    });
-                }
-            })
-            .catch(err => console.error('Error saving Attendance:', err))
-    };
-
     const getFormattedDate = (datestring) => {
         const datetimeString = datestring;
         const date = new Date(datetimeString);
@@ -269,7 +209,6 @@ const AttendanceScreen = () => {
     const handleLoadMore = async () => {
         console.log("Execute Handle More function")
         if (!isEndReached) {
-            // setSkip(skip + 10)
             GetAttendanceList();
         }
     };
@@ -328,7 +267,10 @@ const AttendanceScreen = () => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => handleDeleteAttendance(item.attendanceId)}>
+                }} onPress={() => {
+                    handleDeleteAttendance(item.attendanceId)
+                    setSkip(0);
+                    }}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -349,7 +291,11 @@ const AttendanceScreen = () => {
                             placeholder="Enter Registration Number"
                             value={attendance.RegistrationNumber}
                             keyboardType='numeric'
-                            onChangeText={(text) => setAttendance({ ...attendance, RegistrationNumber: text })}
+                            onChangeText={(text) => {
+                                setAttendance({ ...attendance, RegistrationNumber: text })
+                                setAttendanceList([]);
+                                setSkip(0);
+                            }}
                         />
                     </View>
                     <View style={{ flexDirection: 'row', marginBottom: 10 }}>
@@ -361,7 +307,11 @@ const AttendanceScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3,
-                        }} onPress={handleAddCheckedInAttendance}>
+                        }} onPress={() => {
+                            setAttendanceList([]);
+                            setSkip(0);
+                            handleAddCheckedInAttendance();
+                            }}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -377,7 +327,11 @@ const AttendanceScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3
-                        }} onPress={handleAddCheckedOutAttendance}>
+                        }} onPress={() => {
+                            setAttendanceList([]);
+                            setSkip(0);
+                            handleAddCheckedOutAttendance();
+                            }}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -408,9 +362,6 @@ const AttendanceScreen = () => {
                         showsVerticalScrollIndicator={false}
                         renderItem={renderAttendanceCard}
                         ListFooterComponent={renderFooter}
-                        onEndReached={() => {
-                            handleLoadMore();
-                        }}
                         onEndReachedThreshold={0.1}
                     />
 

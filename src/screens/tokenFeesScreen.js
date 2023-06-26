@@ -7,15 +7,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Post as httpPost } from '../constants/httpService';
 
-const StudentBatchFeesScreen = () => {
+const StudentTokenFeesScreen = () => {
     // const ToDate = new Date();
     // ToDate.setDate(ToDate.getDate() + 1)
     // const FromDate = new Date();
     // FromDate.setDate(FromDate.getDate() - 7);
-    const [studentBatchFeesDeposit, setStudentBatchFeesDeposit] = useState({ "Id": 0,  "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
-    const [studentBatchFeesRefund, setStudentBatchFeesRefund] = useState({ "Id": 0,  "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
+    const [studentTokenFeesDeposit, setStudentTokenFeesDeposit] = useState({ "Id": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
+    const [studentTokenFeesRefund, setStudentTokenFeesRefund] = useState({ "Id": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
     const [registrationNumber, setRegistrationNumber] = useState({"RegistrationNumber": ""})
-    const [studentBatchFeesList, setStudentBatchFeesList] = useState([]);
+    const [studentTokenFeesList, setStudentTokenFeesList] = useState([]);
     const [depositModalVisible, setDepositModalVisible] = useState(false);
     const [refundModalVisible, setRefundModalVisible] = useState(false);
     const moveToRight = useRef(new Animated.Value(0)).current;
@@ -64,7 +64,7 @@ const StudentBatchFeesScreen = () => {
 
     // Function to handle button press
     const handleHistory = () => {
-        setStudentBatchFeesList([]);
+        setStudentTokenFeesList([]);
         setSkip(0);
         if (registrationNumber.RegistrationNumber === "") {
             Toast.show({
@@ -76,30 +76,30 @@ const StudentBatchFeesScreen = () => {
             });
         }
         else {
-            GetStudentBatchFeesList();
+            GetStudentTokenFeesList();
         }
     };
 
     // useEffect(() => {
     //     setLoading(true);
-    //     GetStudentBatchFeesList();
+    //     GetStudentTokenFeesList();
     // }, [skip])
 
-    const GetStudentBatchFeesList = () => {
+    const GetStudentTokenFeesList = () => {
         setLoading(true);
         const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber , "Take": take, "Skip": skip }
-        // axios.post(`http://192.168.1.5:5291/api/StudentBatchFees/getStudentBatchFeesByRegistrationNumber`, JSON.stringify(filter), {
+        // axios.post(`http://192.168.1.5:5291/api/StudentTokenFees/getStudentTokenFeesByRegistrationNumber`, JSON.stringify(filter), {
         //     headers: {
         //         'Content-Type': 'application/json', // Example header
         //         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
         //     },
         // })
-        httpPost("StudentBatchFees/getStudentBatchFeesByRegistrationNumber", filter)
+        httpPost("StudentTokenFees/getStudentTokenFeesByRegistrationNumber", filter)
             .then((response) => {
                 setLoading(false);
                 if (response.data.length >= 0) {
                     setIsEndReached(false);
-                    setStudentBatchFeesList([...studentBatchFeesList, ...response.data])
+                    setStudentTokenFeesList([...studentTokenFeesList, ...response.data])
                     setSkip(skip + 10);
                 }
                 if (response.data.length === 0) {
@@ -119,9 +119,10 @@ const StudentBatchFeesScreen = () => {
             });
     }
 
-    const handleAddDepositStudentBatchFees = () => {
-        setStudentBatchFeesDeposit({
+    const handleAddDepositStudentTokenFees = () => {
+        setStudentTokenFeesDeposit({
             Id: 0,
+            RegistrationNumber: "",
             Particulars: "",
             Deposit: 0,
             Refund: 0,
@@ -129,9 +130,10 @@ const StudentBatchFeesScreen = () => {
         });
         setDepositModalVisible(true);
     };
-    const handleAddRefundStudentBatchFees = () => {
-        setStudentBatchFeesRefund({
+    const handleAddRefundStudentTokenFees = () => {
+        setStudentTokenFeesRefund({
             Id: 0,
+            RegistrationNumber: "",
             Particulars: "",
             Deposit: 0,
             Refund: 0,
@@ -140,18 +142,18 @@ const StudentBatchFeesScreen = () => {
         setRefundModalVisible(true);
     };
 
-    const handleDeleteStudentBatchFees = (id) => {
-        axios.delete(`http://192.168.1.3:5291/api/StudentBatchFees/delete?Id=${id}`)
+    const handleDeleteStudentTokenFees = (id) => {
+        axios.delete(`http://192.168.1.3:5291/api/StudentTokenFees/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
-                setStudentBatchFeesList([]);
+                setStudentTokenFeesList([]);
                 setSkip(0);
             })
             .catch(err => console.error("Delete Error", err));
     }
 
-    const handleSaveStudentBatchFeesDeposit = () => {
-        const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber, "Take": take, "Skip": skip }
+    const handleSaveStudentTokenFeesDeposit = () => {
+        const filter = { "RegistrationNumber": studentTokenFeesDeposit.RegistrationNumber, "Take": take, "Skip": skip }
         httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
             if (response.data === false) {
                 Toast.show({
@@ -163,21 +165,21 @@ const StudentBatchFeesScreen = () => {
                 });
             }
             else {
-                if (studentBatchFeesDeposit.Deposit !== 0) {
-                    httpPost("StudentBatchFees/post", studentBatchFeesDeposit)
+                if (studentTokenFeesDeposit.Deposit !== 0) {
+                    httpPost("StudentTokenFees/post", studentTokenFeesDeposit)
                         .then((response) => {
                             if (response.status === 200) {
-                                setStudentBatchFeesList([]);
+                                setStudentTokenFeesList([]);
                                 setSkip(0);
-                                Alert.alert('Sucess', 'StudentBatchFees Deposit is Added Successfully')
+                                Alert.alert('Sucess', 'StudentTokenFees Deposit is Added Successfully')
                                 setLoading(true);
-                                const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber, "Take": take, "Skip": 0 }
-                                httpPost("StudentBatchFees/getStudentBatchFeesByRegistrationNumber", filter)
+                                const filter = { "RegistrationNumber": studentTokenFeesDeposit.RegistrationNumber, "Take": take, "Skip": 0 }
+                                httpPost("StudentTokenFees/getStudentTokenFeesByRegistrationNumber", filter)
                                     .then((response) => {
                                         setLoading(false);
                                         if (response.data.length >= 0) {
                                             setIsEndReached(false);
-                                            setStudentBatchFeesList(response.data)
+                                            setStudentTokenFeesList(response.data)
                                         }
                                         if (response.data.length === 0) {
                                             setIsEndReached(true);
@@ -192,10 +194,11 @@ const StudentBatchFeesScreen = () => {
                                     })
                                     .catch((error) => {
                                         setLoading(false);
-                                        console.error("Add Deposit Get Student Batch Fees By Registration Number error", error);
+                                        console.error("Add Deposit Get Student Token Fees By Registration Number error", error);
                                     });
-                                setStudentBatchFeesDeposit({
+                                setStudentTokenFeesDeposit({
                                     "Id": 0,
+                                    "RegistrationNumber": "",
                                     "Particulars": "",
                                     "Deposit": 0,
                                     "Refund": 0,
@@ -210,8 +213,8 @@ const StudentBatchFeesScreen = () => {
             .catch(err => console.error('Error in Registration IsExists', err))
     };
 
-    const handleSaveStudentBatchFeesRefund = () => {
-        const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber, "Take": take, "Skip": skip }
+    const handleSaveStudentTokenFeesRefund = () => {
+        const filter = { "RegistrationNumber": studentTokenFeesRefund.RegistrationNumber, "Take": take, "Skip": skip }
         httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
             if (response.data === false) {
                 Toast.show({
@@ -223,21 +226,21 @@ const StudentBatchFeesScreen = () => {
                 });
             }
             else {
-            if (studentBatchFeesRefund.Refund !== 0) {
-                httpPost("StudentBatchFees/post", studentBatchFeesRefund)
+            if (studentTokenFeesRefund.Refund !== 0) {
+                httpPost("StudentTokenFees/post", studentTokenFeesRefund)
                     .then((response) => {
                         if (response.status === 200) {
-                            setStudentBatchFeesList([]);
+                            setStudentTokenFeesList([]);
                             setSkip(0);
-                            Alert.alert('Sucess', 'StudentBatchFees Refund is Added Successfully')
+                            Alert.alert('Sucess', 'StudentTokenFees Refund is Added Successfully')
                             setLoading(true);
-                                const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber, "Take": take, "Skip": 0 }
-                                httpPost("StudentBatchFees/getStudentBatchFeesByRegistrationNumber", filter)
+                                const filter = { "RegistrationNumber": studentTokenFeesRefund.RegistrationNumber, "Take": take, "Skip": 0 }
+                                httpPost("StudentTokenFees/getStudentTokenFeesByRegistrationNumber", filter)
                                     .then((response) => {
                                         setLoading(false);
                                         if (response.data.length >= 0) {
                                             setIsEndReached(false);
-                                            setStudentBatchFeesList(response.data)
+                                            setStudentTokenFeesList(response.data)
                                         }
                                         if (response.data.length === 0) {
                                             setIsEndReached(true);
@@ -252,10 +255,11 @@ const StudentBatchFeesScreen = () => {
                                     })
                                     .catch((error) => {
                                         setLoading(false);
-                                        console.error("Add Refund Get Student Batch Fees By Registration Number error", error);
+                                        console.error("Add Refund Get Student Token Fees By Registration Number error", error);
                                     });
-                            setStudentBatchFeesRefund({
+                            setStudentTokenFeesRefund({
                                 "Id": 0,
+                                "RegistrationNumber": "",
                                 "Particulars": "",
                                 "Deposit": 0,
                                 "Refund": 0,
@@ -287,7 +291,7 @@ const StudentBatchFeesScreen = () => {
     const handleLoadMore = async () => {
         console.log("Execute Handle More function")
         if (!isEndReached) {
-            GetStudentBatchFeesList();
+            GetStudentTokenFeesList();
         }
     };
 
@@ -300,7 +304,7 @@ const StudentBatchFeesScreen = () => {
         );
     };
 
-    const renderStudentBatchFeesCard = ({ item }) => (
+    const renderStudentTokenFeesCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
             borderRadius: 10,
@@ -320,8 +324,8 @@ const StudentBatchFeesScreen = () => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.studentName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
+                <Text style={{ fontSize: 16 }}>Token Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Mobile : </Text>
@@ -349,7 +353,7 @@ const StudentBatchFeesScreen = () => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => handleDeleteStudentBatchFees(item.studentBatchFeesId)}>
+                }} onPress={() => handleDeleteStudentTokenFees(item.studentTokenFeesId)}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -373,7 +377,7 @@ const StudentBatchFeesScreen = () => {
                         keyboardType='numeric'
                         onChangeText={(text)=> {
                             setRegistrationNumber({...registrationNumber, RegistrationNumber: text})
-                            setStudentBatchFeesList([]);
+                            setStudentTokenFeesList([]);
                             setSkip(0);
                         }}
                         />
@@ -388,7 +392,7 @@ const StudentBatchFeesScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3,
-                        }} onPress={handleAddDepositStudentBatchFees}>
+                        }} onPress={handleAddDepositStudentTokenFees}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -404,7 +408,7 @@ const StudentBatchFeesScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3,
-                        }} onPress={handleAddRefundStudentBatchFees}>
+                        }} onPress={handleAddRefundStudentTokenFees}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -540,10 +544,10 @@ const StudentBatchFeesScreen = () => {
                     )} */}
 
                     <FlatList
-                        data={studentBatchFeesList}
-                        keyExtractor={(item) => item.studentBatchFeesId.toString()}
+                        data={studentTokenFeesList}
+                        keyExtractor={(item) => item.studentTokenFeesId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={renderStudentBatchFeesCard}
+                        renderItem={renderStudentTokenFeesCard}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();
@@ -570,13 +574,26 @@ const StudentBatchFeesScreen = () => {
                                             borderRadius: 10,
                                             padding: 8,
                                             marginBottom: 20,
+                                        }}
+                                        placeholder="Enter Registration Number"
+                                        keyboardType='numeric'
+                                        value={studentTokenFeesDeposit.RegistrationNumber}
+                                        onChangeText={(text) => setStudentTokenFeesDeposit({ ...studentTokenFeesDeposit, RegistrationNumber: text })}
+                                    />
+                                    <TextInput
+                                        style={{
+                                            borderWidth: 1,
+                                            borderColor: Colors.primary,
+                                            borderRadius: 10,
+                                            padding: 8,
+                                            marginBottom: 20,
                                             height: 80,
                                             textAlignVertical: 'top',
                                         }}
                                         placeholder="Particulars"
                                         multiline
-                                        value={studentBatchFeesDeposit.Particulars}
-                                        onChangeText={(text) => setStudentBatchFeesDeposit({ ...studentBatchFeesDeposit, Particulars: text })}
+                                        value={studentTokenFeesDeposit.Particulars}
+                                        onChangeText={(text) => setStudentTokenFeesDeposit({ ...studentTokenFeesDeposit, Particulars: text })}
                                     />
                                     <TextInput
                                         style={{
@@ -588,8 +605,8 @@ const StudentBatchFeesScreen = () => {
                                         }}
                                         placeholder="Deposit"
                                         keyboardType='numeric'
-                                        value={studentBatchFeesDeposit.Deposit}
-                                        onChangeText={(text) => setStudentBatchFeesDeposit({ ...studentBatchFeesDeposit, Deposit: text })}
+                                        value={studentTokenFeesDeposit.Deposit}
+                                        onChangeText={(text) => setStudentTokenFeesDeposit({ ...studentTokenFeesDeposit, Deposit: text })}
                                     />
                                     <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
                                         <TouchableOpacity style={{
@@ -597,12 +614,12 @@ const StudentBatchFeesScreen = () => {
                                             borderRadius: 5,
                                             paddingVertical: 8,
                                             paddingHorizontal: 12,
-                                        }} onPress={handleSaveStudentBatchFeesDeposit}>
+                                        }} onPress={handleSaveStudentTokenFeesDeposit}>
                                             <Text style={{
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentBatchFeesDeposit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentTokenFeesDeposit.Id === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -640,13 +657,26 @@ const StudentBatchFeesScreen = () => {
                                             borderRadius: 10,
                                             padding: 8,
                                             marginBottom: 20,
+                                        }}
+                                        placeholder="Enter Registration Number"
+                                        keyboardType='numeric'
+                                        value={studentTokenFeesRefund.RegistrationNumber}
+                                        onChangeText={(text) => setStudentTokenFeesRefund({ ...studentTokenFeesRefund, RegistrationNumber: text })}
+                                    />
+                                    <TextInput
+                                        style={{
+                                            borderWidth: 1,
+                                            borderColor: Colors.primary,
+                                            borderRadius: 10,
+                                            padding: 8,
+                                            marginBottom: 20,
                                             height: 80,
                                             textAlignVertical: 'top',
                                         }}
                                         placeholder="Particulars"
                                         multiline
-                                        value={studentBatchFeesRefund.Particulars}
-                                        onChangeText={(text) => setStudentBatchFeesRefund({ ...studentBatchFeesRefund, Particulars: text })}
+                                        value={studentTokenFeesRefund.Particulars}
+                                        onChangeText={(text) => setStudentTokenFeesRefund({ ...studentTokenFeesRefund, Particulars: text })}
                                     />
                                     <TextInput
                                         style={{
@@ -658,8 +688,8 @@ const StudentBatchFeesScreen = () => {
                                         }}
                                         placeholder="Refund"
                                         keyboardType='numeric'
-                                        value={studentBatchFeesRefund.Refund}
-                                        onChangeText={(text) => setStudentBatchFeesRefund({ ...studentBatchFeesRefund, Refund: text })}
+                                        value={studentTokenFeesRefund.Refund}
+                                        onChangeText={(text) => setStudentTokenFeesRefund({ ...studentTokenFeesRefund, Refund: text })}
                                     />
                                     <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end', }}>
                                         <TouchableOpacity style={{
@@ -667,12 +697,12 @@ const StudentBatchFeesScreen = () => {
                                             borderRadius: 5,
                                             paddingVertical: 8,
                                             paddingHorizontal: 12,
-                                        }} onPress={handleSaveStudentBatchFeesRefund}>
+                                        }} onPress={handleSaveStudentTokenFeesRefund}>
                                             <Text style={{
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentBatchFeesRefund.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentTokenFeesRefund.Id === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -699,7 +729,7 @@ const StudentBatchFeesScreen = () => {
     );
 };
 
-export default StudentBatchFeesScreen;
+export default StudentTokenFeesScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -753,7 +783,7 @@ export default StudentBatchFeesScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   studentBatchFeesCard: {
+//   studentTokenFeesCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -768,7 +798,7 @@ export default StudentBatchFeesScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   studentBatchFeesName: {
+//   studentTokenFeesName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

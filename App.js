@@ -40,10 +40,11 @@ import StudentTokenScreen from './src/screens/student/token/studentTokenScreen';
 import StudentTokenFormScreen from './src/screens/student/token/studentTokenFormScreen';
 import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchScreen';
 import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
-import StudentBatchFeesScreen from './src/screens/student/studentBatch/studentBatchFeesScreen';
-import StudentTokenFeesScreen from './src/screens/student/token/studentTokenFeesScreen';
+import StudentBatchFeesScreen from './src/screens/feeCollection';
+import StudentTokenFeesScreen from './src/screens/tokenFeesScreen';
 import AttendanceScreen from './src/screens/attendanceScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AttendanceHistoryScreen from './src/screens/attendanceHistoryScreen';
 
 
 export const UserContext = React.createContext();
@@ -92,6 +93,7 @@ function App()
               <Stack.Screen name="StudentTokenFeesScreen" options={{ title: 'Student Token Fees' }} component={StudentTokenFeesScreen} />
               <Stack.Screen name="StudentBatchScreen" options={{ title: 'Student Batch' }} component={StudentBatchScreen} />
               <Stack.Screen name="AttendanceScreen" options={{ title: 'Attendance' }} component={AttendanceScreen} />
+              <Stack.Screen name="AttendanceHistoryScreen" options={{title: 'Attendance History'}} component={AttendanceHistoryScreen} />
               <Stack.Screen name="StudentBatchFormScreen" options={{ title: 'Student Batch Form' }} component={StudentBatchFormScreen} />
               <Stack.Screen name="StudentBatchFeesScreen" options={{ title: 'Student Batch Fee' }} component={StudentBatchFeesScreen} />
               <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type' }} component={FeeTypeScreen} />
