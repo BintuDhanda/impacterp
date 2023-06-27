@@ -2,22 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import Colors from '../../constants/Colors';
+import { useFocusEffect } from '@react-navigation/native';
+import { Get as httpGet, Delete as httpDelete } from '../../constants/httpService';
 
-const AddressScreen = ({route,navigation}) => {
-  const {studentId} = route.params;
+const AddressScreen = ({ route, navigation }) => {
+  const { studentId } = route.params;
   const [addressList, setAddressList] = useState([]);
-  
-  useEffect(() => {
-    GetStudentAddressByStudentId();
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      GetStudentAddressByStudentId();
+    }, [])
+  )
 
   const GetStudentAddressByStudentId = () => {
-    axios.get(`http://192.168.1.7:5291/api/StudentAddress/getStudentAddressbyStudentId?Id=${studentId}`, {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
+    httpGet(`StudentAddress/getStudentAddressbyStudentId?Id=${studentId}`)
       .then((response) => {
         console.log(response.data);
         setAddressList(response.data);
@@ -27,8 +26,8 @@ const AddressScreen = ({route,navigation}) => {
       });
   }
 
-  const handleDeleteStudentAddress= (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentAddress/delete?Id=${id}`)
+  const handleDeleteStudentAddress = (id) => {
+    httpDelete(`StudentAddress/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         GetStudentAddressByStudentId();
@@ -37,11 +36,11 @@ const AddressScreen = ({route,navigation}) => {
   }
 
   const handleAddAddressNavigate = () => {
-    navigation.navigate('StudentAddressFormScreen', {studentId: studentId})
+    navigation.navigate('StudentAddressFormScreen', { studentId: studentId })
   }
 
   const handleEditAddressNavigate = (addressId) => {
-    navigation.navigate('StudentAddressFormScreen', {studentId: studentId,addressId: addressId})
+    navigation.navigate('StudentAddressFormScreen', { studentId: studentId, addressId: addressId })
   }
 
   const renderTokenCard = ({ item }) => (

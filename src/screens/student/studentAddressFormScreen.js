@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import Colors from '../../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
+import { Get as httpGet, Post as httpPost , Put as httpPut } from '../../constants/httpService';
 
 const StudentAddressFormScreen = ({ route, navigation }) => {
 
@@ -55,11 +56,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     };
   
     const GetAddressById = () => {
-      axios.get(`http://192.168.1.7:5291/api/StudentAddress/getById?Id=${addressId}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
+      httpGet(`StudentAddress/getById?Id=${addressId}`)
       .then((response)=>{
         setStudentAddress({
           Id: response.data.id,
@@ -77,12 +74,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     }
   
     const GetAddressTypeList = () => {
-      axios.get('http://192.168.1.7:5291/api/AddressType/get', {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      })
+      httpGet("AddressType/get")
         .then((response) => {
           console.log(response.data);
           setAddressTypeList(response.data);
@@ -93,12 +85,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     }
   
     const GetCountryList = () => {
-      axios.get('http://192.168.1.7:5291/api/Country/get', {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      })
+      httpGet("Country/get")
         .then((response) => {
           setCountryList(response.data);
         })
@@ -108,11 +95,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     }
   
     const fetchStateByCountryId = async (countryId) => {
-      await axios.get(`http://192.168.1.7:5291/api/State/getStateByCountryId?Id=${countryId}`,{
-        headers:{
-          'Content-Type': 'application/json'
-        }
-      })
+      await httpGet(`State/getStateByCountryId?Id=${countryId}`)
       .then((response)=>{
         setStateList(response.data)
       })
@@ -122,11 +105,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     }
   
     const fetchCityByStateId = async (stateId) => {
-      await axios.get(`http://192.168.1.7:5291/api/City/getCityByStateId?Id=${stateId}`,{
-        headers:{
-          'Content-Type': 'application/json'
-        }
-      })
+     await httpGet(`City/getCityByStateId?Id=${stateId}`)
       .then((response)=>{
         setCityList(response.data)
       })
@@ -152,11 +131,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     const handleSaveStudentAddress = async () => {
       try {
         if (studentAddress.Id !== 0) {
-          await axios.put(`http://192.168.1.7:5291/api/StudentAddress/put`, JSON.stringify(studentAddress), {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
+          await httpPut('StudentAddress/put', studentAddress)
             .then((response) => {
               if (response.status === 200) {
                 Alert.alert('Success', 'Update Address Successfully')
@@ -178,11 +153,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             .catch(err => console.error("Address update error : ", err));
         }
         else {
-          await axios.post(`http://192.168.1.7:5291/api/StudentAddress/post`, JSON.stringify(studentAddress), {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
+         await httpPost("StudentAddress/post", studentAddress)
             .then((response) => {
               if (response.status === 200) {
                 Alert.alert('Success', 'Add Address Successfully')

@@ -41,10 +41,12 @@ import StudentTokenFormScreen from './src/screens/student/token/studentTokenForm
 import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchScreen';
 import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
 import StudentBatchFeesScreen from './src/screens/feeCollection';
+import StudentBatchFeesHistoryScreen from './src/screens/studentBatchFeesHistoryScreen';
 import StudentTokenFeesScreen from './src/screens/tokenFeesScreen';
 import AttendanceScreen from './src/screens/attendanceScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AttendanceHistoryScreen from './src/screens/attendanceHistoryScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistoryScreen';
 
 
 export const UserContext = React.createContext();
@@ -91,11 +93,13 @@ function App()
               <Stack.Screen name="StudentTokenScreen" options={{ title: 'Student Token' }} component={StudentTokenScreen} />
               <Stack.Screen name="StudentTokenFormScreen" options={{ title: 'Student Token Form' }} component={StudentTokenFormScreen} />
               <Stack.Screen name="StudentTokenFeesScreen" options={{ title: 'Student Token Fees' }} component={StudentTokenFeesScreen} />
+              <Stack.Screen name="StudentTokenFeesHistoryScreen" options={{ title: 'Student Token Fees History' }} component={StudentTokenFeesHistoryScreen} />
               <Stack.Screen name="StudentBatchScreen" options={{ title: 'Student Batch' }} component={StudentBatchScreen} />
               <Stack.Screen name="AttendanceScreen" options={{ title: 'Attendance' }} component={AttendanceScreen} />
               <Stack.Screen name="AttendanceHistoryScreen" options={{title: 'Attendance History'}} component={AttendanceHistoryScreen} />
               <Stack.Screen name="StudentBatchFormScreen" options={{ title: 'Student Batch Form' }} component={StudentBatchFormScreen} />
               <Stack.Screen name="StudentBatchFeesScreen" options={{ title: 'Student Batch Fee' }} component={StudentBatchFeesScreen} />
+              <Stack.Screen name="StudentBatchFeesHistoryScreen" options={{ title: 'Student Batch Fees History' }} component={StudentBatchFeesHistoryScreen} />
               <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type' }} component={FeeTypeScreen} />
               <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
               <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />

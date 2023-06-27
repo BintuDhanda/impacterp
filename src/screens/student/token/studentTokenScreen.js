@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import axios from 'axios';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
 
 const StudentTokenScreen = ({route, navigation}) => {
   const {studentId} = route.params;
@@ -16,12 +17,7 @@ const StudentTokenScreen = ({route, navigation}) => {
   const GetStudentTokenByStudentId = async () => {
     try {
       console.log(studentId, "studentId")
-      const response = await axios.get(`http://192.168.1.7:5291/api/StudentToken/getStudentTokenByStudentId?StudentId=${studentId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      });
+      const response = await httpGet(`StudentToken/getStudentTokenByStudentId?StudentId=${studentId}`)
       setTokenList(response.data);
     } catch (error) {
       console.error('Error fetching Student Token List:', error);
@@ -40,7 +36,7 @@ const StudentTokenScreen = ({route, navigation}) => {
   }
 
   const handleDeleteToken = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentToken/delete?Id=${id}`)
+    httpDelete(`StudentToken/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         GetStudentTokenByStudentId();

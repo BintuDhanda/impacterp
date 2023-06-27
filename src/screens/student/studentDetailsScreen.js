@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, Activity
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import Colors from '../../constants/Colors';
+import { Get as httpGet } from '../../constants/httpService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -38,11 +39,12 @@ const StudentDetailsScreen = ({ navigation }) => {
     }
 
     const GetStudentList = () => {
-        axios.get('http://192.168.1.3:5291/api/StudentDetails/get', {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        // axios.get('http://192.168.1.3:5291/api/StudentDetails/get', {
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // })
+        httpGet("StudentDetails/get")
             .then((response) => {
                 console.log(response.data, "StudentDetails list");
                 const studentDetailsArray = response.data.map((studentDetails) => ({
@@ -80,7 +82,8 @@ const StudentDetailsScreen = ({ navigation }) => {
         axios.delete(`http://192.168.1.3:5291/api/StudentDetails/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
-                fetchStudentDetailsByUserId();
+                GetStudentList();
+                // fetchStudentDetailsByUserId();
             })
             .catch(err => console.error("Delete Error", err));
     }

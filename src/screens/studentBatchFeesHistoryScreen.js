@@ -4,11 +4,12 @@ import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useFocusEffect } from '@react-navigation/native';
 import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
-const AttendanceHistoryScreen = ({ route, navigation }) => {
+const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
     const { registrationNumber } = route.params;
-    const [attendanceList, setAttendanceList] = useState([]);
+    const [studentBatchFeesList, setStudentBatchFeesList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
     const [loading, setLoading] = useState(false);
@@ -16,20 +17,22 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
 
-    useEffect(()=>{
-        GetAttendanceList();
-    },[])
+    useFocusEffect(
+        React.useCallback(() => {
+          GetStudentBatchFeesList();
+        }, [])
+      )
 
-    const GetAttendanceList = () => {
+    const GetStudentBatchFeesList = () => {
         setLoading(true);
         const filter = { "RegistrationNumber": registrationNumber, "Take": take, "Skip": skip }
-        httpPost("Attendance/getAttendanceByRegistrationNumber", filter)
+        httpPost("StudentBatchFees/getStudentBatchFeesByRegistrationNumber", filter)
             .then((response) => {
-                console.log(attendanceList, "AttendanceList")
+                console.log(studentBatchFeesList, "StudentBatchFeesList")
                 setLoading(false);
                 if (response.data.length >= 0) {
                     setIsEndReached(false);
-                    setAttendanceList([...attendanceList, ...response.data]);
+                    setStudentBatchFeesList([...studentBatchFeesList, ...response.data]);
                     setSkip(skip + 10);
                 }
                 if (response.data.length === 0) {
@@ -49,8 +52,8 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             });
     }
 
-    const handleDeleteAttendance = (id) => {
-        httpDelete(`Attendance/delete?Id=${id}`)
+    const handleDeleteStudentBatchFees = (id) => {
+        httpDelete(`StudentBatchFees/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 navigation.goBack();
@@ -61,7 +64,7 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
     const handleLoadMore = async () => {
         console.log("Execute Handle More function")
         if (!isEndReached) {
-            GetAttendanceList();
+            GetStudentBatchFeesList();
         }
     };
     const getFormattedDate = (datestring) => {
@@ -80,7 +83,7 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             </View>
         );
     };
-    const renderAttendanceCard = ({ item }) => (
+    const renderStudentBatchFeesCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
             borderRadius: 10,
@@ -96,28 +99,32 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>BatchName : </Text>
+                <Text style={{ fontSize: 16 }}>Student Name : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.studentName}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Attendance Type : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.attendanceType}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Punch Time : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.punchTime)}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Registration Number : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.registrationNumber}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Student Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.studentName}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Mobile : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.mobile}</Text>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Particulars : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
+            </View>
+            {item.deposit !== 0 ? (<View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Deposit : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.deposit}</Text>
+            </View>) : null}
+            {item.refund !== 0 ? (<View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Refund : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.refund}</Text>
+            </View>) : null}
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Created At : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                 <TouchableOpacity style={{
@@ -125,10 +132,7 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => {
-                    handleDeleteAttendance(item.attendanceId)
-                    setSkip(0);
-                }}>
+                }} onPress={() => handleDeleteStudentBatchFees(item.studentBatchFeesId)}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -143,10 +147,10 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
                     <FlatList
-                        data={attendanceList}
-                        keyExtractor={(item) => item.attendanceId.toString()}
+                        data={studentBatchFeesList}
+                        keyExtractor={(item) => item.studentBatchFeesId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={renderAttendanceCard}
+                        renderItem={renderStudentBatchFeesCard}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();
@@ -160,4 +164,4 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
         </ScrollView>
     )
 }
-export default AttendanceHistoryScreen;
+export default StudentBatchFeesHistoryScreen;
