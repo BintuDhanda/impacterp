@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const DayBookScreen = () => {
     const ToDate = new Date();
@@ -87,11 +87,7 @@ const DayBookScreen = () => {
     // }, [skip])
 
     const GetAccountList = () => {
-        axios.get('http://192.168.1.3:5291/api/Account/get', {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        httpGet("Account/get")
             .then((response) => {
                 console.log(response.data, "Account list");
                 const accountArray = response.data.map((account) => ({
@@ -107,12 +103,7 @@ const DayBookScreen = () => {
     const GetDayBookList = () => {
         setLoading(true);
         const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "Mobile": "" }
-        axios.post('http://192.168.1.3:5291/api/DayBook/get', JSON.stringify(filter), {
-            headers: {
-                'Content-Type': 'application/json', // Example header
-                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-        })
+        httpPost("DayBook/get", filter)
             .then((response) => {
                 setLoading(false);
                 if (response.data.length >= 0) {
@@ -161,7 +152,7 @@ const DayBookScreen = () => {
     };
 
     const handleDeleteDayBook = (id) => {
-        axios.delete(`http://192.168.1.3:5291/api/DayBook/delete?Id=${id}`)
+        httpDelete(`DayBook/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 setDayBookList([]);
@@ -173,11 +164,7 @@ const DayBookScreen = () => {
     const handleSaveDayBookCredit = async () => {
         try {
             if (dayBookCredit.Credit !== 0) {
-                await axios.post('http://192.168.1.3:5291/api/DayBook/post', JSON.stringify(dayBookCredit), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("DayBook/post", dayBookCredit)
                     .then((response) => {
                         if (response.status === 200) {
                             setDayBookList([]);
@@ -203,11 +190,7 @@ const DayBookScreen = () => {
     const handleSaveDayBookDebit = async () => {
         try {
             if (dayBookDebit.Debit !== 0) {
-                await axios.post('http://192.168.1.3:5291/api/DayBook/post', JSON.stringify(dayBookDebit), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("DayBook/post", dayBookDebit)
                     .then((response) => {
                         if (response.status === 200) {
                             setDayBookList([]);

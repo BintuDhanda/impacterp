@@ -31,9 +31,6 @@ const StudentTokenScreen = ({route, navigation}) => {
   const handleEditStudentTokenNavigate = (tokenId,batchName) => {
     navigation.navigate('StudentTokenFormScreen', {studentId: studentId, tokenId: tokenId, batchName: batchName})
   }
-  const handleStudentTokenFeesNavigate = (studentTokenId) => {
-    navigation.navigate('StudentTokenFeesScreen', {studentId: studentId, studentTokenId: studentTokenId})
-  }
 
   const handleDeleteToken = (id) => {
     httpDelete(`StudentToken/delete?Id=${id}`)
@@ -81,6 +78,10 @@ const StudentTokenScreen = ({route, navigation}) => {
         <Text style={{ fontSize: 16 }}>Valid UpTo : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.validUpto)}</Text>
       </View>)}
+      {item.tokenFee === null ? null : (<View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Token Fee : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenFee}</Text>
+      </View>)}
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Status : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.isActive === true ? "Active" : "InActive"}</Text>
@@ -99,19 +100,7 @@ const StudentTokenScreen = ({route, navigation}) => {
             fontWeight: 'bold',
           }}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleStudentTokenFeesNavigate(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Token Fees</Text>
-        </TouchableOpacity>
+        
         <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,

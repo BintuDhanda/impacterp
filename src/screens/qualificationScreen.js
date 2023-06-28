@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const QualificationScreen = () => {
   const [qualification, setQualification] = useState({ "Id": 0, "QualificationName": "", "IsActive": true });
@@ -12,11 +13,7 @@ const QualificationScreen = () => {
     GetQualificationList();
   }, []);
   const GetQualificationList = () => {
-    axios.get("http://192.168.1.7:5291/api/Qualification/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("Qualification/get")
       .then((result) => {
         console.log(result.data)
         setQualificationList(result.data)
@@ -35,11 +32,7 @@ const QualificationScreen = () => {
   const handleSaveQualification = () => {
     try {
       if (qualification.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/Qualification/put`, JSON.stringify(qualification), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("Qualification/put", qualification)
           .then((response) => {
             if (response.status === 200) {
               GetQualificationList();
@@ -54,11 +47,7 @@ const QualificationScreen = () => {
           .catch(err => console.log("Qualification update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/Qualification/post`, JSON.stringify(qualification), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("Qualification/post", qualification)
           .then((response) => {
             if (response.status === 200) {
               GetQualificationList();
@@ -80,7 +69,7 @@ const QualificationScreen = () => {
   }
 
   const handleDeleteQualification = (qualificationId) => {
-    axios.delete(`http://192.168.1.7:5291/api/Qualification/delete?Id=${qualificationId}`)
+    httpDelete(`Qualification/delete?Id=${qualificationId}`)
       .then((result) => {
         console.log(result);
         GetQualificationList();
@@ -89,7 +78,7 @@ const QualificationScreen = () => {
   };
 
   const handleEditQualification = (qualificationId) => {
-    axios.get(`http://192.168.1.7:5291/api/Qualification/getById?Id=${qualificationId}`)
+    httpGet(`Qualification/getById?Id=${qualificationId}`)
       .then((response) => {
         setQualification({
           Id: response.data.id,

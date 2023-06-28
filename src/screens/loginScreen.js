@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native'
 import Icon from 'react-native-vector-icons/AntDesign';

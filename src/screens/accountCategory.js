@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AccountCategoryScreen = () => {
   const [accountCategory, setAccountCategory] = useState({ "Id": 0, "AccCategoryName": "", "IsActive": true });
@@ -12,11 +13,7 @@ const AccountCategoryScreen = () => {
     GetAccountCategoryList();
   }, []);
   const GetAccountCategoryList = () => {
-    axios.get("http://192.168.1.7:5291/api/AccountCategory/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("AccountCategory/get")
       .then((result) => {
         console.log(result.data)
         setAccountCategoryList(result.data)
@@ -35,11 +32,7 @@ const AccountCategoryScreen = () => {
   const handleSaveAccountCategory = () => {
     try {
       if (accountCategory.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/AccountCategory/put`, JSON.stringify(accountCategory), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("AccountCategory/put", accountCategory)
           .then((response) => {
             if (response.status === 200) {
               GetAccountCategoryList();
@@ -54,11 +47,7 @@ const AccountCategoryScreen = () => {
           .catch(err => console.log("AccountCategory update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/AccountCategory/post`, JSON.stringify(accountCategory), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("AccountCategory/post", accountCategory)
           .then((response) => {
             if (response.status === 200) {
               GetAccountCategoryList();
@@ -80,7 +69,7 @@ const AccountCategoryScreen = () => {
   }
 
   const handleDeleteAccountCategory = (accountCategoryId) => {
-    axios.delete(`http://192.168.1.7:5291/api/AccountCategory/delete?Id=${accountCategoryId}`)
+    httpDelete(`AccountCategory/delete?Id=${accountCategoryId}`)
       .then((result) => {
         console.log(result);
         GetAccountCategoryList();
@@ -89,7 +78,7 @@ const AccountCategoryScreen = () => {
   };
 
   const handleEditAccountCategory = (accountCategoryId) => {
-    axios.get(`http://192.168.1.7:5291/api/AccountCategory/getById?Id=${accountCategoryId}`)
+    httpGet(`AccountCategory/getById?Id=${accountCategoryId}`)
       .then((response) => {
         setAccountCategory({
           Id: response.data.id,

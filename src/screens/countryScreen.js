@@ -1,7 +1,7 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CountryScreen = ({ navigation }) => {
   const [country, setCountry] = useState({ "Id": 0, "CountryName": "", "IsActive": true });
@@ -12,11 +12,7 @@ const CountryScreen = ({ navigation }) => {
     GetCountryList();
   }, []);
   const GetCountryList = () => {
-    axios.get("http://192.168.1.7:5291/api/Country/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("Country/get")
       .then((result) => {
         console.log(result.data)
         setCountryList(result.data)
@@ -35,11 +31,7 @@ const CountryScreen = ({ navigation }) => {
   const handleSaveCountry = () => {
     try {
       if (country.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/Country/put`, JSON.stringify(country), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("Country/put", country)
           .then((response) => {
             if (response.status === 200) {
               GetCountryList();
@@ -54,11 +46,7 @@ const CountryScreen = ({ navigation }) => {
           .catch(err => console.log("Country update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/Country/post`, JSON.stringify(country), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("Country/post", country)
           .then((response) => {
             if (response.status === 200) {
               GetCountryList();
@@ -80,7 +68,7 @@ const CountryScreen = ({ navigation }) => {
   }
 
   const handleDeleteCountry = (countryId) => {
-    axios.delete(`http://192.168.1.7:5291/api/Country/delete?Id=${countryId}`)
+    httpDelete(`Country/delete?Id=${countryId}`)
       .then((result) => {
         console.log(result);
         GetCountryList();
@@ -93,7 +81,7 @@ const CountryScreen = ({ navigation }) => {
   }
 
   const handleEditCountry = (countryId) => {
-    axios.get(`http://192.168.1.7:5291/api/Country/getById?Id=${countryId}`)
+    httpGet(`Country/getById?Id=${countryId}`)
       .then((response) => {
         setCountry({
           Id: response.data.id,

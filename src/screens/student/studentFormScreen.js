@@ -48,7 +48,7 @@ const StudentFormScreen = ({ route, navigation }) => {
     };
 
     const handleEditStudentDetails = () => {
-        axios.get(`http://192.168.1.7:5291/api/StudentDetails/getById?Id=${studentId}`)
+        axios.get(`http://192.168.1.5:5291/api/StudentDetails/getById?Id=${studentId}`)
             .then((result) => {
                 console.log(result.data, "studentDetailsById");
                 setFormData(

@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const FeeTypeScreen = () => {
   const [feeType, setFeeType] = useState({ "Id": 0, "FeeTypeName": "", "IsActive": true });
@@ -12,11 +13,7 @@ const FeeTypeScreen = () => {
     GetFeeTypeList();
   }, []);
   const GetFeeTypeList = () => {
-    axios.get("http://192.168.1.7:5291/api/FeeType/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("FeeType/get")
       .then((result) => {
         console.log(result.data)
         setFeeTypeList(result.data)
@@ -35,11 +32,7 @@ const FeeTypeScreen = () => {
   const handleSaveFeeType = () => {
     try {
       if (feeType.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/FeeType/put`, JSON.stringify(feeType), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("FeeType/put", feeType)
           .then((response) => {
             if (response.status === 200) {
               GetFeeTypeList();
@@ -54,11 +47,7 @@ const FeeTypeScreen = () => {
           .catch(err => console.log("FeeType update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/FeeType/post`, JSON.stringify(feeType), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("FeeType/post", feeType)
           .then((response) => {
             if (response.status === 200) {
               GetFeeTypeList();
@@ -80,7 +69,7 @@ const FeeTypeScreen = () => {
   }
 
   const handleDeleteFeeType = (feeTypeId) => {
-    axios.delete(`http://192.168.1.7:5291/api/FeeType/delete?Id=${feeTypeId}`)
+    httpDelete(`FeeType/delete?Id=${feeTypeId}`)
       .then((result) => {
         console.log(result);
         GetFeeTypeList();
@@ -89,7 +78,7 @@ const FeeTypeScreen = () => {
   };
 
   const handleEditFeeType = (feeTypeId) => {
-    axios.get(`http://192.168.1.7:5291/api/FeeType/getById?Id=${feeTypeId}`)
+    httpGet(`FeeType/getById?Id=${feeTypeId}`)
       .then((response) => {
         setFeeType({
           Id: response.data.id,

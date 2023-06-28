@@ -4,6 +4,7 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const BatchScreen = ({ route }) => {
     const { courseId, courseName } = route.params;
@@ -54,12 +55,7 @@ const BatchScreen = ({ route }) => {
 
     const fetchBatchByCourseId = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.7:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
+            const response = await httpGet(`Batch/getBatchByCourseId?Id=${courseId}`)
             setBatchList(response.data);
             console.log(batchList, 'BatchList')
         } catch (error) {

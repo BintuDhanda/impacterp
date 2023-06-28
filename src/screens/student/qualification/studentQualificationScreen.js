@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
 
 const StudentQualificationScreen = ({route,navigation}) => {
   const {studentId} = route.params;
@@ -15,12 +15,7 @@ const StudentQualificationScreen = ({route,navigation}) => {
   );
 
   const GetStudentQualificationByStudentId = () => {
-    axios.get(`http://192.168.1.7:5291/api/StudentQualification/getStudentQualificationByStudentId?Id=${studentId}`, {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
+    httpGet(`StudentQualification/getStudentQualificationByStudentId?Id=${studentId}`)
       .then((response) => {
         console.log(response.data);
         setQualificationList(response.data);
@@ -31,7 +26,7 @@ const StudentQualificationScreen = ({route,navigation}) => {
   }
 
   const handleDeleteStudentQualification= (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/StudentQualification/delete?Id=${id}`)
+    httpDelete(`StudentQualification/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         GetStudentQualificationByStudentId();

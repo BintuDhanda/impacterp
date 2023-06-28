@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseCategoryScreen = ({ navigation }) => {
   const [courseCategory, setCourseCategory] = useState({ "Id": 0, "CourseCategoryName": "", "IsActive": true });
@@ -12,11 +13,7 @@ const CourseCategoryScreen = ({ navigation }) => {
     GetCourseCategoryList();
   }, []);
   const GetCourseCategoryList = () => {
-    axios.get("http://192.168.1.7:5291/api/CourseCategory/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("CourseCategory/get")
       .then((result) => {
         console.log(result.data)
         setCourseCategoryList(result.data)
@@ -35,11 +32,7 @@ const CourseCategoryScreen = ({ navigation }) => {
   const handleSaveCourseCategory = () => {
     try {
       if (courseCategory.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/CourseCategory/put`, JSON.stringify(courseCategory), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("CourseCategory/put", courseCategory)
           .then((response) => {
             if (response.status === 200) {
               GetCourseCategoryList();
@@ -54,11 +47,7 @@ const CourseCategoryScreen = ({ navigation }) => {
           .catch(err => console.log("CourseCategory update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/CourseCategory/post`, JSON.stringify(courseCategory), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("CourseCategory/post", courseCategory)
           .then((response) => {
             if (response.status === 200) {
               GetCourseCategoryList();
@@ -80,7 +69,7 @@ const CourseCategoryScreen = ({ navigation }) => {
   }
 
   const handleDeleteCourseCategory = (courseCategoryId) => {
-    axios.delete(`http://192.168.1.7:5291/api/CourseCategory/delete?Id=${courseCategoryId}`)
+    httpDelete(`CourseCategory/delete?Id=${courseCategoryId}`)
       .then((result) => {
         console.log(result);
         GetCourseCategoryList();
@@ -89,7 +78,7 @@ const CourseCategoryScreen = ({ navigation }) => {
   };
 
   const handleEditCourseCategory = (courseCategoryId) => {
-    axios.get(`http://192.168.1.7:5291/api/CourseCategory/getById?Id=${courseCategoryId}`)
+    httpGet(`CourseCategory/getById?Id=${courseCategoryId}`)
       .then((response) => {
         setCourseCategory({
           Id: response.data.id,

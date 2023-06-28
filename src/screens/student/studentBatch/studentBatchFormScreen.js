@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
+import { Get as httpGet, Put as httpPut, Post as httpPost } from '../../../constants/httpService';
 
 const StudentBatchFormScreen = ({ route, navigation }) => {
 
@@ -42,6 +43,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
         }
     }, [batchId])
 
+    console.log(batchId, "BatchID")
     useEffect(() => {
         if (courseCategoryList.length === 0) {
             GetCourseCategoryList();
@@ -94,11 +96,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     };
 
     const GetBatchById = () => {
-        axios.get(`http://192.168.1.3:5291/api/StudentBatch/getById?Id=${batchId}`, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        httpGet(`StudentBatch/getById?Id=${batchId}`)
             .then((response) => {
                 console.log(response.data, "Get Batch By id")
                 setStudentBatch({
@@ -119,11 +117,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const handleSaveStudentBatch = async () => {
         try {
             if (studentBatch.Id !== 0) {
-                await axios.put(`http://192.168.1.3:5291/api/StudentBatch/put`, JSON.stringify(studentBatch), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPut("StudentBatch/put", studentBatch)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Batch Successfully')
@@ -146,11 +140,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             }
             else {
                 console.log(studentBatch, "studentBatch")
-                await axios.post(`http://192.168.1.3:5291/api/StudentBatch/post`, JSON.stringify(studentBatch), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("StudentBatch/post", studentBatch)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Batch Successfully')
@@ -178,12 +168,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     }
 
     const GetCourseCategoryList = () => {
-        axios.get('http://192.168.1.3:5291/api/CourseCategory/get', {
-            headers: {
-                'Content-Type': 'application/json', // Example header
-                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-        })
+        httpGet("CourseCategory/get")
             .then((response) => {
                 console.log(response.data);
                 setCourseCategoryList(response.data);
@@ -196,12 +181,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const fetchCourseByCourseCategoryId = async (courseCategoryId) => {
         try {
             console.log(courseCategoryId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.3:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
+            const response = await httpGet(`Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`)
             setCourseList(response.data);
         } catch (error) {
             console.error('Error fetching Course:', error);
@@ -211,12 +191,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const fetchBatchByCourseId = async (courseId) => {
         try {
             console.log(courseId, "courseCategoryId")
-            const response = await axios.get(`http://192.168.1.3:5291/api/Batch/getBatchByCourseId?Id=${courseId}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
+            const response = await httpGet(`Batch/getBatchByCourseId?Id=${courseId}`)
             setBatchList(response.data);
         } catch (error) {
             console.error('Error fetching Batch:', error);

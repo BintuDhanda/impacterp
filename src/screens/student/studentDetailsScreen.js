@@ -1,23 +1,77 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
+import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import Colors from '../../constants/Colors';
-import { Get as httpGet } from '../../constants/httpService';
+import { Delete as httpDelete, Post as httpPost } from '../../constants/httpService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const StudentDetailsScreen = ({ navigation }) => {
+    const ToDate = new Date();
+    ToDate.setDate(ToDate.getDate() + 1)
+    const FromDate = new Date();
+    FromDate.setDate(FromDate.getDate() - 7);
     const [studentDetailsList, setStudentDetailsList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
     const [loading, setLoading] = useState(false);
+    const [fromDate, setFromDate] = useState(FromDate.toISOString().slice(0, 10).toString());
+    const [toDate, setToDate] = useState(ToDate.toISOString().slice(0, 10).toString());
+    const [take, setTake] = useState(10);
+    const [skip, setSkip] = useState(0);
+    const [mobile, setMobile] = useState("");
+    const [isEndReached, setIsEndReached] = useState(true);
 
-    useEffect(() => {
-        setLoading(true);
+    const [selectFromDate, setSelectFromDate] = useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
+    const [selectToDate, setSelectToDate] = useState(new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000))
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showToDatePicker, setShowToDatePicker] = useState(false);
+    const [showSearch, setShowSearch] = useState(true);
+
+    const handleFromDateChange = (event, date) => {
+        if (date !== undefined) {
+            setSelectFromDate(date);
+            setFromDate(getFormattedDate(date));
+        }
+        setShowDatePicker(false);
+    };
+
+    const handleOpenFromDatePicker = () => {
+        setShowDatePicker(true);
+    };
+    const handleConfirmFromDatePicker = () => {
+        setShowDatePicker(false);
+    };
+
+    const handleToDateChange = (event, date) => {
+        if (date !== undefined) {
+            setSelectToDate(date);
+            setToDate(getFormattedDate(date));
+        }
+        setShowToDatePicker(false);
+    };
+
+    const handleOpenToDatePicker = () => {
+        setShowToDatePicker(true);
+    };
+
+    const handleConfirmToDatePicker = () => {
+        setShowToDatePicker(false);
+    };
+
+    const handleSearch = () => {
+        setStudentDetailsList([]);
+        setSkip(0);
         GetStudentList();
-    }, [])
+        setShowSearch(false);
+        console.log(selectFromDate, selectToDate, skip)
+    };
 
+    // useEffect(() => {
+    //     setLoading(true);
+    //     GetStudentList();
+    // }, [])
     const handleNavigate = (studentId) => {
         navigation.navigate('StudentFormScreen', { studentId: studentId })
     }
@@ -34,17 +88,11 @@ const StudentDetailsScreen = ({ navigation }) => {
     const handleAddStudentBatchNavigate = (studentId) => {
         navigation.navigate('StudentBatchScreen', { studentId: studentId })
     }
-    const handleAttendanceNavigate = (studentId) => {
-        navigation.navigate('AttendanceScreen', { studentId: studentId })
-    }
 
     const GetStudentList = () => {
-        // axios.get('http://192.168.1.3:5291/api/StudentDetails/get', {
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        // })
-        httpGet("StudentDetails/get")
+        setLoading(true);
+        const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "Mobile": mobile }
+        httpPost("StudentDetails/get", filter)
             .then((response) => {
                 console.log(response.data, "StudentDetails list");
                 const studentDetailsArray = response.data.map((studentDetails) => ({
@@ -52,7 +100,8 @@ const StudentDetailsScreen = ({ navigation }) => {
                     label: studentDetails.firstName + " " + studentDetails.lastName,
                     father: studentDetails.fatherName,
                     mother: studentDetails.motherName,
-                    mobile: studentDetails.mobile
+                    mobile: studentDetails.mobile,
+                    totalStudent: studentDetails.totalStudent
                 }));
                 setStudentDetailsList(studentDetailsArray);
                 setLoading(false);
@@ -62,28 +111,28 @@ const StudentDetailsScreen = ({ navigation }) => {
             });
     }
 
-    const fetchStudentDetailsByUserId = async () => {
-        try {
-            const response = await axios.get(`http://192.168.1.3:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
-                headers: {
-                    'Content-Type': 'application/json', // Example header
-                    'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-                },
-            });
-            setLoading(false);
-            setStudentDetailsList(response.data);
-            console.log(studentDetailsList, 'studentDetails')
-        } catch (error) {
-            console.log('Error fetching StudentDetails:', error);
-        }
-    };
+    // const fetchStudentDetailsByUserId = async () => {
+    //     try {
+    //         const response = await axios.get(`http://192.168.1.3:5291/api/StudentDetails/getStudentDetailsByUserId?UserId=${1}`, {
+    //             headers: {
+    //                 'Content-Type': 'application/json', // Example header
+    //                 'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+    //             },
+    //         });
+    //         await httpGet()
+    //         setLoading(false);
+    //         setStudentDetailsList(response.data);
+    //         console.log(studentDetailsList, 'studentDetails')
+    //     } catch (error) {
+    //         console.log('Error fetching StudentDetails:', error);
+    //     }
+    // };
 
     const handleDeleteStudentDetails = (id) => {
-        axios.delete(`http://192.168.1.3:5291/api/StudentDetails/delete?Id=${id}`)
+        httpDelete(`StudentDetails/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 GetStudentList();
-                // fetchStudentDetailsByUserId();
             })
             .catch(err => console.error("Delete Error", err));
     }
@@ -96,6 +145,13 @@ const StudentDetailsScreen = ({ navigation }) => {
         const year = date.getFullYear();
         return `${year}-${month}-${day}`;
     }
+
+    const handleLoadMore = async () => {
+        console.log("Execute Handle More function")
+        if (!isEndReached) {
+            GetStudentList();
+        }
+    };
 
     const renderFooter = () => {
         if (!loading) return null;
@@ -138,20 +194,22 @@ const StudentDetailsScreen = ({ navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
             </View>
 
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
 
                 <TouchableOpacity
                     style={{
+                        flex: 1,
                         backgroundColor: Colors.primary,
                         borderRadius: 5,
                         paddingVertical: 8,
                         paddingHorizontal: 12,
-                        marginRight: 10,
+                        marginRight: 3,
                     }} onPress={() => handleAddAddressNavigate(item.value)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
+                        alignSelf: 'center',
                     }}>Address</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -159,31 +217,35 @@ const StudentDetailsScreen = ({ navigation }) => {
                         backgroundColor: Colors.primary,
                         borderRadius: 5,
                         paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
+                        paddingHorizontal: 5,
+                        marginRight: 3,
                     }} onPress={() => handleAddStudentQualificationNavigate(item.value)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
+                        alignSelf: 'center',
                     }}>Qualification</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={{
+                        flex: 1,
                         backgroundColor: Colors.primary,
                         borderRadius: 5,
                         paddingVertical: 8,
                         paddingHorizontal: 12,
-                        marginRight: 10,
+                        marginRight: 3,
                     }} onPress={() => handleAddStudentTokenNavigate(item.value)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
+                        alignSelf: 'center',
                     }}>Token</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={{
+                        flex: 1,
                         backgroundColor: Colors.primary,
                         borderRadius: 5,
                         paddingVertical: 8,
@@ -193,24 +255,11 @@ const StudentDetailsScreen = ({ navigation }) => {
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
+                        alignSelf: 'center',
                     }}>Batch</Text>
                 </TouchableOpacity>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: '#5a67f2',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => handleAttendanceNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Attendance</Text>
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
                 <TouchableOpacity
                     style={{
                         backgroundColor: '#5a67f2',
@@ -246,12 +295,155 @@ const StudentDetailsScreen = ({ navigation }) => {
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
 
+                    {showSearch && (
+                        <Modal transparent visible={showSearch}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 10,
+                                    marginBottom: 10,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                    borderWidth: 0.5,
+                                    borderColor: Colors.primary,
+                                }}>
+                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginBottom: 10,
+                                        paddingHorizontal: 10,
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 8,
+                                    }}>
+                                        <TouchableOpacity onPress={handleOpenFromDatePicker}>
+                                            <Icon name={'calendar'} size={25} />
+                                        </TouchableOpacity>
+                                        <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                            value={getFormattedDate(selectFromDate)}
+                                            placeholder="Select From date"
+                                            editable={false}
+                                        />
+
+                                    </View>
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            value={selectFromDate}
+                                            mode="date"
+                                            display="default"
+                                            onChange={handleFromDateChange}
+                                            onConfirm={handleConfirmFromDatePicker}
+                                            onCancel={handleConfirmFromDatePicker}
+                                        />
+                                    )}
+
+                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>To Date :</Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginBottom: 10,
+                                        paddingHorizontal: 10,
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary,
+                                        borderRadius: 8,
+                                    }}>
+                                        <TouchableOpacity onPress={handleOpenToDatePicker}>
+                                            <Icon name={'calendar'} size={25} />
+                                        </TouchableOpacity>
+                                        <TextInput
+                                            style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
+                                            value={getFormattedDate(selectToDate)}
+                                            placeholder="Select To date"
+                                            editable={false}
+                                        />
+
+                                    </View>
+                                    {showToDatePicker && (
+                                        <DateTimePicker
+                                            value={selectToDate}
+                                            mode="date"
+                                            display="default"
+                                            onChange={handleToDateChange}
+                                            onConfirm={handleConfirmToDatePicker}
+                                            onCancel={handleConfirmToDatePicker}
+                                        />
+                                    )}
+                                    <Text style={{ fontSize: 20, marginBottom: 5 }}>Or</Text>
+                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>Mobile :</Text>
+                                    <TextInput
+                                        style={{
+                                            borderWidth: 1,
+                                            borderColor: Colors.primary,
+                                            borderRadius: 8,
+                                            marginBottom: 20,
+                                            padding: 8,
+                                        }}
+                                        placeholder="Enter Mobile"
+                                        value={mobile}
+                                        keyboardType='numeric'
+                                        maxLength={10}
+                                        onChangeText={(text) => setMobile(text)}
+                                    />
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            handleSearch();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Search</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            setShowSearch(false);
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{
+                            fontSize: 20,
+                            marginBottom: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.accent,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.secondary,
+                        }}>Total Student : {studentDetailsList.length === 0 ? null : studentDetailsList[0].totalStudent}</Text>
+                    </View>
                     <FlatList
                         data={studentDetailsList}
                         keyExtractor={(item) => item.value.toString()}
                         showsVerticalScrollIndicator={false}
                         renderItem={renderStudentDetailsCard}
                         ListFooterComponent={renderFooter}
+                        onEndReached={() => {
+                            handleLoadMore();
+                        }}
+                        onEndReachedThreshold={0.1}
                     />
 
                     <Toast ref={(ref) => Toast.setRef(ref)} />

@@ -5,7 +5,7 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
-import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet, Delete as httpDelete } from '../constants/httpService';
 
 const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
     const { registrationNumber } = route.params;
@@ -16,12 +16,21 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
+    const [sumDepositAndRefund, setSumDepositAndRefund] = useState({});
 
     useFocusEffect(
         React.useCallback(() => {
           GetStudentBatchFeesList();
+          GetSumStudentDepositAndRefund();
         }, [])
       )
+      
+      const GetSumStudentDepositAndRefund = () => {
+        httpGet(`StudentBatchFees/sumDepositAndRefund?registrationNumber=${registrationNumber}`)
+            .then((response) => {
+                setSumDepositAndRefund(response.data);
+            })
+    }
 
     const GetStudentBatchFeesList = () => {
         setLoading(true);
@@ -146,6 +155,31 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+                <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Deposit : {sumDepositAndRefund.deposit}</Text>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Refund : {sumDepositAndRefund.refund}</Text>
+                    </View>
                     <FlatList
                         data={studentBatchFeesList}
                         keyExtractor={(item) => item.studentBatchFeesId.toString()}

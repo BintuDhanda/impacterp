@@ -2,120 +2,79 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import axios from 'axios';
 import Colors from '../constants/Colors';
+import { Dropdown } from 'react-native-element-dropdown';
+import { Get as httpGet , Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
-const AsignRoleScreen = ({ route, navigation }) => {
-  const { countryId, countryName } = route.params;
-  const [asignRole, setAsignRole] = useState({ "Id": 0, "AsignRoleName": "", "IsActive": true, "CountryId": countryId });
-  const [asignRoleList, setAsignRoleList] = useState([]);
+const UserRoleScreen = ({ route }) => {
+  const { userId, userMobile } = route.params;
+  const [userRole, setUserRole] = useState({ "Id": 0, "RoleId": "", "IsActive": true, "UserId": userId });
+  const [userRoleList, setUserRoleList] = useState([]);
+  const [roleList, setRoleList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+console.log(userRole, "userRole")
   useEffect(() => {
-    fetchAsignRolesByCountryId(countryId);
+    fetchUserRolesByUserId(userId);
+    GetRoleList();
   }, []);
 
 
-  const fetchAsignRolesByCountryId = async () => {
+  const fetchUserRolesByUserId = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.7:5291/api/AsignRole/getAsignRoleByCountryId?Id=${countryId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      });
-      setAsignRoleList(response.data);
-      console.log(asignRoleList, 'asignRoleList')
+      const response = await httpGet(`UserRole/getUserRoleByUserId?UserId=${userId}`)
+      setUserRoleList(response.data);
+      console.log(userRoleList, 'UserRoleList')
     } catch (error) {
-      console.log('Error fetching asignRoles:', error);
+      console.log('Error fetching UserRoles:', error);
     }
   };
 
-  const handleAddAsignRole = () => {
-    setAsignRole({
-      Id: 0,
-      AsignRoleName: "",
-      IsActive: true,
-      CountryId: countryId
-    });
-    setModalVisible(true);
-  };
-
-  const handleEditAsignRole = (id) => {
-    axios.get(`http://192.168.1.7:5291/api/AsignRole/getById?Id=${id}`)
+  const GetRoleList = () => {
+    httpGet("Role/get")
       .then((result) => {
-        console.log(result);
-        setAsignRole(
-          {
-            Id: result.data.id,
-            AsignRoleName: result.data.asignRoleName,
-            CountryId: result.data.countryId,
-            IsActive: result.data.isActive
-          }
-        );
+        console.log(result.data)
+        setRoleList(result.data)
       })
-      .catch(err => console.error("Get By Id Error", err));
+      .catch(err => console.log('Get Role List error :', err))
+  }
+
+  const handleAddUserRole = () => {
     setModalVisible(true);
   };
 
-  const handleDeleteAsignRole = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/AsignRole/delete?Id=${id}`)
+  const handleDeleteUserRole = (id) => {
+    httpDelete(`UserRole/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
-        fetchAsignRolesByCountryId(result.data.countryId)
+        fetchUserRolesByUserId(result.data.userId)
       })
       .catch(err => console.error("Delete Error", err));
   }
 
-  const handleSaveAsignRole = async () => {
-    try {
-      if (asignRole.Id !== 0) {
-        await axios.put(`http://192.168.1.7:5291/api/AsignRole/put`, JSON.stringify(asignRole), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+  const handleSaveUserRole = async () => {
+        await httpPost("UserRole/post", userRole)
           .then((response) => {
             if (response.status === 200) {
-              fetchAsignRolesByCountryId(response.data.countryId);
-              Alert.alert('Sucess', 'AsignRole Update successfully');
-              setAsignRole({
+              fetchUserRolesByUserId(response.data.userId);
+              Alert.alert('Sucess', 'User Role is Added Successfully')
+              setUserRole({
                 "Id": 0,
-                "AsignRoleName": "",
-                "CountryId": countryId,
+                "RoleId": "",
+                "UserId": userId,
                 "IsActive": true
               });
+              setModalVisible(false);
             }
           })
-          .catch(err => console.error("Post error in AsignRole", err));
-      } else {
-        await axios.post('http://192.168.1.7:5291/api/AsignRole/post', JSON.stringify(asignRole), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              fetchAsignRolesByCountryId(response.data.countryId);
-              Alert.alert('Sucess', 'AsignRole is Added Successfully')
-              setAsignRole({
-                "Id": 0,
-                "AsignRoleName": "",
-                "CountryId": countryId,
-                "IsActive": true
-              });
-            }
-          })
-      }
-      setModalVisible(false);
-    } catch (error) {
-      console.log('Error saving AsignRole:', error);
-    }
+          .catch(err => console.log("Add User Role Error", err))
   };
 
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
-  const renderAsignRoleCard = ({ item }) => (
+  const renderUserRoleCard = ({ item }) => (
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
@@ -130,51 +89,23 @@ const AsignRoleScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1,
       borderColor: Colors.primary
     }}>
 
       <Text style={{
         fontSize: 16,
         fontWeight: 'bold',
-      }}>{item.asignRoleName}</Text>
+      }}>{item.roleName}</Text>
 
       <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditAsignRole(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#ffff80',
-            borderRadius: 5,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            marginRight: 10,
-          }} onPress={() => handleNavigate(item.id, item.asignRoleName)} >
-          <Text style={{
-            color: Colors.primary,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Manage</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteAsignRole(item.id)}>
+        }} onPress={() => handleDeleteUserRole(item.id)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -191,25 +122,27 @@ const AsignRoleScreen = ({ route, navigation }) => {
         padding: 16,
         justifyContent: 'center'
       }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Country Name : {countryName}</Text>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>User Mobile : {userMobile}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          marginBottom: 20,
           marginTop: 10,
-          alignSelf: 'flex-start',
-        }} onPress={handleAddAsignRole}>
+        }} onPress={handleAddUserRole}>
           <Text style={{
+            flex: 1,
             color: Colors.background,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 'bold',
-          }}>Add AsignRole</Text>
+            textAlign: 'center',
+          }}>Add User Role</Text>
         </TouchableOpacity>
         <FlatList
-          data={asignRoleList}
+          data={userRoleList}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderAsignRoleCard}
+          renderItem={renderUserRoleCard}
         />
 
         {modalVisible && (
@@ -227,18 +160,35 @@ const AsignRoleScreen = ({ route, navigation }) => {
                 padding: 20,
                 width: '80%',
               }}>
-
-                <TextInput
-                  style={{
-                    borderWidth: 1,
+                <Dropdown
+                  style={[{
+                    height: 50,
                     borderColor: Colors.primary,
-                    borderRadius: 8,
-                    padding: 8,
-                    marginBottom: 20,
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    paddingHorizontal: 8,
+                  }, isFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={{ fontSize: 16, }}
+                  selectedTextStyle={{ fontSize: 16, }}
+                  inputSearchStyle={{
+                    height: 40,
+                    fontSize: 16,
                   }}
-                  placeholder="AsignRole Name"
-                  value={asignRole.AsignRoleName}
-                  onChangeText={(text) => setAsignRole({ ...asignRole, AsignRoleName: text })}
+                  iconStyle={{
+                    width: 20,
+                    height: 20,
+                  }}
+                  data={roleList}
+                  search
+                  maxHeight={300}
+                  labelField="roleName"
+                  valueField="id"
+                  placeholder={!isFocus ? 'Select Role' : '...'}
+                  searchPlaceholder="Search..."
+                  value={value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(text) => {setUserRole({...userRole, RoleId: text.id})}}
                 />
 
                 <View style={{
@@ -252,13 +202,13 @@ const AsignRoleScreen = ({ route, navigation }) => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                  }} onPress={handleSaveAsignRole}>
+                  }} onPress={handleSaveUserRole}>
 
                     <Text style={{
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{asignRole.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{userRole.Id === 0 ? 'Add' : 'Save'}</Text>
 
                   </TouchableOpacity>
 
@@ -288,7 +238,7 @@ const AsignRoleScreen = ({ route, navigation }) => {
   );
 };
 
-export default AsignRoleScreen;
+export default UserRoleScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -342,7 +292,7 @@ export default AsignRoleScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   asignRoleCard: {
+//   userRoleCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -357,7 +307,7 @@ export default AsignRoleScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   asignRoleName: {
+//   roleId: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

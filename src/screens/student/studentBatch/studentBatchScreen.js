@@ -3,11 +3,12 @@ import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity } from '
 import axios from 'axios';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
 
-const StudentBatchScreen = ({route, navigation}) => {
-  const {studentId} = route.params;
+const StudentBatchScreen = ({ route, navigation }) => {
+  const { studentId } = route.params;
   const [batchList, setBatchList] = useState([]);
-  
+
   useFocusEffect(
     React.useCallback(() => {
       GetStudentBatchByStudentId();
@@ -15,12 +16,7 @@ const StudentBatchScreen = ({route, navigation}) => {
   );
 
   const GetStudentBatchByStudentId = () => {
-    axios.get(`http://192.168.1.3:5291/api/StudentBatch/getStudentBatchByStudentId?Id=${studentId}`, {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
+    httpGet(`StudentBatch/getStudentBatchByStudentId?Id=${studentId}`)
       .then((response) => {
         console.log(response.data);
         setBatchList(response.data);
@@ -31,18 +27,15 @@ const StudentBatchScreen = ({route, navigation}) => {
   }
 
   const handleAddStudentBatchNavigate = () => {
-    navigation.navigate('StudentBatchFormScreen', {studentId: studentId})
+    navigation.navigate('StudentBatchFormScreen', { studentId: studentId })
   };
 
   const handleEditStudentBatchNavigate = (batchId) => {
-    navigation.navigate('StudentBatchFormScreen', {studentId: studentId, batchId: batchId})
-  }
-  const handleBatchFeeNavigate = (studentBatchId) => {
-    navigation.navigate('StudentBatchFeesScreen', {studentId: studentId, studentBatchId: studentBatchId})
+    navigation.navigate('StudentBatchFormScreen', { studentId: studentId, batchId: batchId })
   }
 
   const handleDeleteStudentBatch = (id) => {
-    axios.delete(`http://192.168.1.3:5291/api/StudentBatch/delete?Id=${id}`)
+    httpDelete(`StudentBatch/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         GetStudentBatchByStudentId();
@@ -57,7 +50,7 @@ const StudentBatchScreen = ({route, navigation}) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
-}
+  }
 
   const renderTokenCard = ({ item }) => (
     <View style={{
@@ -102,7 +95,7 @@ const StudentBatchScreen = ({route, navigation}) => {
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditStudentBatchNavigate(item.id)}>
+        }} onPress={() => handleEditStudentBatchNavigate(item.studentBatchId)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -110,24 +103,11 @@ const StudentBatchScreen = ({route, navigation}) => {
           }}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleBatchFeeNavigate(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Batch Fee</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteStudentBatch(item.id)}>
+        }} onPress={() => handleDeleteStudentBatch(item.studentBatchId)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,

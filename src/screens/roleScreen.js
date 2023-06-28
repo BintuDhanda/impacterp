@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import {Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut} from '../constants/httpService';
 
 const RoleScreen = () => {
   const [role, setRole] = useState({ "Id": 0, "RoleName": "", "IsActive": true });
@@ -12,11 +13,7 @@ const RoleScreen = () => {
     GetRoleList();
   }, []);
   const GetRoleList = () => {
-    axios.get("http://192.168.1.7:5291/api/Role/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    httpGet("Role/get")
       .then((result) => {
         console.log(result.data)
         setRoleList(result.data)
@@ -35,11 +32,7 @@ const RoleScreen = () => {
   const handleSaveRole = () => {
     try {
       if (role.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/Role/put`, JSON.stringify(role), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("Role/put", role)
           .then((response) => {
             if (response.status === 200) {
               GetRoleList();
@@ -54,11 +47,7 @@ const RoleScreen = () => {
           .catch(err => console.log("Role update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/Role/post`, JSON.stringify(role), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("Role/post", role)
           .then((response) => {
             if (response.status === 200) {
               GetRoleList();
@@ -80,7 +69,7 @@ const RoleScreen = () => {
   }
 
   const handleDeleteRole = (roleId) => {
-    axios.delete(`http://192.168.1.7:5291/api/Role/delete?Id=${roleId}`)
+    httpDelete(`Role/delete?Id=${roleId}`)
       .then((result) => {
         console.log(result);
         GetRoleList();
@@ -89,7 +78,7 @@ const RoleScreen = () => {
   };
 
   const handleEditRole = (roleId) => {
-    axios.get(`http://192.168.1.7:5291/api/Role/getById?Id=${roleId}`)
+    httpGet(`Role/getById?Id=${roleId}`)
       .then((response) => {
         setRole({
           Id: response.data.id,

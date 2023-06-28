@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const StateScreen = ({ route, navigation }) => {
   const { countryId, countryName } = route.params;
@@ -19,12 +19,7 @@ const StateScreen = ({ route, navigation }) => {
 
   const fetchStatesByCountryId = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.7:5291/api/State/getStateByCountryId?Id=${countryId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      });
+      const response = await httpGet(`State/getStateByCountryId?Id=${countryId}`)
       setStateList(response.data);
       console.log(stateList, 'stateList')
     } catch (error) {
@@ -43,7 +38,7 @@ const StateScreen = ({ route, navigation }) => {
   };
 
   const handleEditState = (id) => {
-    axios.get(`http://192.168.1.7:5291/api/State/getById?Id=${id}`)
+    httpGet(`State/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setState(
@@ -60,7 +55,7 @@ const StateScreen = ({ route, navigation }) => {
   };
 
   const handleDeleteState = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/State/delete?Id=${id}`)
+    httpDelete(`State/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchStatesByCountryId(result.data.countryId)
@@ -71,11 +66,7 @@ const StateScreen = ({ route, navigation }) => {
   const handleSaveState = async () => {
     try {
       if (state.Id !== 0) {
-        await axios.put(`http://192.168.1.7:5291/api/State/put`, JSON.stringify(state), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        await httpPut("State/put", state)
           .then((response) => {
             if (response.status === 200) {
               fetchStatesByCountryId(response.data.countryId);
@@ -90,11 +81,7 @@ const StateScreen = ({ route, navigation }) => {
           })
           .catch(err => console.error("Post error in state", err));
       } else {
-        await axios.post('http://192.168.1.7:5291/api/State/post', JSON.stringify(state), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        await httpPost("State/post", state)
           .then((response) => {
             if (response.status === 200) {
               fetchStatesByCountryId(response.data.countryId);

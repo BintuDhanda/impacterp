@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const AccountScreen = () => {
   const [account, setAccount] = useState({ "Id": 0, "AccountName": "", "IsActive": true, "AccCategoryId": "" });
@@ -16,12 +17,13 @@ const AccountScreen = () => {
   }, []);
 
   const GetAccCategoryList = () => {
-    axios.get('http://192.168.1.7:5291/api/AccountCategory/get', {
-      headers: {
-        'Content-Type': 'application/json', // Example header
-        'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-      },
-    })
+    // axios.get('http://192.168.1.7:5291/api/AccountCategory/get', {
+    //   headers: {
+    //     'Content-Type': 'application/json', // Example header
+    //     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
+    //   },
+    // })
+    httpGet("AccountCategory/get")
       .then((response) => {
         console.log(response.data);
         const AccCategoryArray = response.data.map((accCategory) => ({
@@ -37,12 +39,7 @@ const AccountScreen = () => {
 
   const fetchAccountsByAccCategoryId = async (accCategoryId) => {
     try {
-      const response = await axios.get(`http://192.168.1.7:5291/api/Account/getAccountByAccountCategoryId?Id=${accCategoryId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      });
+      const response = await httpGet(`Account/getAccountByAccountCategoryId?Id=${accCategoryId}`)
       setAccountList(response.data);
     } catch (error) {
       console.log('Error fetching Accounts:', error);
@@ -65,7 +62,8 @@ const AccountScreen = () => {
   };
 
   const handleEditAccount = (id) => {
-    axios.get(`http://192.168.1.7:5291/api/Account/getById?Id=${id}`)
+    // axios.get(`http://192.168.1.7:5291/api/Account/getById?Id=${id}`)
+    httpGet(`Account/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setAccount(
@@ -82,7 +80,8 @@ const AccountScreen = () => {
   };
 
   const handleDeleteAccount = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/Account/delete?Id=${id}`)
+    // axios.delete(`http://192.168.1.7:5291/api/Account/delete?Id=${id}`)
+    httpDelete(`Account/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchAccountsByAccCategoryId(result.data.accCategoryId)
@@ -93,11 +92,12 @@ const AccountScreen = () => {
   const handleSaveAccount = async () => {
     try {
       if (account.Id !== 0) {
-        await axios.put(`http://192.168.1.7:5291/api/Account/put`, JSON.stringify(account), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        // await axios.put(`http://192.168.1.7:5291/api/Account/put`, JSON.stringify(account), {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // })
+        await httpPut("Account/put", account)
           .then((response) => {
             if (response.status === 200) {
               fetchAccountsByAccCategoryId(response.data.accCategoryId);
@@ -112,11 +112,12 @@ const AccountScreen = () => {
           })
           .catch(err => console.error("Post error in Account", err));
       } else {
-        await axios.post('http://192.168.1.7:5291/api/Account/post', JSON.stringify(account), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        // await axios.post('http://192.168.1.7:5291/api/Account/post', JSON.stringify(account), {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // })
+        await httpPost("Account/post", account)
           .then((response) => {
             if (response.status === 200) {
               fetchAccountsByAccCategoryId(response.data.accCategoryId);

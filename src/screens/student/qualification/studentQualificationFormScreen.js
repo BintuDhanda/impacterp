@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
-import axios from 'axios';
+import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../../constants/httpService';
 
 const StudentQualificationFormScreen = ({ route, navigation }) => {
 
@@ -43,11 +43,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
     };
 
     const GetQualificationById = () => {
-        axios.get(`http://192.168.1.7:5291/api/StudentQualification/getById?Id=${qualificationId}`, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        httpGet(`StudentQualification/getById?Id=${qualificationId}`)
             .then((response) => {
                 setStudentQualification({
                     Id: response.data.id,
@@ -65,12 +61,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
     }
 
     const GetQualificationList = () => {
-        axios.get('http://192.168.1.7:5291/api/Qualification/get', {
-            headers: {
-                'Content-Type': 'application/json', // Example header
-                'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-            },
-        })
+        httpGet("Qualification/get")
             .then((response) => {
                 console.log(response.data);
                 setQualificationList(response.data);
@@ -83,11 +74,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
     const handleSaveStudentQualification = async () => {
         try {
             if (studentQualification.Id !== 0) {
-                await axios.put(`http://192.168.1.7:5291/api/StudentQualification/put`, JSON.stringify(studentQualification), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPut("StudentQualification/put", studentQualification)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Qualification Successfully')
@@ -110,11 +97,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
             }
             else {
                 console.log(studentQualification, "studentQualification")
-                await axios.post(`http://192.168.1.7:5291/api/StudentQualification/post`, JSON.stringify(studentQualification), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("StudentQualification/post", studentQualification)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Qualification Successfully')
@@ -157,7 +140,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
         navigation.goBack();
     }
     return (
-        <View style={{ flex: 1, padding: 10, justifyContent: 'center'}}>
+        <View style={{ flex: 1, padding: 10, justifyContent: 'center' }}>
             <View style={{
                 backgroundColor: Colors.background,
                 borderRadius: 8,

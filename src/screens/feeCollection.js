@@ -5,7 +5,7 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost, Get as httpGet } from '../constants/httpService';
+import { Post as httpPost } from '../constants/httpService';
 
 const StudentBatchFeesScreen = ({ navigation }) => {
     const [registrationNumber, setRegistrationNumber] = useState({ "RegistrationNumber": "" })
@@ -20,19 +20,8 @@ const StudentBatchFeesScreen = ({ navigation }) => {
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
-    const [sumDepositAndRefund, setSumDepositAndRefund] = useState({});
 
     console.log(studentBatchFeesDeposit, "Deposit")
-    useEffect(() => {
-        GetSumStudentDepositAndRefund();
-    }, [])
-
-    const GetSumStudentDepositAndRefund = () => {
-        httpGet('StudentBatchFees/sumDepositAndRefund')
-            .then((response) => {
-                setSumDepositAndRefund(response.data);
-            })
-    }
 
     const handleHistory = () => {
         setStudentBatchFeesList([]);
@@ -50,33 +39,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
             navigation.navigate("StudentBatchFeesHistoryScreen", { registrationNumber: registrationNumber.RegistrationNumber })
         }
     };
-
-    const GetStudentBatchFeesList = () => {
-        setLoading(true);
-        const filter = { "RegistrationNumber": registrationNumber.RegistrationNumber, "Take": take, "Skip": skip }
-        httpPost("StudentBatchFees/getStudentBatchFeesByRegistrationNumber", filter)
-            .then((response) => {
-                setLoading(false);
-                if (response.data.length >= 0) {
-                    setIsEndReached(false);
-                    setStudentBatchFeesList(response.data)
-                }
-                if (response.data.length === 0) {
-                    setIsEndReached(true);
-                    Toast.show({
-                        type: 'info',
-                        text1: 'No records found',
-                        position: 'bottom',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                    });
-                }
-            })
-            .catch((error) => {
-                setLoading(false);
-                console.error(error);
-            });
-    }
 
     const handleAddDepositStudentBatchFees = () => {
         setDepositModalVisible(true);
@@ -98,7 +60,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                 });
             }
             else {
-                // if (studentBatchFeesDeposit.Deposit !== 0) {
                 httpPost("StudentBatchFees/post", studentBatchFeesDeposit)
                     .then((response) => {
                         if (response.status === 200) {
@@ -131,7 +92,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                 });
                         }
                     })
-                // }
                 setDepositModalVisible(false);
             }
         })
@@ -151,7 +111,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                 });
             }
             else {
-                // if (studentBatchFeesRefund.Refund !== 0) {
                 httpPost("StudentBatchFees/post", studentBatchFeesRefund)
                     .then((response) => {
                         if (response.status === 200) {
@@ -184,7 +143,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                 });
                         }
                     })
-                // }
                 setRefundModalVisible(false);
             }
         })
@@ -348,31 +306,7 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                             }}>History</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
-                        <Text style={{
-                            fontSize: 14,
-                            marginBottom: 10,
-                            marginRight: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
-                            color: Colors.background
-                        }}>Total Deposit : {sumDepositAndRefund.deposit}</Text>
-                        <Text style={{
-                            fontSize: 14,
-                            marginBottom: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
-                            color: Colors.background
-                        }}>Total Refund : {sumDepositAndRefund.refund}</Text>
-                    </View>
+
                     <FlatList
                         data={studentBatchFeesList}
                         keyExtractor={(item) => item.studentBatchFeesId.toString()}

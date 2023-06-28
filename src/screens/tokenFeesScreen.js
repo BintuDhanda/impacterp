@@ -5,7 +5,7 @@ import axios from 'axios';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost, Get as httpGet } from '../constants/httpService';
+import { Post as httpPost } from '../constants/httpService';
 
 const StudentTokenFeesScreen = ({ navigation }) => {
     const [tokenNumber, setTokenNumber] = useState({ "TokenNumber": "" })
@@ -20,19 +20,6 @@ const StudentTokenFeesScreen = ({ navigation }) => {
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
-    const [sumDepositAndRefund, setSumDepositAndRefund] = useState({});
-
-    console.log(studentTokenFeesDeposit, "Deposit")
-    useEffect(() => {
-        GetSumStudentDepositAndRefund();
-    }, [])
-
-    const GetSumStudentDepositAndRefund = () => {
-        httpGet('StudentTokenFees/sumDepositAndRefund')
-            .then((response) => {
-                setSumDepositAndRefund(response.data);
-            })
-    }
 
     const handleHistory = () => {
         setStudentTokenFeesList([]);
@@ -348,31 +335,7 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                             }}>History</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
-                        <Text style={{
-                            fontSize: 14,
-                            marginBottom: 10,
-                            marginRight: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
-                            color: Colors.background
-                        }}>Total Deposit : {sumDepositAndRefund.deposit}</Text>
-                        <Text style={{
-                            fontSize: 14,
-                            marginBottom: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
-                            color: Colors.background
-                        }}>Total Refund : {sumDepositAndRefund.refund}</Text>
-                    </View>
+                    
                     <FlatList
                         data={studentTokenFeesList}
                         keyExtractor={(item) => item.studentTokenFeesId.toString()}

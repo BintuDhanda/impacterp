@@ -47,6 +47,7 @@ import AttendanceScreen from './src/screens/attendanceScreen';
 import AttendanceHistoryScreen from './src/screens/attendanceHistoryScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistoryScreen';
+import UserRoleScreen from './src/screens/userRoleScreen';
 
 
 export const UserContext = React.createContext();
@@ -75,6 +76,7 @@ function App()
               {/* <Stack.Screen name="HomeScreen" component={DrawerNavigator} /> */}
               <Stack.Screen name="HomeScreen" options={{ title: 'Home' }} component={HomeScreen} />
               <Stack.Screen name="UserScreen" options={{ title: 'User' }} component={UserScreen} />
+              <Stack.Screen name="UserRoleScreen" options={{title: "User Role"}} component={UserRoleScreen} />
               <Stack.Screen name="StudentFormScreen" options={{ title: 'Student Form' }} component={StudentFormScreen} />
               <Stack.Screen name="RolesScreen" options={{ title: 'Roles' }} component={RoleScreen} />
               <Stack.Screen name="StudentDetailsScreen" options={{ title: 'Student Detail' }} component={StudentDetailsScreen} />

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
-import axios from 'axios';
 import { Get as httpGet, Post as httpPost , Put as httpPut } from '../../constants/httpService';
 
 const StudentAddressFormScreen = ({ route, navigation }) => {

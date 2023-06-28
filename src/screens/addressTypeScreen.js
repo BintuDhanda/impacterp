@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const AddressTypeScreen = () => {
   const [addressType, setAddressType] = useState({ "Id": 0, "AddressTypeName": "", "IsActive": true });
@@ -17,6 +18,7 @@ const AddressTypeScreen = () => {
         'Content-Type': 'application/json'
       }
     })
+    httpGet("AddressType/get")
       .then((result) => {
         console.log(result.data)
         setAddressTypeList(result.data)
@@ -35,11 +37,7 @@ const AddressTypeScreen = () => {
   const handleSaveAddressType = () => {
     try {
       if (addressType.Id !== 0) {
-        axios.put(`http://192.168.1.7:5291/api/AddressType/put`, JSON.stringify(addressType), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("AddressType/put", addressType)
           .then((response) => {
             if (response.status === 200) {
               GetAddressTypeList();
@@ -54,11 +52,7 @@ const AddressTypeScreen = () => {
           .catch(err => console.log("AddressType update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.7:5291/api/AddressType/post`, JSON.stringify(addressType), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("AddressType/post", addressType)
           .then((response) => {
             if (response.status === 200) {
               GetAddressTypeList();
@@ -80,7 +74,7 @@ const AddressTypeScreen = () => {
   }
 
   const handleDeleteAddressType = (addressTypeId) => {
-    axios.delete(`http://192.168.1.7:5291/api/AddressType/delete?Id=${addressTypeId}`)
+    httpDelete(`AddressType/delete?Id=${addressTypeId}`)
       .then((result) => {
         console.log(result);
         GetAddressTypeList();
@@ -89,7 +83,7 @@ const AddressTypeScreen = () => {
   };
 
   const handleEditAddressType = (addressTypeId) => {
-    axios.get(`http://192.168.1.7:5291/api/AddressType/getById?Id=${addressTypeId}`)
+    httpGet(`AddressType/getById?Id=${addressTypeId}`)
       .then((response) => {
         setAddressType({
           Id: response.data.id,

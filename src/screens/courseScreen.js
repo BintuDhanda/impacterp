@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../constants/Colors';
+import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseScreen = ({ route, navigation }) => {
   const { courseCategoryId, courseCategoryName } = route.params;
@@ -17,12 +17,7 @@ const CourseScreen = ({ route, navigation }) => {
 
   const fetchCoursesByCourseCategoryId = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.7:5291/api/Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`, {
-        headers: {
-          'Content-Type': 'application/json', // Example header
-          'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        },
-      });
+      const response = await httpGet(`Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`)
       setCourseList(response.data);
     } catch (error) {
       console.log('Error fetching Courses:', error);
@@ -42,7 +37,7 @@ const CourseScreen = ({ route, navigation }) => {
   };
 
   const handleEditCourse = (id) => {
-    axios.get(`http://192.168.1.7:5291/api/Course/getById?Id=${id}`)
+    httpGet(`Course/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setCourse(
@@ -61,7 +56,7 @@ const CourseScreen = ({ route, navigation }) => {
   };
 
   const handleDeleteCourse = (id) => {
-    axios.delete(`http://192.168.1.7:5291/api/Course/delete?Id=${id}`)
+    httpDelete(`Course/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
         fetchCoursesByCourseCategoryId(result.data.courseCategoryId)
@@ -72,11 +67,7 @@ const CourseScreen = ({ route, navigation }) => {
   const handleSaveCourse = async () => {
     try {
       if (course.Id !== 0) {
-        await axios.put(`http://192.168.1.7:5291/api/Course/put`, JSON.stringify(course), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        await httpPut("Course/put", course)
           .then((response) => {
             if (response.status === 200) {
               fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
@@ -93,11 +84,7 @@ const CourseScreen = ({ route, navigation }) => {
           })
           .catch(err => console.error("Post error in Course", err));
       } else {
-        await axios.post('http://192.168.1.7:5291/api/Course/post', JSON.stringify(course), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        await httpPost("Course/post", course)
           .then((response) => {
             if (response.status === 200) {
               fetchCoursesByCourseCategoryId(response.data.courseCategoryId);

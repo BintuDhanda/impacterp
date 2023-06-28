@@ -5,7 +5,7 @@ import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Post as httpPost} from '../constants/httpService';
+import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 const UserScreen = ({ navigation }) => {
   const ToDate = new Date();
@@ -32,11 +32,7 @@ const UserScreen = ({ navigation }) => {
   const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   GetUserList();
-  // }, [skip]);
+  console.log(userList, "UserList")
 
   const handleFromDateChange = (event, date) => {
     if (date !== undefined) {
@@ -79,17 +75,10 @@ const UserScreen = ({ navigation }) => {
   };
 
   const handleNavigate = (userId) => {
-    navigation.navigate('StudentFormScreens', { userId: userId })
+    navigation.navigate('StudentFormScreen', { userId: userId })
   }
-  const handleManageNavigate = (userId) => {
-    navigation.navigate('AsignRoleScreen', { userId: userId })
-  }
-
-
-  const test = ()=>{
-    httpPost.Post('User/get',filter).then((result)=>{
-
-    }).catch()
+  const handleManageNavigate = (userId, userMobile) => {
+    navigation.navigate('UserRoleScreen', { userId: userId, userMobile: userMobile })
   }
 
   const GetUserList = () => {
@@ -129,11 +118,7 @@ const UserScreen = ({ navigation }) => {
   const handleSaveUser = () => {
     try {
       if (user.Id !== 0) {
-        axios.put(`http://192.168.1.3:5291/api/User/put`, JSON.stringify(user), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPut("User/put", user)
           .then((response) => {
             if (response.status === 200) {
               GetUserList();
@@ -149,11 +134,7 @@ const UserScreen = ({ navigation }) => {
           .catch(err => console.error("User update error : ", err));
       }
       else {
-        axios.post(`http://192.168.1.3:5291/api/User/post`, JSON.stringify(user), {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+        httpPost("User/post", user)
           .then((response) => {
             if (response.status === 200) {
               GetUserList();
@@ -176,7 +157,7 @@ const UserScreen = ({ navigation }) => {
   }
 
   const handleDeleteUser = (userId) => {
-    axios.delete(`http://192.168.1.3:5291/api/User/delete?Id=${userId}`)
+    httpDelete(`User/delete?Id=${userId}`)
       .then((result) => {
         console.log(result);
         GetUserList();
@@ -185,7 +166,7 @@ const UserScreen = ({ navigation }) => {
   };
 
   const handleEditUser = (userId) => {
-    axios.get(`http://192.168.1.3:5291/api/User/getById?Id=${userId}`)
+    httpGet(`User/getById?Id=${userId}`)
       .then((response) => {
         setUser({
           Id: response.data.id,
@@ -205,7 +186,6 @@ const UserScreen = ({ navigation }) => {
   const handleLoadMore = async () => {
     console.log("Execute Handle More function")
     if (!isEndReached) {
-      // setSkip(skip + 10)
       GetUserList();
     }
   };
@@ -274,7 +254,7 @@ const UserScreen = ({ navigation }) => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleManageNavigate(item.id)} >
+            }} onPress={() => handleManageNavigate(item.id, item.userMobile)} >
             <Text style={{
               color: Colors.primary,
               fontSize: 14,
@@ -319,9 +299,22 @@ const UserScreen = ({ navigation }) => {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={{ flex: 1, padding: 20, }}>
         <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{
+              fontSize: 20,
+              marginBottom: 10,
+              fontWeight: 'bold',
+              backgroundColor: Colors.accent,
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              flex: 1,
+              color: Colors.secondary,
+            }}>Total User : {userList.length === 0 ? null : userList[0].totalUser}</Text>
+          </View>
           <TouchableOpacity onPress={() => { setShowSearch(true); }}>
             <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
-              <TextInput style={{ flex: 1, fontWeight: 'bold'}} editable={false} placeholder="Search..." />
+              <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
               <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
             </View>
           </TouchableOpacity>
@@ -420,6 +413,8 @@ const UserScreen = ({ navigation }) => {
                       onCancel={handleConfirmToDatePicker}
                     />
                   )}
+                  <Text style={{ fontSize: 20, marginBottom: 5 }}>Or</Text>
+                  <Text style={{ fontSize: 16, marginBottom: 5 }}>Mobile :</Text>
                   <TextInput
                     style={{
                       borderWidth: 1,
@@ -428,7 +423,7 @@ const UserScreen = ({ navigation }) => {
                       marginBottom: 20,
                       padding: 8,
                     }}
-                    placeholder="Mobile"
+                    placeholder="Enter Mobile"
                     value={mobile}
                     keyboardType='numeric'
                     maxLength={10}
@@ -475,7 +470,6 @@ const UserScreen = ({ navigation }) => {
               handleLoadMore();
             }}
             onEndReachedThreshold={0.1}
-          // contentContainerStyle={{ flexGrow: 1, }}
           />
 
           <Toast ref={(ref) => Toast.setRef(ref)} />
