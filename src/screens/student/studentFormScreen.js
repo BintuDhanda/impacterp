@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
-import axios from 'axios';
+import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../constants/httpService';
 
 const StudentFormScreen = ({ route, navigation }) => {
 
@@ -48,7 +48,7 @@ const StudentFormScreen = ({ route, navigation }) => {
     };
 
     const handleEditStudentDetails = () => {
-        axios.get(`http://192.168.1.5:5291/api/StudentDetails/getById?Id=${studentId}`)
+        httpGet(`StudentDetails/getById?Id=${studentId}`)
             .then((result) => {
                 console.log(result.data, "studentDetailsById");
                 setFormData(
@@ -74,11 +74,7 @@ const StudentFormScreen = ({ route, navigation }) => {
         try {
             if (formData.Id !== 0) {
                 console.log(JSON.stringify(formData), "Form data request")
-                await axios.put(`http://192.168.1.7:5291/api/StudentDetails/put`, JSON.stringify(formData), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPut("StudentDetails/put", formData)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Student Successfully')
@@ -101,11 +97,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                     .catch(err => console.error("Student Details update error : ", err));
             }
             else {
-                await axios.post(`http://192.168.1.7:5291/api/StudentDetails/post`, JSON.stringify(formData), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("StudentDetails/post", formData)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Student Details Successfully')

@@ -9,7 +9,7 @@ import CountryScreen from '../screens/countryScreen';
 import CourseCategoryScreen from '../screens/courseCategory';
 import AddressTypeScreen from '../screens/addressTypeScreen';
 import EnterAccountScreen from '../screens/enterAccountScreen';
-import AccountCategoryScreen from '../screens/accountCategory';
+import AccountCategoryScreen from '../screens/accountCategoryScreen';
 import AccountScreen from '../screens/accountScreen';
 import CourseScreen from '../screens/courseScreen';
 import DayBookScreen from '../screens/dayBookScreen';

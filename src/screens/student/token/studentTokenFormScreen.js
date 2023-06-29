@@ -82,11 +82,6 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
     };
 
     const GetTokenById = () => {
-        // axios.get(`http://192.168.1.7:5291/api/StudentToken/getById?Id=${tokenId}`, {
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        // })
         httpGet(`StudentToken/getById?Id=${tokenId}`)
             .then((response) => {
                 console.log(response.data, "Get token By id")
@@ -106,11 +101,6 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
     const handleSaveStudentToken = async () => {
         try {
             if (studentToken.Id !== 0) {
-                // await axios.put(`http://192.168.1.7:5291/api/StudentToken/put`, JSON.stringify(studentToken), {
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     }
-                // })
                 await httpPut("StudentToken/put", studentToken)
                     .then((response) => {
                         if (response.status === 200) {
@@ -132,11 +122,6 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             }
             else {
                 console.log(studentToken, "studentToken")
-                // await axios.post(`http://192.168.1.7:5291/api/StudentToken/post`, JSON.stringify(studentToken), {
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     }
-                // })
                 await httpPost("StudentToken/post", studentToken)
                     .then((response) => {
                         if (response.status === 200) {
@@ -163,12 +148,6 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
     }
 
     const GetCourseCategoryList = () => {
-        // axios.get('http://192.168.1.7:5291/api/CourseCategory/get', {
-        //     headers: {
-        //         'Content-Type': 'application/json', // Example header
-        //         'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-        //     },
-        // })
         httpGet("CourseCategory/get")
             .then((response) => {
                 console.log(response.data);

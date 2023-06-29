@@ -13,11 +13,6 @@ const AddressTypeScreen = () => {
     GetAddressTypeList();
   }, []);
   const GetAddressTypeList = () => {
-    axios.get("http://192.168.1.7:5291/api/AddressType/get", {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
     httpGet("AddressType/get")
       .then((result) => {
         console.log(result.data)

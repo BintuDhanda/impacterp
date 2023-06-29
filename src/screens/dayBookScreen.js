@@ -12,8 +12,8 @@ const DayBookScreen = () => {
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
-    const [dayBookCredit, setDayBookCredit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
-    const [dayBookDebit, setDayBookDebit] = useState({ "Id": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "" });
+    const [dayBookCredit, setDayBookCredit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null });
+    const [dayBookDebit, setDayBookDebit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null });
     const [dayBookList, setDayBookList] = useState([]);
     const [creditModalVisible, setCreditModalVisible] = useState(false);
     const [debitModalVisible, setDebitModalVisible] = useState(false);
@@ -91,7 +91,7 @@ const DayBookScreen = () => {
             .then((response) => {
                 console.log(response.data, "Account list");
                 const accountArray = response.data.map((account) => ({
-                    value: account.id,
+                    value: account.accountId,
                     label: account.accountName,
                 }));
                 setAccountList(accountArray);
@@ -130,23 +130,25 @@ const DayBookScreen = () => {
 
     const handleAddCreditDayBook = () => {
         setDayBookCredit({
-            Id: 0,
+            DayBookId: 0,
             Particulars: "",
             Credit: 0,
             Debit: 0,
             IsActive: true,
+            CreatedAt: null,
             AccountId: "",
         });
         setCreditModalVisible(true);
     };
     const handleAddDebitDayBook = () => {
         setDayBookDebit({
-            Id: 0,
+            DayBookId: 0,
             Particulars: "",
             Credit: 0,
             Debit: 0,
             IsActive: true,
             AccountId: "",
+            CreatedAt: null,
         });
         setDebitModalVisible(true);
     };
@@ -171,12 +173,13 @@ const DayBookScreen = () => {
                             setSkip(0);
                             Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
                             setDayBookCredit({
-                                "Id": 0,
+                                "DayBookId": 0,
                                 "Particulars": "",
                                 "Credit": 0,
                                 "Debit": 0,
                                 "AccountId": "",
                                 "IsActive": true,
+                                "CreatedAt": null,
                             });
                         }
                     })
@@ -197,12 +200,13 @@ const DayBookScreen = () => {
                             setSkip(0);
                             Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
                             setDayBookDebit({
-                                "Id": 0,
+                                "DayBookId": 0,
                                 "Particulars": "",
                                 "Credit": 0,
                                 "Debit": 0,
                                 "AccountId": "",
                                 "IsActive": true,
+                                "CreatedAt": null,
                             });
                         }
                     })
@@ -285,7 +289,7 @@ const DayBookScreen = () => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => handleDeleteDayBook(item.id)}>
+                }} onPress={() => handleDeleteDayBook(item.dayBookId)}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -300,40 +304,42 @@ const DayBookScreen = () => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                    <TouchableOpacity onPress={() => { setShowSearch(true); }}>
-                        <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
-                            <TextInput style={{ flex: 1, borderRadius: 10, borderColor: Colors.primary, marginRight: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }} editable={false} placeholder="Search..." />
+                    <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                            <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>
                     </TouchableOpacity>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', marginBottom: 10 }}>
                         <TouchableOpacity style={{
+                            flex: 1,
                             backgroundColor: Colors.primary,
                             borderRadius: 5,
                             paddingVertical: 8,
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3,
-                            alignSelf: 'flex-start',
                         }} onPress={handleAddCreditDayBook}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
                                 fontWeight: 'bold',
+                                alignSelf: 'center',
                             }}>Credit DayBook Entry</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{
+                            flex: 1,
                             backgroundColor: Colors.primary,
                             borderRadius: 5,
                             paddingVertical: 8,
                             paddingHorizontal: 12,
                             marginTop: 10,
-                            alignSelf: 'flex-start',
                         }} onPress={handleAddDebitDayBook}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
                                 fontWeight: 'bold',
+                                alignSelf: 'center',
                             }}>Debit DayBook Entry</Text>
                         </TouchableOpacity>
                     </View>
@@ -450,7 +456,7 @@ const DayBookScreen = () => {
 
                     <FlatList
                         data={dayBookList}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item) => item.dayBookId.toString()}
                         showsVerticalScrollIndicator={false}
                         renderItem={renderDayBookCard}
                         ListFooterComponent={renderFooter}
@@ -542,7 +548,7 @@ const DayBookScreen = () => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{dayBookCredit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{dayBookCredit.DayBookId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -642,7 +648,7 @@ const DayBookScreen = () => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{dayBookDebit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{dayBookDebit.DayBookId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',

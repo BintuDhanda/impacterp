@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, A
 import Colors from '../constants/Colors';
 import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
-const AccountCategoryScreen = () => {
-  const [accountCategory, setAccountCategory] = useState({ "Id": 0, "AccCategoryName": "", "IsActive": true });
+const AccountCategoryScreen = ({navigation}) => {
+  const [accountCategory, setAccountCategory] = useState({ "AccountCategoryId": 0, "AccCategoryName": "", "IsActive": true, "CreatedAt": null });
   const [accountCategoryList, setAccountCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -22,44 +22,47 @@ const AccountCategoryScreen = () => {
   }
   const handleAddAccountCategory = () => {
     setAccountCategory({
-      Id: 0,
+      AccountCategoryId: 0,
       AccCategoryName: "",
       IsActive: true,
+      CreatedAt: null,
     });
     setModalVisible(true);
   };
 
   const handleSaveAccountCategory = () => {
     try {
-      if (accountCategory.Id !== 0) {
+      if (accountCategory.AccountCategoryId !== 0) {
         httpPut("AccountCategory/put", accountCategory)
           .then((response) => {
             if (response.status === 200) {
               GetAccountCategoryList();
-              Alert.alert('Sucees', 'Update AccountCategory Successfully')
+              Alert.alert('Sucees', 'Update Account Category Successfully')
               setAccountCategory({
-                "Id": 0,
+                "AccountCategoryId": 0,
                 "AccCategoryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null
               })
             }
           })
-          .catch(err => console.log("AccountCategory update error : ", err));
+          .catch(err => console.log("Account Category update error : ", err));
       }
       else {
         httpPost("AccountCategory/post", accountCategory)
           .then((response) => {
             if (response.status === 200) {
               GetAccountCategoryList();
-              Alert.alert('Success', 'Add AccountCategory Successfully')
+              Alert.alert('Success', 'Add Account Category Successfully')
               setAccountCategory({
-                "Id": 0,
+                "AccountCategoryId": 0,
                 "AccCategoryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
               })
             }
           })
-          .catch(err => console.log('AccountCategory Add error :', err));
+          .catch(err => console.log('Account Category Add error :', err));
       }
       setModalVisible(false);
     }
@@ -81,14 +84,19 @@ const AccountCategoryScreen = () => {
     httpGet(`AccountCategory/getById?Id=${accountCategoryId}`)
       .then((response) => {
         setAccountCategory({
-          Id: response.data.id,
+          AccountCategoryId: response.data.accountCategoryId,
           AccCategoryName: response.data.accCategoryName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt
         })
       })
-      .catch(error => console.log('AccountCategory Get By Id :', error))
+      .catch(error => console.log('AccountCategory Get By AccountCategoryId :', error))
     setModalVisible(true);
   };
+
+  const handleNavigate = (accountCategoryId,accCategoryName) => {
+    navigation.navigate('AccountScreen', {accountCategoryId: accountCategoryId, accCategoryName: accCategoryName})
+  }
 
   const handleClose = () => {
     setModalVisible(false);
@@ -124,7 +132,7 @@ const AccountCategoryScreen = () => {
               paddingVertical: 8,
               paddingHorizontal: 12,
               marginRight: 10,
-            }} onPress={() => handleEditAccountCategory(item.id)} >
+            }} onPress={() => handleEditAccountCategory(item.accountCategoryId)} >
             <Text style={{
               color: Colors.background,
               fontSize: 14,
@@ -133,12 +141,26 @@ const AccountCategoryScreen = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={{
+              backgroundColor: '#ffff80',
+              borderRadius: 5,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              marginRight: 10,
+            }} onPress={() => handleNavigate(item.accountCategoryId, item.accCategoryName)} >
+            <Text style={{
+              color: Colors.primary,
+              fontSize: 14,
+              fontWeight: 'bold',
+            }}>Manage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
               backgroundColor: '#f25252',
               borderRadius: 5,
               paddingVertical: 8,
               paddingHorizontal: 12,
             }}
-            onPress={() => handleDeleteAccountCategory(item.id)}
+            onPress={() => handleDeleteAccountCategory(item.accountCategoryId)}
           >
             <Text style={{
               color: Colors.background,
@@ -209,7 +231,7 @@ const AccountCategoryScreen = () => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{accountCategory.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{accountCategory.AccountCategoryId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -234,8 +256,7 @@ const AccountCategoryScreen = () => {
         <FlatList
           data={accountCategoryList}
           renderItem={renderAccountCategoryCard}
-          keyExtractor={(item) => item.id.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
+          keyExtractor={(item) => item.accountCategoryId.toString()}
         />
       </View>
     </ScrollView>

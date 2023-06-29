@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
-import Colors from '../../constants/Colors';
-import { Delete as httpDelete, Post as httpPost } from '../../constants/httpService';
+import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
-const StudentDetailsScreen = ({ navigation }) => {
+const AccountDayBookScreen = ({ route }) => {
+    const { accountId } = route.params;
     const ToDate = new Date();
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
-    const [studentDetailsList, setStudentDetailsList] = useState([]);
+    const [dayBookList, setDayBookList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
     const [loading, setLoading] = useState(false);
@@ -19,7 +21,6 @@ const StudentDetailsScreen = ({ navigation }) => {
     const [toDate, setToDate] = useState(ToDate.toISOString().slice(0, 10).toString());
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
-    const [mobile, setMobile] = useState("");
     const [isEndReached, setIsEndReached] = useState(true);
 
     const [selectFromDate, setSelectFromDate] = useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
@@ -27,11 +28,25 @@ const StudentDetailsScreen = ({ navigation }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
+    const [sumCreditAndDebit, setSumCreditAndDebit] = useState({});
+
+    useEffect(()=>{
+        GetSumDayBookCreditAndDebit();
+    },[])
+
+    const GetSumDayBookCreditAndDebit = () => {
+        const filter = { "AccountId": accountId, "From": fromDate, "To": toDate}
+        httpPost("DayBook/sumCreditAndDebit", filter)
+            .then((response) => {
+                setSumCreditAndDebit(response.data);
+            })
+    }
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
             setSelectFromDate(date);
             setFromDate(getFormattedDate(date));
+            setSkip(0);
         }
         setShowDatePicker(false);
     };
@@ -47,6 +62,7 @@ const StudentDetailsScreen = ({ navigation }) => {
         if (date !== undefined) {
             setSelectToDate(date);
             setToDate(getFormattedDate(date));
+            setSkip(0);
         }
         setShowToDatePicker(false);
     };
@@ -59,62 +75,48 @@ const StudentDetailsScreen = ({ navigation }) => {
         setShowToDatePicker(false);
     };
 
+    // Function to handle button press
     const handleSearch = () => {
-        setStudentDetailsList([]);
+        setDayBookList([]);
         setSkip(0);
-        GetStudentList();
+        GetDayBookList();
         setShowSearch(false);
-        console.log(selectFromDate, selectToDate, skip)
     };
 
-    // useEffect(() => {
-    //     setLoading(true);
-    //     GetStudentList();
-    // }, [])
-    const handleNavigate = (studentId) => {
-        navigation.navigate('StudentFormScreen', { studentId: studentId })
-    }
-
-    const handleAddAddressNavigate = (studentId) => {
-        navigation.navigate('AddressScreen', { studentId: studentId })
-    }
-    const handleAddStudentQualificationNavigate = (studentId) => {
-        navigation.navigate('StudentQualificationScreen', { studentId: studentId })
-    }
-    const handleAddStudentTokenNavigate = (studentId) => {
-        navigation.navigate('StudentTokenScreen', { studentId: studentId })
-    }
-    const handleAddStudentBatchNavigate = (studentId) => {
-        navigation.navigate('StudentBatchScreen', { studentId: studentId })
-    }
-
-    const GetStudentList = () => {
+    const GetDayBookList = () => {
         setLoading(true);
-        const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "Mobile": mobile }
-        httpPost("StudentDetails/get", filter)
+        const filter = { "AccountId": accountId, "From": fromDate, "To": toDate, "Take": take, "Skip": skip }
+        httpPost("DayBook/getDayBookByAccountId", filter)
             .then((response) => {
-                console.log(response.data, "StudentDetails list");
-                const studentDetailsArray = response.data.map((studentDetails) => ({
-                    value: studentDetails.id,
-                    label: studentDetails.firstName + " " + studentDetails.lastName,
-                    father: studentDetails.fatherName,
-                    mother: studentDetails.motherName,
-                    mobile: studentDetails.mobile,
-                    totalStudent: studentDetails.totalStudent
-                }));
-                setStudentDetailsList(studentDetailsArray);
                 setLoading(false);
+                if (response.data.length >= 0) {
+                    setIsEndReached(false);
+                    setDayBookList([...dayBookList, ...response.data])
+                    setSkip(skip + 10)
+                }
+                if (response.data.length === 0) {
+                    setIsEndReached(true);
+                    Toast.show({
+                        type: 'info',
+                        text1: 'No records found',
+                        position: 'bottom',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    });
+                }
             })
             .catch((error) => {
-                console.error(error);
+                setLoading(false);
+                console.error('Get DayBook List Error : ', error);
             });
     }
 
-    const handleDeleteStudentDetails = (id) => {
-        httpDelete(`StudentDetails/delete?Id=${id}`)
+    const handleDeleteDayBook = (id) => {
+        httpDelete(`DayBook/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
-                GetStudentList();
+                setDayBookList([]);
+                setSkip(0);
             })
             .catch(err => console.error("Delete Error", err));
     }
@@ -128,10 +130,11 @@ const StudentDetailsScreen = ({ navigation }) => {
         return `${year}-${month}-${day}`;
     }
 
-    const handleLoadMore = async () => {
+    const handleLoadMore = () => {
         console.log("Execute Handle More function")
         if (!isEndReached) {
-            GetStudentList();
+            // setSkip(skip + 10)
+            GetDayBookList();
         }
     };
 
@@ -144,7 +147,7 @@ const StudentDetailsScreen = ({ navigation }) => {
         );
     };
 
-    const renderStudentDetailsCard = ({ item }) => (
+    const renderDayBookCard = ({ item }) => (
         <View style={{
             backgroundColor: Colors.background,
             borderRadius: 10,
@@ -156,112 +159,36 @@ const StudentDetailsScreen = ({ navigation }) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 0.5,
+            borderWidth: 1,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Student Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.label}</Text>
+                <Text style={{ fontSize: 16 }}>Particulars : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.particulars}</Text>
+            </View>
+            {item.credit !== 0 ? (<View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Credit : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.credit}</Text>
+            </View>) : null}
+            {item.debit !== 0 ? (<View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Debit : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.debit}</Text>
+            </View>) : null}
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Created At : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Father Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.father}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Mother Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mother}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Mobile : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-
-                <TouchableOpacity
-                    style={{
-                        flex: 1,
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 3,
-                    }} onPress={() => handleAddAddressNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        alignSelf: 'center',
-                    }}>Address</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 5,
-                        marginRight: 3,
-                    }} onPress={() => handleAddStudentQualificationNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        alignSelf: 'center',
-                    }}>Qualification</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{
-                        flex: 1,
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 3,
-                    }} onPress={() => handleAddStudentTokenNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        alignSelf: 'center',
-                    }}>Token</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{
-                        flex: 1,
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                    }} onPress={() => handleAddStudentBatchNavigate(item.value)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        alignSelf: 'center',
-                    }}>Batch</Text>
-                </TouchableOpacity>
+                <Text style={{ fontSize: 16 }}>Account : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.account}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: '#5a67f2',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => {handleNavigate(item.value); setStudentDetailsList([]);}} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Edit</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={{
                     backgroundColor: '#f25252',
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                }} onPress={() => {handleDeleteStudentDetails(item.id); setStudentDetailsList([]);}}>
+                }} onPress={() => handleDeleteDayBook(item.dayBookId)}>
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -269,14 +196,45 @@ const StudentDetailsScreen = ({ navigation }) => {
                     }}>Delete</Text>
                 </TouchableOpacity>
             </View>
-        </View >
+        </View>
     );
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-
+                    <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                            <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
+                            <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
+                        </View>
+                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Credit : {sumCreditAndDebit.credit}</Text>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Debit : {sumCreditAndDebit.debit}</Text>
+                    </View>
+                    
                     {showSearch && (
                         <Modal transparent visible={showSearch}>
                             <View style={{
@@ -357,22 +315,6 @@ const StudentDetailsScreen = ({ navigation }) => {
                                             onCancel={handleConfirmToDatePicker}
                                         />
                                     )}
-                                    <Text style={{ fontSize: 20, marginBottom: 5 }}>Or</Text>
-                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>Mobile :</Text>
-                                    <TextInput
-                                        style={{
-                                            borderWidth: 1,
-                                            borderColor: Colors.primary,
-                                            borderRadius: 8,
-                                            marginBottom: 20,
-                                            padding: 8,
-                                        }}
-                                        placeholder="Enter Mobile"
-                                        value={mobile}
-                                        keyboardType='numeric'
-                                        maxLength={10}
-                                        onChangeText={(text) => setMobile(text)}
-                                    />
                                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
 
                                         <TouchableOpacity style={{
@@ -403,24 +345,12 @@ const StudentDetailsScreen = ({ navigation }) => {
                             </View>
                         </Modal>
                     )}
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{
-                            fontSize: 20,
-                            marginBottom: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.accent,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
-                            color: Colors.secondary,
-                        }}>Total Student : {studentDetailsList.length === 0 ? null : studentDetailsList[0].totalStudent}</Text>
-                    </View>
+
                     <FlatList
-                        data={studentDetailsList}
-                        keyExtractor={(item) => item.value.toString()}
+                        data={dayBookList}
+                        keyExtractor={(item) => item.dayBookId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={renderStudentDetailsCard}
+                        renderItem={renderDayBookCard}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();
@@ -429,13 +359,14 @@ const StudentDetailsScreen = ({ navigation }) => {
                     />
 
                     <Toast ref={(ref) => Toast.setRef(ref)} />
+
                 </Animated.View>
             </View>
         </ScrollView>
     );
 };
 
-export default StudentDetailsScreen;
+export default AccountDayBookScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -489,7 +420,7 @@ export default StudentDetailsScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   studentDetailsCard: {
+//   dayBookCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -504,7 +435,7 @@ export default StudentDetailsScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   studentDetailsName: {
+//   dayBookName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

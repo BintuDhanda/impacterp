@@ -24,7 +24,7 @@ import CourseCategoryScreen from './src/screens/courseCategory';
 import CourseScreen from './src/screens/courseScreen';
 import AddressTypeScreen from './src/screens/addressTypeScreen';
 import EnterAccountScreen from './src/screens/enterAccountScreen';
-import AccountCategoryScreen from './src/screens/accountCategory';
+import AccountCategoryScreen from './src/screens/accountCategoryScreen';
 import AccountScreen from './src/screens/accountScreen';
 import DayBookScreen from './src/screens/dayBookScreen';
 import CityScreen from './src/screens/cityScreen';
@@ -48,6 +48,7 @@ import AttendanceHistoryScreen from './src/screens/attendanceHistoryScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistoryScreen';
 import UserRoleScreen from './src/screens/userRoleScreen';
+import AccountDayBookScreen from './src/screens/accountDaybookScreen';
 
 
 export const UserContext = React.createContext();
@@ -106,6 +107,7 @@ function App()
               <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
               <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
               <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
+              <Stack.Screen name="AccountDaybookScreen" options={{title: 'Account Daybook'}} component={AccountDayBookScreen} />
               <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
             </Stack.Navigator>
           </NavigationContainer>)

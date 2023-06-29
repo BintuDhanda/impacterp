@@ -1,77 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
-const AccountScreen = () => {
-  const [account, setAccount] = useState({ "Id": 0, "AccountName": "", "IsActive": true, "AccCategoryId": "" });
-  const [accCategoryData, setAccCategoryData] = useState([]);
+const AccountScreen = ({ route, navigation }) => {
+  const { accountCategoryId, accCategoryName } = route.params;
+  const [account, setAccount] = useState({ "AccountId": 0, "AccountName": "", "IsActive": true, "AccCategoryId": accountCategoryId, "CreatedAt": null });
   const [accountList, setAccountList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+
   useEffect(() => {
-    GetAccCategoryList();
-  }, []);
+    fetchAccountsByAccCategoryId();
+  }, [])
 
-  const GetAccCategoryList = () => {
-    // axios.get('http://192.168.1.7:5291/api/AccountCategory/get', {
-    //   headers: {
-    //     'Content-Type': 'application/json', // Example header
-    //     'User-Agent': 'react-native/0.64.2', // Example User-Agent header
-    //   },
-    // })
-    httpGet("AccountCategory/get")
-      .then((response) => {
-        console.log(response.data);
-        const AccCategoryArray = response.data.map((accCategory) => ({
-          value: accCategory.id,
-          label: accCategory.accCategoryName,
-        }));
-        setAccCategoryData(AccCategoryArray);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  const fetchAccountsByAccCategoryId = async (accCategoryId) => {
+  const fetchAccountsByAccCategoryId = async () => {
     try {
-      const response = await httpGet(`Account/getAccountByAccountCategoryId?Id=${accCategoryId}`)
+      const response = await httpGet(`Account/getAccountByAccountCategoryId?Id=${accountCategoryId}`)
       setAccountList(response.data);
     } catch (error) {
       console.log('Error fetching Accounts:', error);
     }
   };
-  const handleAccCategorySelect = (accCategory) => {
-    setValue(accCategory.value);
-    fetchAccountsByAccCategoryId(accCategory.value);
-  };
 
 
   const handleAddAccount = () => {
     setAccount({
-      Id: 0,
+      AccountId: 0,
       AccountName: "",
       IsActive: true,
-      AccCategoryId: ""
+      AccCategoryId: accountCategoryId,
+      CreatedAt: null,
     });
     setModalVisible(true);
   };
 
   const handleEditAccount = (id) => {
-    // axios.get(`http://192.168.1.7:5291/api/Account/getById?Id=${id}`)
     httpGet(`Account/getById?Id=${id}`)
       .then((result) => {
         console.log(result);
         setAccount(
           {
-            Id: result.data.id,
+            AccountId: result.data.accountId,
             AccountName: result.data.accountName,
             AccCategoryId: result.data.accCategoryId,
-            IsActive: result.data.isActive
+            IsActive: result.data.isActive,
+            CreatedAt: result.data.createdAt,
           }
         );
       })
@@ -80,53 +54,48 @@ const AccountScreen = () => {
   };
 
   const handleDeleteAccount = (id) => {
-    // axios.delete(`http://192.168.1.7:5291/api/Account/delete?Id=${id}`)
     httpDelete(`Account/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
-        fetchAccountsByAccCategoryId(result.data.accCategoryId)
+        fetchAccountsByAccCategoryId();
       })
       .catch(err => console.error("Delete Error", err));
   }
 
+  const handleNavigate = (accountId) => {
+    navigation.navigate('AccountDaybookScreen', { accountId: accountId })
+  }
+
   const handleSaveAccount = async () => {
     try {
-      if (account.Id !== 0) {
-        // await axios.put(`http://192.168.1.7:5291/api/Account/put`, JSON.stringify(account), {
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // })
+      if (account.AccountId !== 0) {
         await httpPut("Account/put", account)
           .then((response) => {
             if (response.status === 200) {
-              fetchAccountsByAccCategoryId(response.data.accCategoryId);
+              fetchAccountsByAccCategoryId();
               Alert.alert('Sucess', 'Account Update successfully');
               setAccount({
-                "Id": 0,
+                "AccountId": 0,
                 "AccountName": "",
-                "AccCategoryId": "",
-                "IsActive": true
+                "AccCategoryId": accountCategoryId,
+                "IsActive": true,
+                "CreatedAt": null,
               });
             }
           })
           .catch(err => console.error("Post error in Account", err));
       } else {
-        // await axios.post('http://192.168.1.7:5291/api/Account/post', JSON.stringify(account), {
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // })
         await httpPost("Account/post", account)
           .then((response) => {
             if (response.status === 200) {
-              fetchAccountsByAccCategoryId(response.data.accCategoryId);
+              fetchAccountsByAccCategoryId();
               Alert.alert('Sucess', 'Account is Added Successfully')
               setAccount({
-                "Id": 0,
+                "AccountId": 0,
                 "AccountName": "",
-                "AccCategoryId": "",
-                "IsActive": true
+                "AccCategoryId": accountCategoryId,
+                "IsActive": true,
+                "CreatedAt": null,
               });
             }
           })
@@ -144,8 +113,6 @@ const AccountScreen = () => {
 
   const renderAccountCard = ({ item }) => (
     <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
       justifyContent: 'space-between',
       backgroundColor: Colors.background,
       borderRadius: 10,
@@ -157,21 +124,21 @@ const AccountScreen = () => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1,
       borderColor: Colors.primary,
     }}>
-      <Text style={{
-        fontSize: 16,
-        fontWeight: 'bold',
-      }}>{item.accountName}</Text>
       <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Account Name : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.accountName}</Text>
+      </View>
+      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{
           backgroundColor: '#5a67f2',
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleEditAccount(item.id)}>
+        }} onPress={() => handleEditAccount(item.accountId)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -179,11 +146,24 @@ const AccountScreen = () => {
           }}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
+          backgroundColor: '#ffff80',
+          borderRadius: 5,
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          marginRight: 10,
+        }} onPress={() => handleNavigate(item.accountId)}>
+          <Text style={{
+            color: Colors.primary,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}>Manage</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
           backgroundColor: '#f25252',
           borderRadius: 5,
           paddingVertical: 8,
           paddingHorizontal: 12,
-        }} onPress={() => handleDeleteAccount(item.id)}>
+        }} onPress={() => handleDeleteAccount(item.accountId)}>
           <Text style={{
             color: Colors.background,
             fontSize: 14,
@@ -200,53 +180,25 @@ const AccountScreen = () => {
         padding: 16,
         justifyContent: 'center'
       }}>
-        <Dropdown
-          style={[{
-            height: 50,
-            borderColor: Colors.primary,
-            borderWidth: 0.5,
-            borderRadius: 10,
-            paddingHorizontal: 8,
-          }, isFocus && { borderColor: 'blue' }]}
-          placeholderStyle={{ fontSize: 16, }}
-          selectedTextStyle={{ fontSize: 16, }}
-          inputSearchStyle={{
-            height: 40,
-            fontSize: 16,
-          }}
-          iconStyle={{
-            width: 20,
-            height: 20,
-          }}
-          data={accCategoryData}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Select Account Category' : '...'}
-          searchPlaceholder="Search..."
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={handleAccCategorySelect}
-        />
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Account Category Name : {accCategoryName}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginTop: 10,
-          alignSelf: 'flex-start',
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          marginBottom: 20,
+          marginTop: 10
         }} onPress={handleAddAccount}>
           <Text style={{
             color: Colors.background,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 'bold',
-          }}>Add</Text>
+            textAlign: 'center',
+          }}>Add Account</Text>
         </TouchableOpacity>
         <FlatList
           data={accountList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.accountId.toString()}
           renderItem={renderAccountCard}
         />
 
@@ -276,36 +228,7 @@ const AccountScreen = () => {
                   value={account.AccountName}
                   onChangeText={(text) => setAccount({ ...account, AccountName: text })}
                 />
-                <Dropdown
-                  style={[{
-                    height: 50,
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    paddingHorizontal: 8,
-                  }, isFocus && { borderColor: 'blue' }]}
-                  placeholderStyle={{ fontSize: 16, }}
-                  selectedTextStyle={{ fontSize: 16, }}
-                  inputSearchStyle={{
-                    height: 40,
-                    fontSize: 16,
-                  }}
-                  iconStyle={{
-                    width: 20,
-                    height: 20,
-                  }}
-                  data={accCategoryData}
-                  search
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? 'Select Account Category' : '...'}
-                  searchPlaceholder="Search..."
-                  value={account.AccCategoryId}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(value) => setAccount({ ...account, AccCategoryId: value.value })}
-                />
+
                 <View style={{
                   marginTop: 10,
                   flexDirection: 'row',
@@ -321,7 +244,7 @@ const AccountScreen = () => {
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{account.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{account.AccountId === 0 ? 'Add' : 'Save'}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={{
                     backgroundColor: '#f25252',

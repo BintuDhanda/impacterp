@@ -204,11 +204,11 @@ const AttendanceScreen = ({navigation}) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 0.5,
+            borderWidth: 1,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>BatchName : </Text>
+                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>

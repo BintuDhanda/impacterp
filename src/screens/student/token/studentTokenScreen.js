@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';

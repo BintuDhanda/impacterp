@@ -29,12 +29,8 @@ const EnterAccountScreen = () => {
       return (
         <View style={styles.horizontalLine}>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AccountCategoryScreen')}>
-            <Icon name="folder" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Account Category</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AccountScreen')}>
             <Icon name="user-circle" size={50} color={Colors.primary} style={styles.icon} />
-            <Text style={styles.title}>Account</Text>
+            <Text style={styles.title}>Account Category</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('DayBookScreen')}>
             <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
@@ -47,12 +43,8 @@ const EnterAccountScreen = () => {
     return (
       <View style={styles.verticalLine}>
         <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AccountCategoryScreen')}>
-          <Icon name="folder" size={50} color={Colors.primary} style={styles.icon} />
-          <Text style={styles.title}>Account Category</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={() => handleIconPress('AccountScreen')}>
           <Icon name="user-circle" size={50} color={Colors.primary} style={styles.icon} />
-          <Text style={styles.title}>Account</Text>
+          <Text style={styles.title}>Account Category</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.card} onPress={() => handleIconPress('DayBookScreen')}>
           <Icon name="book" size={50} color={Colors.primary} style={styles.icon} />
@@ -86,7 +78,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: (Dimensions.get('window').width - 60) / 3,
+    width: (Dimensions.get('window').width - 60) / 2,
     backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 20,

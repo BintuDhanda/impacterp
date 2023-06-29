@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AttendanceHistoryScreen = ({ route, navigation }) => {

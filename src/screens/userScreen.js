@@ -32,7 +32,6 @@ const UserScreen = ({ navigation }) => {
   const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  console.log(userList, "UserList")
 
   const handleFromDateChange = (event, date) => {
     if (date !== undefined) {
@@ -121,6 +120,8 @@ const UserScreen = ({ navigation }) => {
         httpPut("User/put", user)
           .then((response) => {
             if (response.status === 200) {
+              setUserList([]);
+              setSkip(0);
               GetUserList();
               Alert.alert('Sucees', 'Update User Successfully')
               setUser({
@@ -137,6 +138,8 @@ const UserScreen = ({ navigation }) => {
         httpPost("User/post", user)
           .then((response) => {
             if (response.status === 200) {
+              setUserList([]);
+              setSkip(0);
               GetUserList();
               Alert.alert('Success', 'Add User Successfully')
               setUser({
@@ -160,6 +163,8 @@ const UserScreen = ({ navigation }) => {
     httpDelete(`User/delete?Id=${userId}`)
       .then((result) => {
         console.log(result);
+        setUserList([]);
+        setSkip(0);
         GetUserList();
       })
       .catch(err => console.error("Delete Error", err));
@@ -312,7 +317,7 @@ const UserScreen = ({ navigation }) => {
               color: Colors.secondary,
             }}>Total User : {userList.length === 0 ? null : userList[0].totalUser}</Text>
           </View>
-          <TouchableOpacity onPress={() => { setShowSearch(true); }}>
+          <TouchableOpacity onPress={() => { setShowSearch(true); setUserList([]); }}>
             <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
               <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
               <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
@@ -519,7 +524,7 @@ const UserScreen = ({ navigation }) => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                  }} onPress={handleSaveUser}>
+                  }} onPress={() => { handleSaveUser(); setUserList([]); }}>
                     <Text style={{
                       color: Colors.background,
                       fontSize: 16,

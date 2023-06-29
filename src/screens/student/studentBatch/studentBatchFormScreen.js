@@ -4,7 +4,6 @@ import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
-import axios from 'axios';
 import { Get as httpGet, Put as httpPut, Post as httpPost } from '../../../constants/httpService';
 
 const StudentBatchFormScreen = ({ route, navigation }) => {
