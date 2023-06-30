@@ -19,6 +19,7 @@ const StudentFormScreen = ({ route, navigation }) => {
         "BodyRemark": "",
         "UserId": userId,
         "IsActive": true,
+        "CreatedAt": null,
     });
 
     console.log(formData, "Formdata")
@@ -63,7 +64,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                         StudentWeight: result.data.studentWeight,
                         BodyRemark: result.data.bodyRemark,
                         UserId: result.data.userId,
-                        IsActive: result.data.isActive
+                        IsActive: result.data.isActive,
+                        CreatedAt: result.data.createdAt,
                     }
                 );
             })
@@ -90,6 +92,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "BodyRemark": "",
                                 "UserId": userId,
                                 "IsActive": true,
+                                "CreatedAt": null,
                             })
                             navigation.goBack();
                         }
@@ -113,6 +116,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "BodyRemark": "",
                                 "UserId": userId,
                                 "IsActive": true,
+                                "CreatedAt": null,
                             })
                             navigation.navigate('StudentDetailsScreen')
                         }
@@ -294,7 +298,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                             paddingVertical: 8,
                             marginBottom: 10,
                             fontSize: 16,
-                        }, {height: 80, textAlignVertical: 'top',}]}
+                        }, { height: 80, textAlignVertical: 'top', }]}
                         value={formData.BodyRemark}
                         onChangeText={(value) => handleInputChange('BodyRemark', value)}
                         placeholder="Enter body remarks"

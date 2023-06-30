@@ -30,12 +30,8 @@ const AccountDayBookScreen = ({ route }) => {
     const [showSearch, setShowSearch] = useState(true);
     const [sumCreditAndDebit, setSumCreditAndDebit] = useState({});
 
-    useEffect(()=>{
-        GetSumDayBookCreditAndDebit();
-    },[])
-
     const GetSumDayBookCreditAndDebit = () => {
-        const filter = { "AccountId": accountId, "From": fromDate, "To": toDate}
+        const filter = { "AccountId": accountId, "From": fromDate, "To": toDate }
         httpPost("DayBook/sumCreditAndDebit", filter)
             .then((response) => {
                 setSumCreditAndDebit(response.data);
@@ -80,6 +76,7 @@ const AccountDayBookScreen = ({ route }) => {
         setDayBookList([]);
         setSkip(0);
         GetDayBookList();
+        GetSumDayBookCreditAndDebit();
         setShowSearch(false);
     };
 
@@ -209,7 +206,7 @@ const AccountDayBookScreen = ({ route }) => {
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>
                     </TouchableOpacity>
-                    <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{
                             fontSize: 14,
                             marginBottom: 10,
@@ -221,7 +218,7 @@ const AccountDayBookScreen = ({ route }) => {
                             paddingHorizontal: 12,
                             flex: 1,
                             color: Colors.background
-                        }}>Total Credit : {sumCreditAndDebit.credit}</Text>
+                        }}>Total Credit : {sumCreditAndDebit.credit} Rs/-</Text>
                         <Text style={{
                             fontSize: 14,
                             marginBottom: 10,
@@ -232,9 +229,9 @@ const AccountDayBookScreen = ({ route }) => {
                             paddingHorizontal: 12,
                             flex: 1,
                             color: Colors.background
-                        }}>Total Debit : {sumCreditAndDebit.debit}</Text>
+                        }}>Total Debit : {sumCreditAndDebit.debit} Rs/-</Text>
                     </View>
-                    
+
                     {showSearch && (
                         <Modal transparent visible={showSearch}>
                             <View style={{

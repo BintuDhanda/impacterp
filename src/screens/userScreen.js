@@ -492,32 +492,32 @@ const UserScreen = ({ navigation }) => {
                 padding: 20,
                 width: '80%',
               }}>
-                <TextInput
-                  style={{
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                    marginBottom: 20,
-                    padding: 8,
-                  }}
-                  placeholder="User Mobile"
-                  value={user.UserMobile}
-                  keyboardType='numeric'
-                  maxLength={10}
-                  onChangeText={(text) => setUser({ ...user, UserMobile: text })}
-                />
-                <TextInput
-                  style={{
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                    marginBottom: 20,
-                    padding: 8,
-                  }}
-                  placeholder="User Password"
-                  value={user.UserPassword}
-                  onChangeText={(text) => setUser({ ...user, UserPassword: text })}
-                />
+                <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: Colors.primary, borderRadius: 8, marginBottom: 10 }}>
+                  <Icon name="phone" size={25} color={Colors.primary} style={{ marginRight: 8, marginLeft: 8, textAlignVertical: 'center' }} />
+                  <TextInput
+                    style={{
+                      flex: 1
+                    }}
+                    placeholder="User Mobile"
+                    value={user.UserMobile}
+                    keyboardType='numeric'
+                    maxLength={10}
+                    editable={user.Id === 0 ? true : false}
+                    onChangeText={(text) => setUser({ ...user, UserMobile: text })}
+                  />
+                </View>
+                <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: Colors.primary, borderRadius: 8 }}>
+                  <Icon name="lock" size={25} color={Colors.primary} style={{ marginRight: 8, marginLeft: 8, textAlignVertical: 'center' }} />
+                  <TextInput
+                    style={{
+                      flex: 1,
+                    }}
+                    placeholder="User Password"
+                    value={user.UserPassword}
+                    onChangeText={(text) => setUser({ ...user, UserPassword: text })}
+                    secureTextEntry={true}
+                  />
+                </View>
                 <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <TouchableOpacity style={{
                     backgroundColor: Colors.primary,

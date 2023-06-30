@@ -49,79 +49,102 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistoryScreen';
 import UserRoleScreen from './src/screens/userRoleScreen';
 import AccountDayBookScreen from './src/screens/accountDaybookScreen';
+import Colors from './src/constants/Colors';
 
 
 export const UserContext = React.createContext();
 const Stack = createStackNavigator();
 
-function App() 
-{
- 
-  const [user, setUser] = useState({"UserId":0});
-  
+function App() {
+
+  const [user, setUser] = useState();
+  const [isSpalsh, setIsSplash] = useState(true);
+
   useEffect(() => {
     getUser();
+    setTimeout(() => {
+      setIsSplash(false);
+    }, 2000);
   }, [])
-  
-  const getUser = () => {
-    let user = AsyncStorage.getItem('user')?AsyncStorage.getItem('user'):{};
-      //setUser(user);
+
+  const getUser = async () => {
+    try {
+      const user = await AsyncStorage.getItem('user');
+      if (user !== null) {
+        // We have data!!
+        console.log(user);
+        setUser(user)
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error);
+    }
   }
 
   return (
-    <UserContext.Provider value={{user,setUser}}>
-      <SafeAreaView style={{ flex: 1 }}>
-        {user ? (
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: true }}>
-              {/* <Stack.Screen name="HomeScreen" component={DrawerNavigator} /> */}
-              <Stack.Screen name="HomeScreen" options={{ title: 'Home' }} component={HomeScreen} />
-              <Stack.Screen name="UserScreen" options={{ title: 'User' }} component={UserScreen} />
-              <Stack.Screen name="UserRoleScreen" options={{title: "User Role"}} component={UserRoleScreen} />
-              <Stack.Screen name="StudentFormScreen" options={{ title: 'Student Form' }} component={StudentFormScreen} />
-              <Stack.Screen name="RolesScreen" options={{ title: 'Roles' }} component={RoleScreen} />
-              <Stack.Screen name="StudentDetailsScreen" options={{ title: 'Student Detail' }} component={StudentDetailsScreen} />
-              <Stack.Screen name="QualificationScreen" options={{ title: 'Qualification' }} component={QualificationScreen} />
-              <Stack.Screen name="CountryScreen" options={{ title: 'Country' }} component={CountryScreen} />
-              <Stack.Screen name="StateScreen" options={{ title: 'State' }} component={StateScreen} />
-              <Stack.Screen name="CityScreen" options={{ title: 'City' }} component={CityScreen} />
-              <Stack.Screen name="CourseCategoryScreen" options={{ title: 'Course Category' }} component={CourseCategoryScreen} />
-              <Stack.Screen name="CourseScreen" options={{ title: 'Course' }} component={CourseScreen} />
-              <Stack.Screen name="BatchScreen" options={{ title: 'Batch' }} component={BatchScreen} />
-              <Stack.Screen name="AddressTypeScreen" options={{ title: 'Address Type' }} component={AddressTypeScreen} />
-              <Stack.Screen name="AddressScreen" options={{ title: 'Student Address' }} component={AddressScreen} />
-              <Stack.Screen name="StudentAddressFormScreen" options={{ title: 'Student Address Form' }} component={StudentAddressFormScreen} />
-              <Stack.Screen name="StudentQualificationScreen" options={{ title: 'Student Qualification' }} component={StudentQualificationScreen} />
-              <Stack.Screen name="StudentQualificationFormScreen" options={{ title: 'Student Qualification Form' }} component={StudentQualificationFormScreen} />
-              <Stack.Screen name="StudentTokenScreen" options={{ title: 'Student Token' }} component={StudentTokenScreen} />
-              <Stack.Screen name="StudentTokenFormScreen" options={{ title: 'Student Token Form' }} component={StudentTokenFormScreen} />
-              <Stack.Screen name="StudentTokenFeesScreen" options={{ title: 'Student Token Fees' }} component={StudentTokenFeesScreen} />
-              <Stack.Screen name="StudentTokenFeesHistoryScreen" options={{ title: 'Student Token Fees History' }} component={StudentTokenFeesHistoryScreen} />
-              <Stack.Screen name="StudentBatchScreen" options={{ title: 'Student Batch' }} component={StudentBatchScreen} />
-              <Stack.Screen name="AttendanceScreen" options={{ title: 'Attendance' }} component={AttendanceScreen} />
-              <Stack.Screen name="AttendanceHistoryScreen" options={{title: 'Attendance History'}} component={AttendanceHistoryScreen} />
-              <Stack.Screen name="StudentBatchFormScreen" options={{ title: 'Student Batch Form' }} component={StudentBatchFormScreen} />
-              <Stack.Screen name="StudentBatchFeesScreen" options={{ title: 'Student Batch Fee' }} component={StudentBatchFeesScreen} />
-              <Stack.Screen name="StudentBatchFeesHistoryScreen" options={{ title: 'Student Batch Fees History' }} component={StudentBatchFeesHistoryScreen} />
-              <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type' }} component={FeeTypeScreen} />
-              <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
-              <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
-              <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
-              <Stack.Screen name="AccountDaybookScreen" options={{title: 'Account Daybook'}} component={AccountDayBookScreen} />
-              <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>)
-          :
-          (<NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="logInScreen" options={{ title: 'Log In' }} component={LogInScreen} />
-              <Stack.Screen name="VerifyOTPScreen" options={{ title: 'Verify Otp' }} component={VerifyOTPScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>)
-        }
-      </SafeAreaView>
-    </UserContext.Provider>
-  );
+    <>
+      {isSpalsh ? (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.primary }}>
+        {/* <Image source={require('../assets/impact.png')} /> */}
+        <Text style={{ fontSize: 60, color: Colors.background, fontWeight: 'bold' }}>IMPACT</Text>
+        <Text style={{ fontSize: 60, color: Colors.background, fontWeight: 'bold' }}>ACADEMY</Text>
+      </View>)
+        :
+
+        (<UserContext.Provider value={{ user, setUser }}>
+          <SafeAreaView style={{ flex: 1 }}>
+            {user ? (
+              <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: true }}>
+                  {/* <Stack.Screen name="HomeScreen" component={DrawerNavigator} /> */}
+                  <Stack.Screen name="HomeScreen" options={{ title: 'Home' }} component={HomeScreen} />
+                  <Stack.Screen name="UserScreen" options={{ title: 'User' }} component={UserScreen} />
+                  <Stack.Screen name="UserRoleScreen" options={{ title: "User Role" }} component={UserRoleScreen} />
+                  <Stack.Screen name="StudentFormScreen" options={{ title: 'Student Form' }} component={StudentFormScreen} />
+                  <Stack.Screen name="RolesScreen" options={{ title: 'Roles' }} component={RoleScreen} />
+                  <Stack.Screen name="StudentDetailsScreen" options={{ title: 'Student Detail' }} component={StudentDetailsScreen} />
+                  <Stack.Screen name="QualificationScreen" options={{ title: 'Qualification' }} component={QualificationScreen} />
+                  <Stack.Screen name="CountryScreen" options={{ title: 'Country' }} component={CountryScreen} />
+                  <Stack.Screen name="StateScreen" options={{ title: 'State' }} component={StateScreen} />
+                  <Stack.Screen name="CityScreen" options={{ title: 'City' }} component={CityScreen} />
+                  <Stack.Screen name="CourseCategoryScreen" options={{ title: 'Course Category' }} component={CourseCategoryScreen} />
+                  <Stack.Screen name="CourseScreen" options={{ title: 'Course' }} component={CourseScreen} />
+                  <Stack.Screen name="BatchScreen" options={{ title: 'Batch' }} component={BatchScreen} />
+                  <Stack.Screen name="AddressTypeScreen" options={{ title: 'Address Type' }} component={AddressTypeScreen} />
+                  <Stack.Screen name="AddressScreen" options={{ title: 'Student Address' }} component={AddressScreen} />
+                  <Stack.Screen name="StudentAddressFormScreen" options={{ title: 'Student Address Form' }} component={StudentAddressFormScreen} />
+                  <Stack.Screen name="StudentQualificationScreen" options={{ title: 'Student Qualification' }} component={StudentQualificationScreen} />
+                  <Stack.Screen name="StudentQualificationFormScreen" options={{ title: 'Student Qualification Form' }} component={StudentQualificationFormScreen} />
+                  <Stack.Screen name="StudentTokenScreen" options={{ title: 'Student Token' }} component={StudentTokenScreen} />
+                  <Stack.Screen name="StudentTokenFormScreen" options={{ title: 'Student Token Form' }} component={StudentTokenFormScreen} />
+                  <Stack.Screen name="StudentTokenFeesScreen" options={{ title: 'Student Token Fees' }} component={StudentTokenFeesScreen} />
+                  <Stack.Screen name="StudentTokenFeesHistoryScreen" options={{ title: 'Student Token Fees History' }} component={StudentTokenFeesHistoryScreen} />
+                  <Stack.Screen name="StudentBatchScreen" options={{ title: 'Student Batch' }} component={StudentBatchScreen} />
+                  <Stack.Screen name="AttendanceScreen" options={{ title: 'Attendance' }} component={AttendanceScreen} />
+                  <Stack.Screen name="AttendanceHistoryScreen" options={{ title: 'Attendance History' }} component={AttendanceHistoryScreen} />
+                  <Stack.Screen name="StudentBatchFormScreen" options={{ title: 'Student Batch Form' }} component={StudentBatchFormScreen} />
+                  <Stack.Screen name="StudentBatchFeesScreen" options={{ title: 'Student Batch Fee' }} component={StudentBatchFeesScreen} />
+                  <Stack.Screen name="StudentBatchFeesHistoryScreen" options={{ title: 'Student Batch Fees History' }} component={StudentBatchFeesHistoryScreen} />
+                  <Stack.Screen name="FeeTypeScreen" options={{ title: 'Fees Type' }} component={FeeTypeScreen} />
+                  <Stack.Screen name="EnterAccountScreen" options={{ title: 'Enter Account' }} component={EnterAccountScreen} />
+                  <Stack.Screen name="AccountCategoryScreen" options={{ title: 'Account Category' }} component={AccountCategoryScreen} />
+                  <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
+                  <Stack.Screen name="AccountDaybookScreen" options={{ title: 'Account Daybook' }} component={AccountDayBookScreen} />
+                  <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
+                </Stack.Navigator>
+              </NavigationContainer>)
+              :
+              (<NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="logInScreen" options={{ title: 'Log In' }} component={LogInScreen} />
+                  <Stack.Screen name="VerifyOTPScreen" options={{ title: 'Verify Otp' }} component={VerifyOTPScreen} />
+                </Stack.Navigator>
+              </NavigationContainer>)
+            }
+          </SafeAreaView>
+        </UserContext.Provider>)
+      }
+    </>
+  )
 }
 
 const styles = StyleSheet.create({

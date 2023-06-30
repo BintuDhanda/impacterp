@@ -20,12 +20,12 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
 
     useFocusEffect(
         React.useCallback(() => {
-          GetStudentBatchFeesList();
-          GetSumStudentDepositAndRefund();
+            GetStudentBatchFeesList();
+            GetSumStudentDepositAndRefund();
         }, [])
-      )
-      
-      const GetSumStudentDepositAndRefund = () => {
+    )
+
+    const GetSumStudentDepositAndRefund = () => {
         httpGet(`StudentBatchFees/sumDepositAndRefund?registrationNumber=${registrationNumber}`)
             .then((response) => {
                 setSumDepositAndRefund(response.data);
@@ -155,7 +155,7 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                <View style={{ flexDirection: 'row' ,alignItems: 'center'}}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{
                             fontSize: 14,
                             marginBottom: 10,
@@ -167,7 +167,7 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
                             paddingHorizontal: 12,
                             flex: 1,
                             color: Colors.background
-                        }}>Total Deposit : {sumDepositAndRefund.deposit}</Text>
+                        }}>Total Deposit : {sumDepositAndRefund.deposit} Rs/-</Text>
                         <Text style={{
                             fontSize: 14,
                             marginBottom: 10,
@@ -178,7 +178,7 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
                             paddingHorizontal: 12,
                             flex: 1,
                             color: Colors.background
-                        }}>Total Refund : {sumDepositAndRefund.refund}</Text>
+                        }}>Total Refund : {sumDepositAndRefund.refund} Rs/-</Text>
                     </View>
                     <FlatList
                         data={studentBatchFeesList}

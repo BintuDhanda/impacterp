@@ -15,8 +15,13 @@ const HomeScreen = () => {
     navigation.navigate(screenName);
   };
 
-  const handleLogOut = () => {
-    AsyncStorage.removeItem(user);
+  const handleLogOut = async () => {
+
+    try {
+      const savedUser = await AsyncStorage.clear();
+    } catch (error) {
+      console.log(error);
+    }
     setUser(null);
   }
 

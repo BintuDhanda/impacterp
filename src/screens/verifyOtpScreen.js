@@ -6,11 +6,11 @@ import Toast from 'react-native-toast-message';
 import { sendOTP } from '../constants/smsService';
 import Colors from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {UserContext} from '../../App';
+import { UserContext } from '../../App';
 import { useContext } from 'react';
 
 const VerifyOTPScreen = ({ route, navigation }) => {
-  const {verifyOtp,mobile} = route.params;
+  const { verifyOtp, mobile } = route.params;
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [count, setCount] = useState(1)
@@ -37,41 +37,41 @@ const VerifyOTPScreen = ({ route, navigation }) => {
 
   const handleConfirmOtp = () => {
     // Update the isLogedIn state to true
-    console.log(otp,verifyOtp)
-    if(otp == verifyOtp){
+    console.log(otp, verifyOtp)
+    if (otp == verifyOtp) {
       // get user token api call
-      httpPost("User/login",{userMobile: mobile, userPassword: password}).then((response)=> {
+      httpPost("User/login", { userMobile: mobile, userPassword: password }).then((response) => {
         console.log(response.data, "Response")
-        if(response.status === 200){
-         AsyncStorage.setItem('user',JSON.stringify(response.data));
-         setUser(response.data);
+        if (response.status === 200) {
+          AsyncStorage.setItem('user', JSON.stringify(response.data));
+          setUser(response.data);
         }
       })
     }
     // Navigate to the HomeScreen
-     };
+  };
 
   const handleResendOtp = () => {
-    setCount(count+1)
+    setCount(count + 1)
     console.log(count, "Count")
-    if(count >= 3){
+    if (count >= 3) {
       Toast.show({
         type: 'error',
         text1: 'No Send More Otp You Reached Limit already',
         position: 'bottom',
         visibilityTime: 2000,
         autoHide: true,
-    });
+      });
     }
-    else{
+    else {
       sendOTP(verifyOtp, mobile).then((res) => {
         console.log(res.data, "Response otp")
-            if (res.status == 200) {
-              setTimer(60);
-              setShowResend(false);
-            }
+        if (res.status == 200) {
+          setTimer(60);
+          setShowResend(false);
         }
-    ).catch(err => console.error("Send Otp Error : ", err))
+      }
+      ).catch(err => console.error("Send Otp Error : ", err))
     }
   };
 
@@ -113,12 +113,13 @@ const VerifyOTPScreen = ({ route, navigation }) => {
             paddingBottom: 8,
             marginBottom: 25
           }}>
-            <Icon name="verified" style={{ marginRight: 5 }} size={20} color="#666" />
+            <Icon name="lock" style={{ marginRight: 5 }} size={20} color="#666" />
             <TextInput
               style={{ flex: 1, paddingVertical: 0 }}
               placeholder="Enter Password"
               value={password}
               onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
             />
           </View>
           {showResend ? (
