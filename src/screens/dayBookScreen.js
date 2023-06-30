@@ -33,6 +33,15 @@ const DayBookScreen = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
+    const [sumCreditAndDebitDayBook, setSumCreditAndDebitDayBook] = useState({});
+
+    const GetSumDayBookCreditAndDebitDayBook = () => {
+        const filter = { "From": fromDate, "To": toDate }
+        httpPost("DayBook/sumCreditAndDebitDayBook", filter)
+            .then((response) => {
+                setSumCreditAndDebitDayBook(response.data);
+            })
+    }
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
@@ -72,6 +81,7 @@ const DayBookScreen = () => {
         setDayBookList([]);
         setSkip(0);
         GetDayBookList();
+        GetSumDayBookCreditAndDebitDayBook();
         setShowSearch(false);
     };
 
@@ -304,6 +314,31 @@ const DayBookScreen = () => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Credit : {sumCreditAndDebitDayBook.credit} Rs/-</Text>
+                        <Text style={{
+                            fontSize: 14,
+                            marginBottom: 10,
+                            fontWeight: 'bold',
+                            backgroundColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            flex: 1,
+                            color: Colors.background
+                        }}>Total Debit : {sumCreditAndDebitDayBook.debit} Rs/-</Text>
+                    </View>
                     <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
                         <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
                             <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />

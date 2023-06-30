@@ -77,6 +77,10 @@ const HomeScreen = () => {
             <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Attendance</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('CameraScreen')}>
+            <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Camera</Text>
+          </TouchableOpacity>
         </View>
         <View style={{ justifyContent: "center", marginTop: 30 }}>
           <TouchableOpacity onPress={handleLogOut}>

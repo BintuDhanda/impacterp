@@ -83,7 +83,7 @@ const StudentTokenScreen = ({route, navigation}) => {
       </View>)}
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Status : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.isActive === true ? "Active" : "InActive"}</Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenStatus === true ? "Active" : "InActive"}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{

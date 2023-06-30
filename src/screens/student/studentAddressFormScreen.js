@@ -146,7 +146,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
                   "IsActive": true,
                   "CreatedAt": null
                 })
-                navigation.goBack();
+                navigation.navigate('HomeScreen');
               }
             })
             .catch(err => console.error("Address update error : ", err));
@@ -168,7 +168,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
                   "IsActive": true,
                   "CreatedAt": null
                 })
-                navigation.navigate('HomeScreen')
+                navigation.navigate('HomeScreen');
               }
             })
             .catch(err => console.error('Address Add error :', err));

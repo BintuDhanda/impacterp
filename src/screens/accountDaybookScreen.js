@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AccountDayBookScreen = ({ route }) => {
-    const { accountId } = route.params;
+    const { accountId, accountName } = route.params;
     const ToDate = new Date();
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
@@ -200,6 +200,7 @@ const AccountDayBookScreen = ({ route }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Account Name : {accountName}</Text>
                     <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
                         <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
                             <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />

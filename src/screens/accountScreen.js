@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
@@ -62,8 +61,8 @@ const AccountScreen = ({ route, navigation }) => {
       .catch(err => console.error("Delete Error", err));
   }
 
-  const handleNavigate = (accountId) => {
-    navigation.navigate('AccountDaybookScreen', { accountId: accountId })
+  const handleNavigate = (accountId, accountName) => {
+    navigation.navigate('AccountDaybookScreen', { accountId: accountId, accountName: accountName })
   }
 
   const handleSaveAccount = async () => {
@@ -151,7 +150,7 @@ const AccountScreen = ({ route, navigation }) => {
           paddingVertical: 8,
           paddingHorizontal: 12,
           marginRight: 10,
-        }} onPress={() => handleNavigate(item.accountId)}>
+        }} onPress={() => handleNavigate(item.accountId, item.accountName)}>
           <Text style={{
             color: Colors.primary,
             fontSize: 14,
