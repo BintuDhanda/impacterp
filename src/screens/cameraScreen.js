@@ -1,80 +1,104 @@
-import React, { useRef } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import React, { useState } from 'react';
+import { View, Button, Image, TextInput } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import axios from 'axios';
 
 const CameraScreen = () => {
-  const cameraRef = useRef(null);
+  const [image, setImage] = useState(null);
+  // const [video, setVideo] = useState(null);
+  const [newsText, setNewsText] = useState('');
+  const [newsTitle, setNewsTitle] = useState('');
 
-  const takePhoto = async () => {
-    if (cameraRef.current) {
-      const options = { quality: 0.5, base64: true };
-      const { uri } = await cameraRef.current.takePictureAsync(options);
-      uploadPhoto(uri);
-    }
-  };
-
-  const pickPhoto = () => {
+  const selectImage = () => {
     const options = {
-      title: 'Select Photo',
-      mediaType: 'photo',
-      quality: 0.5,
+      title: 'Select Image',
       storageOptions: {
         skipBackup: true,
         path: 'images',
       },
     };
 
-    ImagePicker.launchImageLibrary(options, (response) => {
+    ImagePicker.showImagePicker(options, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
-      } else if (response.uri) {
-        uploadPhoto(response.uri);
+      } else {
+        const source = { uri: response.uri };
+        setImage(source);
       }
     });
   };
 
-  const uploadPhoto = (uri) => {
-    const formData = new FormData();
-    formData.append('photo', {
-      uri: uri,
-      type: 'image/jpeg',
-      name: 'photo.jpg',
-    });
+  // const selectVideo = () => {
+  //   const options = {
+  //     title: 'Select Video',
+  //     mediaType: 'video',
+  //     storageOptions: {
+  //       skipBackup: true,
+  //       path: 'videos',
+  //     },
+  //   };
 
-    axios.post('YOUR_UPLOAD_URL', formData)
+  //   ImagePicker.launchImageLibrary(options, (response) => {
+  //     if (response.didCancel) {
+  //       console.log('User cancelled video picker');
+  //     } else if (response.error) {
+  //       console.log('VideoPicker Error: ', response.error);
+  //     } else {
+  //       const source = { uri: response.uri };
+  //       setVideo(source);
+  //     }
+  //   });
+  // };
+
+  const uploadNews = () => {
+    const formData = new FormData();
+    formData.append('image', {
+      uri: image.uri,
+      type: 'image/jpeg',
+      name: 'newsImage.jpg',
+    });
+    // formData.append('video', {
+    //   uri: video.uri,
+    //   type: 'video/mp4',
+    //   name: 'newsVideo.mp4',
+    // });
+    formData.append('newsText', newsText);
+    formData.append('newsTitle', newsTitle);
+
+    axios.post('YOUR_API_ENDPOINT', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
       .then((response) => {
-        console.log('Upload successful!', response.data);
+        // Handle successful news submission
+        console.log('News uploaded successfully');
       })
       .catch((error) => {
-        console.error('Upload failed!', error);
+        // Handle error
+        console.log('News upload error: ', error);
       });
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <RNCamera
-        ref={cameraRef}
-        style={{ flex: 1 }}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.off}
-        captureAudio={false}
+    <View>
+      {image && <Image source={image} style={{ width: 200, height: 200 }} />}
+      <Button title="Select Image" onPress={selectImage} />
+      {/* {video && <Video source={video} style={{ width: 200, height: 200 }} />}
+      <Button title="Select Video" onPress={selectVideo} /> */}
+      <TextInput
+        value={newsText}
+        onChangeText={setNewsText}
+        placeholder="News Text"
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <TouchableOpacity onPress={takePhoto}>
-          <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
-            Take Photo
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={pickPhoto}>
-          <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
-            Choose Photo
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TextInput
+        value={newsTitle}
+        onChangeText={setNewsTitle}
+        placeholder="News Title"
+      />
+      <Button title="Upload News" onPress={uploadNews} />
     </View>
   );
 };

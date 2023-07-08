@@ -50,6 +50,8 @@ import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistory
 import UserRoleScreen from './src/screens/userRoleScreen';
 import AccountDayBookScreen from './src/screens/accountDaybookScreen';
 import Colors from './src/constants/Colors';
+import CameraScreen from './src/screens/cameraScreen';
+import NewsScreen from './src/screens/news/newsScreen';
 
 
 export const UserContext = React.createContext();
@@ -73,7 +75,7 @@ function App() {
       if (user !== null) {
         // We have data!!
         console.log(user);
-        setUser(user)
+        setUser(JSON.parse(user))
       }
     } catch (error) {
       // Error retrieving data
@@ -130,6 +132,8 @@ function App() {
                   <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
                   <Stack.Screen name="AccountDaybookScreen" options={{ title: 'Account Daybook' }} component={AccountDayBookScreen} />
                   <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
+                  <Stack.Screen name="CameraScreen" options={{title: 'Camera'}} component={CameraScreen} />
+                  <Stack.Screen name="NewsScreen" options={{title: 'News'}} component={NewsScreen} />
                 </Stack.Navigator>
               </NavigationContainer>)
               :

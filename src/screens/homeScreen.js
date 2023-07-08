@@ -81,6 +81,10 @@ const HomeScreen = () => {
             <Icon name="calendar" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Camera</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('NewsScreen')}>
+            <Icon name="newspaper-o" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>News</Text>
+          </TouchableOpacity>
         </View>
         <View style={{ justifyContent: "center", marginTop: 30 }}>
           <TouchableOpacity onPress={handleLogOut}>

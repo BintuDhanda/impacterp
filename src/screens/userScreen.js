@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Animated, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
