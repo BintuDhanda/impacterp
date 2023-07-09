@@ -7,21 +7,29 @@ import { useContext } from 'react';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 
-const NewsCardComponent = ({item, showModel}) => {
-    console.log(item.item,'item');
+const NewsCardComponent = ({ item, navigation}) => {
     const { user, setUser } = useContext(UserContext);
-    const [cardNews,SetCardNews] = useState(item.item);
-    const [iscardUpdated,SetIscardUpdated] = useState(false);
+    const [cardNews, SetCardNews] = useState(item.item);
 
     const handleNewsLike = (newsId) => {
-        httpPost("NewsLike/post", {NewsId: newsId , CreatedBy: 1, IsActive: true})
+        httpPost("NewsLike/post", { NewsId: newsId, CreatedBy: user.userId, IsActive: true })
             .then((response) => {
-               
-             SetCardNews({...cardNews,
-                isLiked: !cardNews.isLiked,
-                totalLikes: response.data.totalLikes,});
+
+                SetCardNews({
+                    ...cardNews,
+                    isLiked: !cardNews.isLiked,
+                    totalLikes: response.data.totalLikes,
+                });
             })
             .catch(err => console.error("News Like Error", err))
+    }
+
+    const handleNewsCommentNavigate = (newsId) => {
+        navigation.navigate('NewsCommentScreen', {newsId: newsId})
+    }
+    
+    const handleNewsLikeNavigate = (newsId) => {
+        navigation.navigate('NewsLikeScreen', {newsId: newsId})
     }
 
     return (
@@ -49,13 +57,15 @@ const NewsCardComponent = ({item, showModel}) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, textAlignVertical: 'center' }}> {cardNews.newsText} </Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, }}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20, }} onPress={() =>  handleNewsLike(cardNews.newsId)}>
-                   {cardNews.isLiked? (<Icon name="heart" size={20} color="red" />): (<Icon name="heart-o" size={20} color="red" />)}
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center'}} onPress={() => handleNewsLike(cardNews.newsId)}>
+                    {cardNews.isLiked ? (<Icon name="heart" size={20} color="red" />) : (<Icon name="heart-o" size={20} color="red" />)}
+                </TouchableOpacity>
+                <TouchableOpacity style={{marginRight: 20}} onPress={() => handleNewsLikeNavigate(cardNews.newsId)}>
                     <Text style={{ marginLeft: 5, }}>{cardNews.totalLikes}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20, }} onPress={()=>showModel(true) } >
-                    <Icon name="comment" size={20} color="blue" />
-                    <Text style={{ marginLeft: 5, }}>{item.totalComments}</Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20, }} onPress={() => handleNewsCommentNavigate(cardNews.newsId)} >
+                    {cardNews.isCommented ? (<Icon name="comment" size={20} color="blue" />) : (<Icon name="comment-o" size={20} color="blue" />)}
+                    <Text style={{ marginLeft: 5, }}>{cardNews.totalComments}</Text>
                 </TouchableOpacity>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
@@ -66,7 +76,7 @@ const NewsCardComponent = ({item, showModel}) => {
                         paddingVertical: 8,
                         paddingHorizontal: 12,
                         marginRight: 10,
-                    }} onPress={() => handleEditNews(item.newsId)} >
+                    }} onPress={() => handleEditNews(cardNews.newsId)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,
@@ -108,7 +118,7 @@ const NewsCardComponent = ({item, showModel}) => {
                         paddingVertical: 8,
                         paddingHorizontal: 12,
                     }}
-                    onPress={() => handleDeleteNews(item.newsId)}
+                    onPress={() => handleDeleteNews(cardNews.newsId)}
                 >
                     <Text style={{
                         color: Colors.background,

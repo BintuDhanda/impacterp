@@ -52,6 +52,8 @@ import AccountDayBookScreen from './src/screens/accountDaybookScreen';
 import Colors from './src/constants/Colors';
 import CameraScreen from './src/screens/cameraScreen';
 import NewsScreen from './src/screens/news/newsScreen';
+import NewsCommentScreen from './src/screens/news/newsCommentScreen';
+import NewsLikeScreen from './src/screens/news/newsLikeScreen';
 
 
 export const UserContext = React.createContext();
@@ -134,6 +136,8 @@ function App() {
                   <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
                   <Stack.Screen name="CameraScreen" options={{title: 'Camera'}} component={CameraScreen} />
                   <Stack.Screen name="NewsScreen" options={{title: 'News'}} component={NewsScreen} />
+                  <Stack.Screen name="NewsLikeScreen" options={{title: 'News Like'}} component={NewsLikeScreen} />
+                  <Stack.Screen name="NewsCommentScreen" options={{title: 'News Comment'}} component={NewsCommentScreen} />
                 </Stack.Navigator>
               </NavigationContainer>)
               :

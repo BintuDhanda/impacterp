@@ -8,12 +8,9 @@ import { UserContext } from '../../../App';
 import { useContext } from 'react';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../../constants/httpService';
 import NewsCardComponent from '../../components/newsCardComponent';
-import TestComp from '../../components/testComp';
 
 const NewsScreen = ({ navigation }) => {
     const { user, setUser } = useContext(UserContext);
-    //let userId = (JSON.parse(user)).userId; // Assuming `userId` is a property of the `user` object
-    console.log("user",user.userId)
     const ToDate = new Date();
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
@@ -33,10 +30,8 @@ const NewsScreen = ({ navigation }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
-    const [showComment, setShowComment] = useState(false);
 
     const [news, setNews] = useState({ "NewsId": 0, "NewsText": "", "NewsTitle": "", "IsActive": true });
-    const [newsComment, setNewsComment] = useState({ "NewsCommentId": 0, "Comment": "", "NewsId": 0, "IsActive": true })
     const [newsList, setNewsList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -166,36 +161,6 @@ const NewsScreen = ({ navigation }) => {
             console.error('Error saving News:', error);
         }
     }
-
-    const handleSaveComment = () => {
-        httpPost("NewsComment/post", newsComment)
-            .then((response) => {
-                if (response.status === 200) {
-                    setNewsComment({ "NewsCommentId": 0, "Comment": "", "NewsId": 0, "IsActive": true })
-                }
-            })
-            .catch( err => console.er)
-    }
-
-    // const handleNewsLike = (newsId) => {
-    //     httpPost("NewsLike/post", {NewsId:newsId , CreatedBy: user.userId, IsActive: true})
-    //         .then((response) => {
-    //             console.log(response.data)
-    //             if (response.status === 200) {
-    //                 for (let i = 0; i < newsList.length; i++) {
-    //                     if (newsList[i].newsId === newsId) {
-    //                       newsList[i].totalLikes = response.data.totalLikes;
-    //                       newsList[i].isLiked = !newsList[i].isLiked;
-
-    //                       console.log(newsList[i],'item')
-    //                         setNewsList(newsList);
-    //                       break; // Break the loop since we found and updated the element
-    //                     }
-    //                   }
-    //             }
-    //         })
-    //         .catch(err => console.error("News Like Error", err))
-    // }
 
     const handleDeleteNews = (newsId) => {
         httpDelete(`News/delete?Id=${newsId}`)
@@ -416,78 +381,15 @@ const NewsScreen = ({ navigation }) => {
                             </View>
                         </Modal>
                     )}
-                    {showComment && (
-                        <Modal transparent visible={showComment}>
-                            <View style={{
-                                flex: 1,
-                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}>
-                                <View style={{
-                                    backgroundColor: Colors.background,
-                                    borderRadius: 10,
-                                    padding: 10,
-                                    marginBottom: 10,
-                                    shadowColor: Colors.shadow,
-                                    width: '80%',
-                                    borderWidth: 0.5,
-                                    borderColor: Colors.primary,
-                                }}>
-
-                                    <Text style={{ fontSize: 16, marginBottom: 5 }}>News Comment :</Text>
-                                    <TextInput
-                                        style={{
-                                            borderWidth: 1,
-                                            borderColor: Colors.primary,
-                                            borderRadius: 8,
-                                            marginBottom: 20,
-                                            padding: 8,
-                                        }}
-                                        placeholder="Enter News Comment"
-                                        value={newsComment.Comment}
-                                        maxLength={10}
-                                        onChangeText={(text) => setNewsComment({ ...newsComment, Comment: text })}
-                                    />
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                                        <TouchableOpacity style={{
-                                            backgroundColor: Colors.primary,
-                                            borderRadius: 5,
-                                            paddingVertical: 8,
-                                            paddingHorizontal: 12,
-                                            marginTop: 10,
-                                            marginRight: 3,
-                                        }} onPress={() => {
-                                            handleSearch();
-                                        }}>
-                                            <Text style={{ fontSize: 16, color: Colors.background }}>Add</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={{
-                                            backgroundColor: '#f25252',
-                                            borderRadius: 5,
-                                            paddingVertical: 8,
-                                            paddingHorizontal: 12,
-                                            marginTop: 10,
-                                        }} onPress={() => {
-                                            setShowComment(false);
-                                        }}>
-                                            <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                            </View>
-                        </Modal>
-                    )}
 
                     <FlatList
                         data={newsList}
                         keyExtractor={(item) => item.newsId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={(item)=><NewsCardComponent item={item} showModel={setShowSearch}/>}
+                        renderItem={(item)=><NewsCardComponent item={item} navigation={navigation}/>}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
-                            //handleLoadMore();
+                            handleLoadMore();
                         }}
                         onEndReachedThreshold={0.1}
                     />

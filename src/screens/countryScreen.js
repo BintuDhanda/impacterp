@@ -112,7 +112,7 @@ const CountryScreen = ({ navigation }) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
+        borderWidth: 1,
         borderColor: Colors.primary
       }}>
 
