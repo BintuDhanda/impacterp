@@ -218,15 +218,12 @@ const NewsScreen = ({ navigation }) => {
 
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={{ flex: 1, padding: 20, }}>
-                <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+            <View style={{ flex: 1, }}>
+                <Animated.View style={{ flex: 1, top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={{
-                            fontSize: 20,
-                            marginBottom: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.accent,
+                            fontSize: 18,
                             borderRadius: 5,
                             paddingVertical: 8,
                             paddingHorizontal: 12,
@@ -270,7 +267,6 @@ const NewsScreen = ({ navigation }) => {
                                     marginBottom: 10,
                                     shadowColor: Colors.shadow,
                                     width: '80%',
-                                    borderWidth: 0.5,
                                     borderColor: Colors.primary,
                                 }}>
                                     <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
@@ -279,7 +275,7 @@ const NewsScreen = ({ navigation }) => {
                                         alignItems: 'center',
                                         marginBottom: 10,
                                         paddingHorizontal: 10,
-                                        borderWidth: 1,
+                                        borderWidth: 1.5,
                                         borderColor: Colors.primary,
                                         borderRadius: 8,
                                     }}>
@@ -310,7 +306,7 @@ const NewsScreen = ({ navigation }) => {
                                         alignItems: 'center',
                                         marginBottom: 10,
                                         paddingHorizontal: 10,
-                                        borderWidth: 1,
+                                        borderWidth: 1.5,
                                         borderColor: Colors.primary,
                                         borderRadius: 8,
                                     }}>
@@ -339,7 +335,7 @@ const NewsScreen = ({ navigation }) => {
                                     <Text style={{ fontSize: 16, marginBottom: 5 }}>News Title :</Text>
                                     <TextInput
                                         style={{
-                                            borderWidth: 1,
+                                            borderWidth: 1.5,
                                             borderColor: Colors.primary,
                                             borderRadius: 8,
                                             marginBottom: 20,

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
@@ -135,18 +134,9 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16 }}>Created At : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => handleDeleteStudentBatchFees(item.studentBatchFeesId)}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={() => handleDeleteStudentBatchFees(item.studentBatchFeesId)}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View>

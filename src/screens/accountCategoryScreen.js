@@ -1,10 +1,10 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
-const AccountCategoryScreen = ({navigation}) => {
+const AccountCategoryScreen = ({ navigation }) => {
   const [accountCategory, setAccountCategory] = useState({ "AccountCategoryId": 0, "AccCategoryName": "", "IsActive": true, "CreatedAt": null });
   const [accountCategoryList, setAccountCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -94,8 +94,8 @@ const AccountCategoryScreen = ({navigation}) => {
     setModalVisible(true);
   };
 
-  const handleNavigate = (accountCategoryId,accCategoryName) => {
-    navigation.navigate('AccountScreen', {accountCategoryId: accountCategoryId, accCategoryName: accCategoryName})
+  const handleNavigate = (accountCategoryId, accCategoryName) => {
+    navigation.navigate('AccountScreen', { accountCategoryId: accountCategoryId, accCategoryName: accCategoryName })
   }
 
   const handleClose = () => {
@@ -117,7 +117,7 @@ const AccountCategoryScreen = ({navigation}) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
+        borderWidth: 1.5,
         borderColor: Colors.primary,
       }}>
         <Text style={{
@@ -125,48 +125,14 @@ const AccountCategoryScreen = ({navigation}) => {
           fontWeight: 'bold',
         }}>{item.accCategoryName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#5a67f2',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleEditAccountCategory(item.accountCategoryId)} >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Edit</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAccountCategory(item.accountCategoryId)} >
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#ffff80',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleNavigate(item.accountCategoryId, item.accCategoryName)} >
-            <Text style={{
-              color: Colors.primary,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Manage</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.accountCategoryId, item.accCategoryName)} >
+            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#f25252',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-            }}
-            onPress={() => handleDeleteAccountCategory(item.accountCategoryId)}
-          >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteAccountCategory(item.accountCategoryId)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
       </View >

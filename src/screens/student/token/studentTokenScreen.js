@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
 
-const StudentTokenScreen = ({route, navigation}) => {
-  const {studentId} = route.params;
+const StudentTokenScreen = ({ route, navigation }) => {
+  const { studentId } = route.params;
   const [tokenList, setTokenList] = useState([]);
   useFocusEffect(
     React.useCallback(() => {
@@ -24,11 +25,11 @@ const StudentTokenScreen = ({route, navigation}) => {
   };
 
   const handleAddStudentTokenNavigate = () => {
-    navigation.navigate('StudentTokenFormScreen', {studentId: studentId})
+    navigation.navigate('StudentTokenFormScreen', { studentId: studentId })
   };
 
-  const handleEditStudentTokenNavigate = (tokenId,batchName) => {
-    navigation.navigate('StudentTokenFormScreen', {studentId: studentId, tokenId: tokenId, batchName: batchName})
+  const handleEditStudentTokenNavigate = (tokenId, batchName) => {
+    navigation.navigate('StudentTokenFormScreen', { studentId: studentId, tokenId: tokenId, batchName: batchName })
   }
 
   const handleDeleteToken = (id) => {
@@ -47,7 +48,7 @@ const StudentTokenScreen = ({route, navigation}) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
-}
+  }
 
   const renderTokenCard = ({ item }) => (
     <View style={{
@@ -72,7 +73,7 @@ const StudentTokenScreen = ({route, navigation}) => {
       {item.validFrom === null ? null : (<View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Valid From : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.validFrom)}</Text>
-      </View>) }
+      </View>)}
       {item.validUpto === null ? null : (<View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Valid UpTo : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.validUpto)}</Text>
@@ -86,31 +87,12 @@ const StudentTokenScreen = ({route, navigation}) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenStatus === true ? "Active" : "InActive"}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditStudentTokenNavigate(item.id,item.batchName)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.id, item.batchName)}>
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteToken(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+
+        <TouchableOpacity onPress={() => handleDeleteToken(item.id)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>

@@ -67,10 +67,6 @@ const StudentDetailsScreen = ({ navigation }) => {
         console.log(selectFromDate, selectToDate, skip)
     };
 
-    // useEffect(() => {
-    //     setLoading(true);
-    //     GetStudentList();
-    // }, [])
     const handleNavigate = (studentId) => {
         navigation.navigate('StudentFormScreen', { studentId: studentId })
     }
@@ -241,32 +237,12 @@ const StudentDetailsScreen = ({ navigation }) => {
                     }}>Batch</Text>
                 </TouchableOpacity>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: '#5a67f2',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => {handleNavigate(item.value); setStudentDetailsList([]);}} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Edit</Text>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { handleNavigate(item.value); setStudentDetailsList([]); }} >
+                    <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => {handleDeleteStudentDetails(item.id); setStudentDetailsList([]);}}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+                <TouchableOpacity onPress={() => { handleDeleteStudentDetails(item.id); setStudentDetailsList([]); }}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View >

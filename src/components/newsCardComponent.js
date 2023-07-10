@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Image, ActivityIndicator, Animated, FlatList, Alert, ScrollView } from 'react-native';
+import { Dimensions, View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Image, ActivityIndicator, Animated, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
@@ -7,9 +7,10 @@ import { useContext } from 'react';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 
-const NewsCardComponent = ({ item, navigation}) => {
+const NewsCardComponent = ({ item, navigation }) => {
     const { user, setUser } = useContext(UserContext);
     const [cardNews, SetCardNews] = useState(item.item);
+    const { width, height } = Dimensions.get('window');
 
     const handleNewsLike = (newsId) => {
         httpPost("NewsLike/post", { NewsId: newsId, CreatedBy: user.userId, IsActive: true })
@@ -24,14 +25,26 @@ const NewsCardComponent = ({ item, navigation}) => {
             .catch(err => console.error("News Like Error", err))
     }
 
+    const handleDeleteNews = (newsId) => {
+        httpDelete(`News/delete?Id=${newsId}`)
+            .then((result) => {
+                console.log(result);
+                setNewsList([]);
+                setSkip(0);
+                GetNewsList();
+            })
+            .catch(err => console.error("Delete Error", err));
+    };
+
     const handleNewsCommentNavigate = (newsId) => {
-        navigation.navigate('NewsCommentScreen', {newsId: newsId})
-    }
-    
-    const handleNewsLikeNavigate = (newsId) => {
-        navigation.navigate('NewsLikeScreen', {newsId: newsId})
+        navigation.navigate('NewsCommentScreen', { newsId: newsId })
     }
 
+    const handleNewsLikeNavigate = (newsId) => {
+        navigation.navigate('NewsLikeScreen', { newsId: newsId })
+    }
+
+    console.log("News Image", cardNews.newsImage)
     return (
         <View style={{
             justifyContent: 'space-between',
@@ -48,84 +61,34 @@ const NewsCardComponent = ({ item, navigation}) => {
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>News Title : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{cardNews.newsTitle}</Text>
             </View>
-            <Image source={{ uri: 'https://cdn.pixabay.com/photo/2023/05/14/19/42/sky-7993656_1280.jpg' }} style={{ width: '100%', height: 200, resizeMode: 'cover', }} />
+            {(cardNews.newsImage !== null && cardNews.newsImage !== "") && (<Image source={{ uri: `http://192.168.1.6:5291${cardNews.newsImage}` }} style={{ width: width * 0.8, height: (width * 0.8 / 1.5), resizeMode: 'cover', borderRadius: 10, alignSelf: 'center', }} />)}
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>News Text : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, textAlignVertical: 'center' }}> {cardNews.newsText} </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}> {cardNews.newsText} </Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, }}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center'}} onPress={() => handleNewsLike(cardNews.newsId)}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignContent: 'center' }} onPress={() => handleNewsLike(cardNews.newsId)}>
                     {cardNews.isLiked ? (<Icon name="heart" size={20} color="red" />) : (<Icon name="heart-o" size={20} color="red" />)}
                 </TouchableOpacity>
-                <TouchableOpacity style={{marginRight: 20}} onPress={() => handleNewsLikeNavigate(cardNews.newsId)}>
+                <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleNewsLikeNavigate(cardNews.newsId)}>
                     <Text style={{ marginLeft: 5, }}>{cardNews.totalLikes}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20, }} onPress={() => handleNewsCommentNavigate(cardNews.newsId)} >
+                <TouchableOpacity style={{ flexDirection: 'row', alignContent: 'center' }} onPress={() => handleNewsCommentNavigate(cardNews.newsId)} >
                     {cardNews.isCommented ? (<Icon name="comment" size={20} color="blue" />) : (<Icon name="comment-o" size={20} color="blue" />)}
                     <Text style={{ marginLeft: 5, }}>{cardNews.totalComments}</Text>
                 </TouchableOpacity>
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+            <View style={{ flex: 1, flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
                 <TouchableOpacity
                     style={{
-                        backgroundColor: '#5a67f2',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
                         marginRight: 10,
                     }} onPress={() => handleEditNews(cardNews.newsId)} >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Edit</Text>
+                    <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                {/* <TouchableOpacity
-                    style={{
-                        backgroundColor: '#ffff80',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => handleManageNavigate(item.newsId, item.newsTitle)} >
-                    <Text style={{
-                        color: Colors.primary,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Manage</Text>
+                <TouchableOpacity onPress={() => handleDeleteNews(cardNews.newsId)} >
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                {item.isStudentCreated !== true ? (<TouchableOpacity
-                    style={{
-                        backgroundColor: '#ffff80',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginRight: 10,
-                    }} onPress={() => handleNavigate(item.newsId)} >
-                    <Text style={{
-                        color: Colors.primary,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Student Create</Text>
-                </TouchableOpacity>) : null} */}
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                    }}
-                    onPress={() => handleDeleteNews(cardNews.newsId)}
-                >
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
-                </TouchableOpacity>
+            </View>
             </View>
         </View >
     );

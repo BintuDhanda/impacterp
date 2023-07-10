@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseCategoryScreen = ({ navigation }) => {
@@ -113,7 +114,7 @@ const CourseCategoryScreen = ({ navigation }) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.5,
+        borderWidth: 1.5,
         borderColor: Colors.primary
       }}>
         <Text style={{
@@ -121,50 +122,16 @@ const CourseCategoryScreen = ({ navigation }) => {
           fontWeight: 'bold',
         }}>{item.courseCategoryName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#5a67f2',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleEditCourseCategory(item.id)} >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Edit</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourseCategory(item.id)} >
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#ffff80',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleNavigate(item.id, item.courseCategoryName)} >
-            <Text style={{
-              color: Colors.primary,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Manage</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.courseCategoryName)} >
+            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#f25252',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-            }}
-            onPress={() => handleDeleteCourseCategory(item.id)}
-          >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteCourseCategory(item.id)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
       </View >

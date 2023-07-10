@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseScreen = ({ route, navigation }) => {
@@ -12,8 +13,6 @@ const CourseScreen = ({ route, navigation }) => {
   useEffect(() => {
     fetchCoursesByCourseCategoryId(courseCategoryId);
   }, []);
-
-
 
   const fetchCoursesByCourseCategoryId = async () => {
     try {
@@ -127,62 +126,25 @@ const CourseScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary
     }}>
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Course Name : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.courseName}</Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Course Fees : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.fees}</Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Duration : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
-      </View>
-      <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditCourse(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.courseName}</Text>
+      <View style={{ flex:1, flexDirection: 'row',  justifyContent: 'flex-end' }}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.id)}>
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{
-          backgroundColor: '#ffff80',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleNavigate(item.id, item.courseName)}>
-          <Text style={{
-            color: Colors.primary,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Manage</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.courseName)}>
+          <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteCourse(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDeleteCourse(item.id)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
+      </View>
       </View>
     </View>
   );

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
 
-const StudentQualificationScreen = ({route,navigation}) => {
-  const {studentId} = route.params;
+const StudentQualificationScreen = ({ route, navigation }) => {
+  const { studentId } = route.params;
   const [qualificationList, setQualificationList] = useState([]);
-  
+
   useFocusEffect(
     React.useCallback(() => {
       GetStudentQualificationByStudentId();
@@ -25,7 +26,7 @@ const StudentQualificationScreen = ({route,navigation}) => {
       });
   }
 
-  const handleDeleteStudentQualification= (id) => {
+  const handleDeleteStudentQualification = (id) => {
     httpDelete(`StudentQualification/delete?Id=${id}`)
       .then((result) => {
         console.log(result);
@@ -35,11 +36,11 @@ const StudentQualificationScreen = ({route,navigation}) => {
   }
 
   const handleAddQualificationNavigate = () => {
-    navigation.navigate('StudentQualificationFormScreen', {studentId: studentId})
+    navigation.navigate('StudentQualificationFormScreen', { studentId: studentId })
   }
 
   const handleEditQualificationNavigate = (qualificationId) => {
-    navigation.navigate('StudentQualificationFormScreen', {studentId: studentId,qualificationId: qualificationId})
+    navigation.navigate('StudentQualificationFormScreen', { studentId: studentId, qualificationId: qualificationId })
   }
 
   const renderTokenCard = ({ item }) => (
@@ -83,30 +84,11 @@ const StudentQualificationScreen = ({route,navigation}) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.grade}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditQualificationNavigate(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.id)}>
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteStudentQualification(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity  onPress={() => handleDeleteStudentQualification(item.id)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>

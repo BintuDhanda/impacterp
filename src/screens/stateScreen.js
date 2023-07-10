@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const StateScreen = ({ route, navigation }) => {
@@ -114,13 +115,12 @@ const StateScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary
     }}>
 
@@ -130,46 +130,16 @@ const StateScreen = ({ route, navigation }) => {
       }}>{item.stateName}</Text>
 
       <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditState(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditState(item.id)}>
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#ffff80',
-            borderRadius: 5,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            marginRight: 10,
-          }} onPress={() => handleNavigate(item.id, item.stateName)} >
-          <Text style={{
-            color: Colors.primary,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Manage</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.stateName)} >
+            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteState(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDeleteState(item.id)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>
@@ -177,23 +147,21 @@ const StateScreen = ({ route, navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{
-        padding: 16,
-        justifyContent: 'center'
-      }}>
+      <View style={{ flex: 1, padding: 20, }}>
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Country Name : {countryName}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
           borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          marginBottom: 20,
           marginTop: 10,
-          alignSelf: 'flex-start',
         }} onPress={handleAddState}>
           <Text style={{
             color: Colors.background,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 'bold',
+            textAlign: 'center',
           }}>Add State</Text>
         </TouchableOpacity>
         <FlatList

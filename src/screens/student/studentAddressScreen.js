@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Delete as httpDelete } from '../../constants/httpService';
 
 const AddressScreen = ({ route, navigation }) => {
@@ -83,30 +84,11 @@ const AddressScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.pincode}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditAddressNavigate(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressNavigate(item.id)}>
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteStudentAddress(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDeleteStudentAddress(item.id)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>

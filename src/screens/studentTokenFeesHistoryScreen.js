@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
@@ -104,7 +103,7 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -135,18 +134,9 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16 }}>Created At : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => handleDeleteStudentTokenFees(item.studentTokenFeesId)}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={() => handleDeleteStudentTokenFees(item.studentTokenFeesId)}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View>

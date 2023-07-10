@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const AccountScreen = ({ route, navigation }) => {
@@ -123,7 +124,7 @@ const AccountScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>
@@ -131,43 +132,14 @@ const AccountScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.accountName}</Text>
       </View>
       <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{
-          backgroundColor: '#5a67f2',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleEditAccount(item.accountId)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Edit</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAccount(item.accountId)}>
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: '#ffff80',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-          marginRight: 10,
-        }} onPress={() => handleNavigate(item.accountId, item.accountName)}>
-          <Text style={{
-            color: Colors.primary,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Manage</Text>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.accountId, item.accountName)}>
+          <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteAccount(item.accountId)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDeleteAccount(item.accountId)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>

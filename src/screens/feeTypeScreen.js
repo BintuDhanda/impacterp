@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const FeeTypeScreen = () => {
   const [feeType, setFeeType] = useState({ "Id": 0, "FeeTypeName": "", "IsActive": true });
@@ -110,41 +110,18 @@ const FeeTypeScreen = () => {
         shadowRadius: 10,
         elevation: 10,
         borderColor: Colors.primary,
-        borderWidth: 0.5,
+        borderWidth: 1.5,
       }}>
         <Text style={{
           fontSize: 16,
           fontWeight: 'bold',
         }}>{item.feeTypeName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#5a67f2',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleEditFeeType(item.id)} >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Edit</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditFeeType(item.id)} >
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#f25252',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-            }}
-            onPress={() => handleDeleteFeeType(item.id)}
-          >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteFeeType(item.id)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
       </View >

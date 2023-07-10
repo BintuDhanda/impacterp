@@ -26,7 +26,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <View style={styles.cardContainer}>
           <TouchableOpacity style={styles.card} onPress={() => handleIconPress('UserScreen')}>
@@ -86,7 +86,7 @@ const HomeScreen = () => {
             <Text style={styles.title}>News</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ justifyContent: "center", marginTop: 30 }}>
+        <View style={{ justifyContent: "center", marginTop: 30, marginBottom: 20 }}>
           <TouchableOpacity onPress={handleLogOut}>
             <Text style={{ color: '#1c8adb', fontSize: 16 }}>LogOut</Text>
           </TouchableOpacity>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
-    width: (Dimensions.get('window').width - 60) / 3, // Adjust the card width based on the desired layout
+    width: (Dimensions.get('window').width - 60) / 2, // Adjust the card width based on the desired layout
     backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 20,

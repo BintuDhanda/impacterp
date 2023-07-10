@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Get as httpGet , Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const UserRoleScreen = ({ route }) => {
   const { userId, userMobile } = route.params;
@@ -13,7 +13,7 @@ const UserRoleScreen = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-console.log(userRole, "userRole")
+  console.log(userRole, "userRole")
   useEffect(() => {
     fetchUserRolesByUserId(userId);
     GetRoleList();
@@ -53,21 +53,21 @@ console.log(userRole, "userRole")
   }
 
   const handleSaveUserRole = async () => {
-        await httpPost("UserRole/post", userRole)
-          .then((response) => {
-            if (response.status === 200) {
-              fetchUserRolesByUserId(response.data.userId);
-              Alert.alert('Sucess', 'User Role is Added Successfully')
-              setUserRole({
-                "Id": 0,
-                "RoleId": "",
-                "UserId": userId,
-                "IsActive": true
-              });
-              setModalVisible(false);
-            }
-          })
-          .catch(err => console.log("Add User Role Error", err))
+    await httpPost("UserRole/post", userRole)
+      .then((response) => {
+        if (response.status === 200) {
+          fetchUserRolesByUserId(response.data.userId);
+          Alert.alert('Sucess', 'User Role is Added Successfully')
+          setUserRole({
+            "Id": 0,
+            "RoleId": "",
+            "UserId": userId,
+            "IsActive": true
+          });
+          setModalVisible(false);
+        }
+      })
+      .catch(err => console.log("Add User Role Error", err))
   };
 
   const handleCloseModal = () => {
@@ -89,7 +89,7 @@ console.log(userRole, "userRole")
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: Colors.primary
     }}>
 
@@ -100,17 +100,8 @@ console.log(userRole, "userRole")
 
       <View style={{ flexDirection: 'row' }}>
 
-        <TouchableOpacity style={{
-          backgroundColor: '#f25252',
-          borderRadius: 5,
-          paddingVertical: 8,
-          paddingHorizontal: 12,
-        }} onPress={() => handleDeleteUserRole(item.id)}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDeleteUserRole(item.id)}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>
@@ -188,7 +179,7 @@ console.log(userRole, "userRole")
                   value={value}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
-                  onChange={(text) => {setUserRole({...userRole, RoleId: text.id})}}
+                  onChange={(text) => { setUserRole({ ...userRole, RoleId: text.id }) }}
                 />
 
                 <View style={{

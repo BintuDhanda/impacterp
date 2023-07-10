@@ -293,18 +293,9 @@ const DayBookScreen = () => {
                 <Text style={{ fontSize: 16 }}>Account : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.account}</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => handleDeleteDayBook(item.dayBookId)}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={() => handleDeleteDayBook(item.dayBookId)}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -314,7 +305,7 @@ const DayBookScreen = () => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{
                             fontSize: 14,
                             marginBottom: 10,

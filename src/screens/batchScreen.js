@@ -183,7 +183,7 @@ const BatchScreen = ({ route }) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 0.5,
+            borderWidth: 1.5,
             borderColor: Colors.primary
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -203,30 +203,11 @@ const BatchScreen = ({ route }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.endDate)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#5a67f2',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginRight: 10,
-                }} onPress={() => handleEditBatch(item.id)}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Edit</Text>
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.id)}>
+                    <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => handleDeleteBatch(item.id)}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+                <TouchableOpacity onPress={() => handleDeleteBatch(item.id)}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View>

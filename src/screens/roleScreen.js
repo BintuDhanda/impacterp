@@ -2,7 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
-import {Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut} from '../constants/httpService';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 const RoleScreen = () => {
   const [role, setRole] = useState({ "Id": 0, "RoleName": "", "IsActive": true });
@@ -109,7 +110,7 @@ const RoleScreen = () => {
         shadowOpacity: 10,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 0.8,
+        borderWidth: 1.5,
         borderColor: Colors.primary
       }}>
         <Text style={{
@@ -117,34 +118,11 @@ const RoleScreen = () => {
           fontWeight: 'bold',
         }}>{item.roleName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#5a67f2',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleEditRole(item.id)} >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Edit</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditRole(item.id)} >
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#f25252',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-            }}
-            onPress={() => handleDeleteRole(item.id)}
-          >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteRole(item.id)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
       </View >

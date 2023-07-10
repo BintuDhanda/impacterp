@@ -225,7 +225,7 @@ const UserScreen = ({ navigation }) => {
         shadowOpacity: 4,
         shadowRadius: 10,
         elevation: 10,
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: Colors.primary,
       }}>
         <View style={{ flexDirection: 'row' }}>
@@ -237,62 +237,17 @@ const UserScreen = ({ navigation }) => {
           <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.userMobile}</Text>
         </View>
         <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#5a67f2',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleEditUser(item.id)} >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Edit</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditUser(item.id)} >
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#ffff80',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleManageNavigate(item.id, item.userMobile)} >
-            <Text style={{
-              color: Colors.primary,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Manage</Text>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleManageNavigate(item.id, item.userMobile)} >
+            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          {item.isStudentCreated !== true ? (<TouchableOpacity
-            style={{
-              backgroundColor: '#ffff80',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              marginRight: 10,
-            }} onPress={() => handleNavigate(item.id)} >
-            <Text style={{
-              color: Colors.primary,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Student Create</Text>
+          {item.isStudentCreated !== true ? (<TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id)} >
+            <Icon name="user" size={20} color={'#8c53a4'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>) : null}
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#f25252',
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-            }}
-            onPress={() => handleDeleteUser(item.id)}
-          >
-            <Text style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
       </View >
@@ -301,8 +256,8 @@ const UserScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1, padding: 20, }}>
-        <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+      <View style={{ flex: 1, }}>
+        <Animated.View style={{ flex: 1, top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
           <View style={{ flexDirection: 'row' }}>
             <Text style={{
               fontSize: 20,
@@ -317,7 +272,7 @@ const UserScreen = ({ navigation }) => {
             }}>Total User : {userList.length === 0 ? null : userList[0].totalUser}</Text>
           </View>
           <TouchableOpacity onPress={() => { setShowSearch(true); setUserList([]); }}>
-            <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+            <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
               <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
               <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
             </View>

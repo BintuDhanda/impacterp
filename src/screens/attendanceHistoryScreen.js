@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AttendanceHistoryScreen = ({ route, navigation }) => {
@@ -90,7 +91,7 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -117,21 +118,9 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16 }}>Mobile : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'center' }}>
-                <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                }} onPress={() => {
-                    handleDeleteAttendance(item.attendanceId)
-                    setSkip(0);
-                }}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    }}>Delete</Text>
+            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={() => { handleDeleteAttendance(item.attendanceId); setSkip(0); }}>
+                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
         </View>
