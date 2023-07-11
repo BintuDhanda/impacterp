@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const StateScreen = ({ route, navigation }) => {
+  const { user, setUser } = useContext(UserContext);
   const { countryId, countryName } = route.params;
-  const [state, setState] = useState({ "Id": 0, "StateName": "", "IsActive": true, "CountryId": countryId });
+  const [state, setState] = useState({ "StateId": 0, "StateName": "", "IsActive": true, "CountryId": countryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [stateList, setStateList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -30,10 +33,13 @@ const StateScreen = ({ route, navigation }) => {
 
   const handleAddState = () => {
     setState({
-      Id: 0,
+      StateId: 0,
       StateName: "",
       IsActive: true,
-      CountryId: countryId
+      CountryId: countryId,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
@@ -44,10 +50,13 @@ const StateScreen = ({ route, navigation }) => {
         console.log(result);
         setState(
           {
-            Id: result.data.id,
+            StateId: result.data.stateId,
             StateName: result.data.stateName,
             CountryId: result.data.countryId,
-            IsActive: result.data.isActive
+            IsActive: result.data.isActive,
+            CreatedAt: result.data.createdAt,
+            CreatedBy: result.data.createdBy,
+            LastUpdatedBy: user.userId,
           }
         );
       })
@@ -66,17 +75,20 @@ const StateScreen = ({ route, navigation }) => {
 
   const handleSaveState = async () => {
     try {
-      if (state.Id !== 0) {
+      if (state.StateId !== 0) {
         await httpPut("State/put", state)
           .then((response) => {
             if (response.status === 200) {
               fetchStatesByCountryId(response.data.countryId);
               Alert.alert('Sucess', 'State Update successfully');
               setState({
-                "Id": 0,
+                "StateId": 0,
                 "StateName": "",
                 "CountryId": countryId,
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               });
             }
           })
@@ -88,10 +100,13 @@ const StateScreen = ({ route, navigation }) => {
               fetchStatesByCountryId(response.data.countryId);
               Alert.alert('Sucess', 'State is Added Successfully')
               setState({
-                "Id": 0,
+                "StateId": 0,
                 "StateName": "",
                 "CountryId": countryId,
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               });
             }
           })
@@ -130,15 +145,15 @@ const StateScreen = ({ route, navigation }) => {
       }}>{item.stateName}</Text>
 
       <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditState(item.id)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditState(item.stateId)}>
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.stateName)} >
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.stateId, item.stateName)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDeleteState(item.id)}>
+        <TouchableOpacity onPress={() => handleDeleteState(item.stateId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -166,7 +181,7 @@ const StateScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <FlatList
           data={stateList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.stateId.toString()}
           renderItem={renderStateCard}
         />
 
@@ -216,7 +231,7 @@ const StateScreen = ({ route, navigation }) => {
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{state.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{state.StateId === 0 ? 'Add' : 'Save'}</Text>
 
                   </TouchableOpacity>
 

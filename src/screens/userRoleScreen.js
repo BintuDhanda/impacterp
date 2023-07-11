@@ -3,11 +3,14 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import Colors from '../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const UserRoleScreen = ({ route }) => {
+  const { user, setUser } = useContext(UserContext);
   const { userId, userMobile } = route.params;
-  const [userRole, setUserRole] = useState({ "Id": 0, "RoleId": "", "IsActive": true, "UserId": userId });
+  const [userRole, setUserRole] = useState({ "UserRoleId": 0, "RoleId": "", "IsActive": true, "UserId": userId, "CreatedBy": user.userId });
   const [userRoleList, setUserRoleList] = useState([]);
   const [roleList, setRoleList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -26,7 +29,7 @@ const UserRoleScreen = ({ route }) => {
       setUserRoleList(response.data);
       console.log(userRoleList, 'UserRoleList')
     } catch (error) {
-      console.log('Error fetching UserRoles:', error);
+      console.error('Error fetching UserRoles:', error);
     }
   };
 
@@ -36,7 +39,7 @@ const UserRoleScreen = ({ route }) => {
         console.log(result.data)
         setRoleList(result.data)
       })
-      .catch(err => console.log('Get Role List error :', err))
+      .catch(err => console.error('Get Role List error :', err))
   }
 
   const handleAddUserRole = () => {
@@ -59,15 +62,16 @@ const UserRoleScreen = ({ route }) => {
           fetchUserRolesByUserId(response.data.userId);
           Alert.alert('Sucess', 'User Role is Added Successfully')
           setUserRole({
-            "Id": 0,
+            "UserRoleId": 0,
             "RoleId": "",
             "UserId": userId,
+            "CreatedBy": user.userId,
             "IsActive": true
           });
           setModalVisible(false);
         }
       })
-      .catch(err => console.log("Add User Role Error", err))
+      .catch(err => console.error("Add User Role Error", err))
   };
 
   const handleCloseModal = () => {
@@ -100,7 +104,7 @@ const UserRoleScreen = ({ route }) => {
 
       <View style={{ flexDirection: 'row' }}>
 
-        <TouchableOpacity onPress={() => handleDeleteUserRole(item.id)}>
+        <TouchableOpacity onPress={() => handleDeleteUserRole(item.userRoleId)}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -109,10 +113,7 @@ const UserRoleScreen = ({ route }) => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{
-        padding: 16,
-        justifyContent: 'center'
-      }}>
+      <View style={{ flex: 1, padding: 20, }}>
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>User Mobile : {userMobile}</Text>
         <TouchableOpacity style={{
           backgroundColor: Colors.primary,
@@ -132,7 +133,7 @@ const UserRoleScreen = ({ route }) => {
         </TouchableOpacity>
         <FlatList
           data={userRoleList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.userRoleId.toString()}
           renderItem={renderUserRoleCard}
         />
 
@@ -155,7 +156,7 @@ const UserRoleScreen = ({ route }) => {
                   style={[{
                     height: 50,
                     borderColor: Colors.primary,
-                    borderWidth: 0.5,
+                    borderWidth: 1.5,
                     borderRadius: 10,
                     paddingHorizontal: 8,
                   }, isFocus && { borderColor: 'blue' }]}
@@ -173,13 +174,13 @@ const UserRoleScreen = ({ route }) => {
                   search
                   maxHeight={300}
                   labelField="roleName"
-                  valueField="id"
+                  valueField="rolesId"
                   placeholder={!isFocus ? 'Select Role' : '...'}
                   searchPlaceholder="Search..."
                   value={value}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
-                  onChange={(text) => { setUserRole({ ...userRole, RoleId: text.id }) }}
+                  onChange={(text) => { setUserRole({ ...userRole, RoleId: text.rolesId }) }}
                 />
 
                 <View style={{
@@ -199,7 +200,7 @@ const UserRoleScreen = ({ route }) => {
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{userRole.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{userRole.UserRoleId === 0 ? 'Add' : 'Save'}</Text>
 
                   </TouchableOpacity>
 

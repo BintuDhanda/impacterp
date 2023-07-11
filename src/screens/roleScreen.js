@@ -1,12 +1,14 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 const RoleScreen = () => {
-  const [role, setRole] = useState({ "Id": 0, "RoleName": "", "IsActive": true });
+  const { user, setUser } = useContext(UserContext);
+  const [role, setRole] = useState({ "RolesId": 0, "RoleName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [roleList, setRoleList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -23,9 +25,12 @@ const RoleScreen = () => {
   }
   const handleAddRole = () => {
     setRole({
-      Id: 0,
+      RolesId: 0,
       RoleName: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
@@ -39,9 +44,12 @@ const RoleScreen = () => {
               GetRoleList();
               Alert.alert('Sucees', 'Update Role Successfully')
               setRole({
-                "Id": 0,
+                "RolesId": 0,
                 "RoleName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -54,9 +62,12 @@ const RoleScreen = () => {
               GetRoleList();
               Alert.alert('Success', 'Add Role Successfully')
               setRole({
-                "Id": 0,
+                "RolesId": 0,
                 "RoleName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -82,9 +93,12 @@ const RoleScreen = () => {
     httpGet(`Role/getById?Id=${roleId}`)
       .then((response) => {
         setRole({
-          Id: response.data.id,
+          RolesId: response.data.rolesId,
           RoleName: response.data.roleName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
         })
       })
       .catch(error => console.log('Role Get By Id :', error))
@@ -118,10 +132,10 @@ const RoleScreen = () => {
           fontWeight: 'bold',
         }}>{item.roleName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditRole(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditRole(item.rolesId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteRole(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteRole(item.rolesId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -187,7 +201,7 @@ const RoleScreen = () => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{role.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{role.RolesId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -212,7 +226,7 @@ const RoleScreen = () => {
         <FlatList
           data={roleList}
           renderItem={renderRoleCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.rolesId.toString()}
           contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>

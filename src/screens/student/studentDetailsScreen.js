@@ -91,7 +91,7 @@ const StudentDetailsScreen = ({ navigation }) => {
             .then((response) => {
                 console.log(response.data, "StudentDetails list");
                 const studentDetailsArray = response.data.map((studentDetails) => ({
-                    value: studentDetails.id,
+                    value: studentDetails.studentId,
                     label: studentDetails.firstName + " " + studentDetails.lastName,
                     father: studentDetails.fatherName,
                     mother: studentDetails.motherName,
@@ -152,7 +152,7 @@ const StudentDetailsScreen = ({ navigation }) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 0.5,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -241,7 +241,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                 <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { handleNavigate(item.value); setStudentDetailsList([]); }} >
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { handleDeleteStudentDetails(item.id); setStudentDetailsList([]); }}>
+                <TouchableOpacity onPress={() => { handleDeleteStudentDetails(item.value); setStudentDetailsList([]); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -381,14 +381,8 @@ const StudentDetailsScreen = ({ navigation }) => {
                     )}
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={{
-                            fontSize: 20,
+                            fontSize: 18,
                             marginBottom: 10,
-                            fontWeight: 'bold',
-                            backgroundColor: Colors.accent,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            flex: 1,
                             color: Colors.secondary,
                         }}>Total Student : {studentDetailsList.length === 0 ? null : studentDetailsList[0].totalStudent}</Text>
                     </View>

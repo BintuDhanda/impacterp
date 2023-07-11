@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseCategoryScreen = ({ navigation }) => {
-  const [courseCategory, setCourseCategory] = useState({ "Id": 0, "CourseCategoryName": "", "IsActive": true });
+  const { user, setUser } = useContext(UserContext);
+  const [courseCategory, setCourseCategory] = useState({ "CourseCategoryId": 0, "CourseCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": user.userId });
   const [courseCategoryList, setCourseCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -23,25 +26,31 @@ const CourseCategoryScreen = ({ navigation }) => {
   }
   const handleAddCourseCategory = () => {
     setCourseCategory({
-      Id: 0,
+      CourseCategoryId: 0,
       CourseCategoryName: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: user.userId
     });
     setModalVisible(true);
   };
 
   const handleSaveCourseCategory = () => {
     try {
-      if (courseCategory.Id !== 0) {
+      if (courseCategory.CourseCategoryId !== 0) {
         httpPut("CourseCategory/put", courseCategory)
           .then((response) => {
             if (response.status === 200) {
               GetCourseCategoryList();
               Alert.alert('Sucees', 'Update CourseCategory Successfully')
               setCourseCategory({
-                "Id": 0,
+                "CourseCategoryId": 0,
                 "CourseCategoryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": user.userId
               })
             }
           })
@@ -54,9 +63,12 @@ const CourseCategoryScreen = ({ navigation }) => {
               GetCourseCategoryList();
               Alert.alert('Success', 'Add CourseCategory Successfully')
               setCourseCategory({
-                "Id": 0,
+                "CourseCategoryId": 0,
                 "CourseCategoryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": user.userId
               })
             }
           })
@@ -82,9 +94,12 @@ const CourseCategoryScreen = ({ navigation }) => {
     httpGet(`CourseCategory/getById?Id=${courseCategoryId}`)
       .then((response) => {
         setCourseCategory({
-          Id: response.data.id,
+          CourseCategoryId: response.data.courseCategoryId,
           CourseCategoryName: response.data.courseCategoryName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt, 
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: response.data.lastUpdatedBy
         })
       })
       .catch(error => console.error('CourseCategory Get By Id :', error))
@@ -122,15 +137,15 @@ const CourseCategoryScreen = ({ navigation }) => {
           fontWeight: 'bold',
         }}>{item.courseCategoryName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourseCategory(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourseCategory(item.courseCategoryId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.courseCategoryName)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.courseCategoryId, item.courseCategoryName)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleDeleteCourseCategory(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteCourseCategory(item.courseCategoryId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -196,7 +211,7 @@ const CourseCategoryScreen = ({ navigation }) => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{courseCategory.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{courseCategory.CourseCategoryId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -221,7 +236,7 @@ const CourseCategoryScreen = ({ navigation }) => {
         <FlatList
           data={courseCategoryList}
           renderItem={renderCourseCategoryCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.courseCategoryId.toString()}
         // contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>

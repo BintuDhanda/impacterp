@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Post as httpPost } from '../constants/httpService';
 
 const StudentBatchFeesScreen = ({ navigation }) => {
+    const { user, setUser } = useContext(UserContext);
     const [registrationNumber, setRegistrationNumber] = useState({ "RegistrationNumber": "" })
-    const [studentBatchFeesDeposit, setStudentBatchFeesDeposit] = useState({ "Id": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
-    const [studentBatchFeesRefund, setStudentBatchFeesRefund] = useState({ "Id": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
+    const [studentBatchFeesDeposit, setStudentBatchFeesDeposit] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true,  "CreatedBy": user.userId,  });
+    const [studentBatchFeesRefund, setStudentBatchFeesRefund] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true,  "CreatedBy": user.userId, });
     const [studentBatchFeesList, setStudentBatchFeesList] = useState([]);
     const [depositModalVisible, setDepositModalVisible] = useState(false);
     const [refundModalVisible, setRefundModalVisible] = useState(false);
@@ -370,7 +371,7 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentBatchFeesDeposit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentBatchFeesDeposit.StudentBatchFeesId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -440,7 +441,7 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentBatchFeesRefund.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentBatchFeesRefund.StudentBatchFeesId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',

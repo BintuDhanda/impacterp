@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import { UserContext } from '../../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../constants/httpService';
 
 const StudentFormScreen = ({ route, navigation }) => {
-
+    const { user, setUser } = useContext(UserContext);
     const { userId, studentId } = route.params;
     console.log(studentId == undefined ? 0 : studentId, "studentId")
     const [formData, setFormData] = useState({
-        "Id": studentId == undefined ? 0 : studentId,
+        "StudentId": studentId == undefined ? 0 : studentId,
         "FirstName": "",
         "LastName": "",
         "FatherName": "",
@@ -20,6 +22,8 @@ const StudentFormScreen = ({ route, navigation }) => {
         "UserId": userId,
         "IsActive": true,
         "CreatedAt": null,
+        "CreatedBy": user.userId,
+        "LastUpdatedBy": null,
     });
 
     console.log(formData, "Formdata")
@@ -54,7 +58,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                 console.log(result.data, "studentDetailsById");
                 setFormData(
                     {
-                        Id: result.data.id,
+                        StudentId: result.data.studentId,
                         FirstName: result.data.firstName,
                         LastName: result.data.lastName,
                         FatherName: result.data.fatherName,
@@ -66,6 +70,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                         UserId: result.data.userId,
                         IsActive: result.data.isActive,
                         CreatedAt: result.data.createdAt,
+                        CreatedBy: result.data.createdBy,
+                        LastUpdatedBy: user.userId,
                     }
                 );
             })
@@ -81,7 +87,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Student Successfully')
                             setFormData({
-                                "Id": 0,
+                                "StudentId": 0,
                                 "FirstName": "",
                                 "LastName": "",
                                 "FatherName": "",
@@ -93,6 +99,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "UserId": userId,
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.goBack();
                         }
@@ -117,6 +125,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "UserId": userId,
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.navigate('StudentDetailsScreen')
                         }
@@ -133,7 +143,7 @@ const StudentFormScreen = ({ route, navigation }) => {
         navigation.goBack();
     }
     return (
-        <View style={{ flex: 1, padding: 10, }}>
+        <View style={{ flex: 1 }}>
             <View style={{
                 backgroundColor: Colors.background,
                 borderRadius: 8,

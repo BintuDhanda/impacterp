@@ -4,9 +4,12 @@ import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 const UserScreen = ({ navigation }) => {
+  const { user, setUser } = useContext(UserContext);
   const ToDate = new Date();
   ToDate.setDate(ToDate.getDate() + 1)
   const FromDate = new Date();
@@ -28,7 +31,7 @@ const UserScreen = ({ navigation }) => {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [showSearch, setShowSearch] = useState(true);
 
-  const [user, setUser] = useState({ "Id": 0, "UserMobile": "", "UserPassword": "", "IsActive": true });
+  const [users, setUsers] = useState({ "UsersId": 0, "UserMobile": "", "UserPassword": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, "IsEmailConfirmed": null, "IsMobileConfirmed": null });
   const [userList, setUserList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -104,48 +107,63 @@ const UserScreen = ({ navigation }) => {
       .catch(err => console.error('Get User error :', err))
   }
   const handleAddUser = () => {
-    setUser({
-      Id: 0,
+    setUsers({
+      UsersId: 0,
       UserMobile: "",
       UserPassword: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
+      IsEmailConfirmed: null,
+      IsMobileConfirmed: null
     });
     setModalVisible(true);
   };
 
   const handleSaveUser = () => {
     try {
-      if (user.Id !== 0) {
-        httpPut("User/put", user)
+      if (users.UsersId !== 0) {
+        httpPut("User/put", users)
           .then((response) => {
             if (response.status === 200) {
               setUserList([]);
               setSkip(0);
               GetUserList();
               Alert.alert('Sucees', 'Update User Successfully')
-              setUser({
-                "Id": 0,
+              setUsers({
+                "UsersId": 0,
                 "UserMobile": "",
                 "UserPassword": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
+                "IsEmailConfirmed": null,
+                "IsMobileConfirmed": null
               })
             }
           })
           .catch(err => console.error("User update error : ", err));
       }
       else {
-        httpPost("User/post", user)
+        httpPost("User/post", users)
           .then((response) => {
             if (response.status === 200) {
               setUserList([]);
               setSkip(0);
               GetUserList();
               Alert.alert('Success', 'Add User Successfully')
-              setUser({
-                "Id": 0,
+              setUsers({
+                "UsersId": 0,
                 "UserMobile": "",
                 "UserPassword": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
+                "IsEmailConfirmed": null,
+                "IsMobileConfirmed": null
               })
             }
           })
@@ -172,11 +190,16 @@ const UserScreen = ({ navigation }) => {
   const handleEditUser = (userId) => {
     httpGet(`User/getById?Id=${userId}`)
       .then((response) => {
-        setUser({
-          Id: response.data.id,
+        setUsers({
+          UsersId: response.data.usersId,
           UserMobile: response.data.userMobile,
           UserPassword: response.data.userPassword,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
+          IsEmailConfirmed: response.data.isEmailConfirmed,
+          IsMobileConfirmed: response.data.isMobileConfirmed
         })
       })
       .catch(error => console.error('User Get By Id :', error))
@@ -237,16 +260,16 @@ const UserScreen = ({ navigation }) => {
           <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.userMobile}</Text>
         </View>
         <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditUser(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditUser(item.usersId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleManageNavigate(item.id, item.userMobile)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleManageNavigate(item.usersId, item.userMobile)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          {item.isStudentCreated !== true ? (<TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id)} >
+          {item.isStudentCreated !== true ? (<TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.usersId)} >
             <Icon name="user" size={20} color={'#8c53a4'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>) : null}
-          <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteUser(item.usersId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -260,21 +283,15 @@ const UserScreen = ({ navigation }) => {
         <Animated.View style={{ flex: 1, top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
           <View style={{ flexDirection: 'row' }}>
             <Text style={{
-              fontSize: 20,
+              fontSize: 18,
               marginBottom: 10,
-              fontWeight: 'bold',
-              backgroundColor: Colors.accent,
-              borderRadius: 5,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              flex: 1,
               color: Colors.secondary,
             }}>Total User : {userList.length === 0 ? null : userList[0].totalUser}</Text>
           </View>
           <TouchableOpacity onPress={() => { setShowSearch(true); setUserList([]); }}>
             <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
               <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
-              <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
+              <Icon style={{ textAlignVertical: 'center' }} name="search" size={25} />
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={{
@@ -421,7 +438,7 @@ const UserScreen = ({ navigation }) => {
 
           <FlatList
             data={userList}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.usersId.toString()}
             showsVerticalScrollIndicator={false}
             renderItem={renderUserCard}
             ListFooterComponent={renderFooter}
@@ -453,11 +470,11 @@ const UserScreen = ({ navigation }) => {
                       flex: 1
                     }}
                     placeholder="User Mobile"
-                    value={user.UserMobile}
+                    value={users.UserMobile}
                     keyboardType='numeric'
                     maxLength={10}
-                    editable={user.Id === 0 ? true : false}
-                    onChangeText={(text) => setUser({ ...user, UserMobile: text })}
+                    editable={users.UsersId === 0 ? true : false}
+                    onChangeText={(text) => setUsers({ ...users, UserMobile: text })}
                   />
                 </View>
                 <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: Colors.primary, borderRadius: 8 }}>
@@ -467,8 +484,8 @@ const UserScreen = ({ navigation }) => {
                       flex: 1,
                     }}
                     placeholder="User Password"
-                    value={user.UserPassword}
-                    onChangeText={(text) => setUser({ ...user, UserPassword: text })}
+                    value={users.UserPassword}
+                    onChangeText={(text) => setUsers({ ...users, UserPassword: text })}
                     secureTextEntry={true}
                   />
                 </View>
@@ -483,7 +500,7 @@ const UserScreen = ({ navigation }) => {
                       color: Colors.background,
                       fontSize: 16,
                       fontWeight: 'bold',
-                    }}>{user.Id !== 0 ? 'Save' : 'Add'}</Text>
+                    }}>{users.UsersId !== 0 ? 'Save' : 'Add'}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{

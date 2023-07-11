@@ -4,13 +4,15 @@ import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Get as httpGet, Post as httpPost, Put as httpPut} from '../../../constants/httpService';
+import { UserContext } from '../../../../App';
+import { useContext } from 'react';
+import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../../constants/httpService';
 
 const StudentTokenFormScreen = ({ route, navigation }) => {
-
+    const { user, setUser } = useContext(UserContext);
     const { tokenId, studentId, batchName } = route.params;
     const [studentToken, setStudentToken] = useState({
-        "Id": 0,
+        "StudentTokenId": 0,
         "ValidFrom": "",
         "ValidUpto": "",
         "TokenFee": "",
@@ -18,6 +20,8 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
         "BatchId": "",
         "IsActive": true,
         "CreatedAt": null,
+        "CreatedBy": user.userId,
+        "LastUpdatedBy": null,
     });
     const [courseCategoryList, setCourseCategoryList] = useState([]);
     const [courseList, setCourseList] = useState([]);
@@ -86,7 +90,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             .then((response) => {
                 console.log(response.data, "Get token By id")
                 setStudentToken({
-                    Id: response.data.id,
+                    StudentTokenId: response.data.studentTokenId,
                     ValidFrom: response.data.validFrom,
                     ValidUpto: response.data.validUpto,
                     TokenFee: response.data.tokenFee,
@@ -94,19 +98,21 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
+                    CreatedBy: response.data.CreatedBy,
+                    LastUpdatedBy: user.userId,
                 })
             })
     }
 
     const handleSaveStudentToken = async () => {
         try {
-            if (studentToken.Id !== 0) {
+            if (studentToken.StudentTokenId !== 0) {
                 await httpPut("StudentToken/put", studentToken)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Token Successfully')
                             setStudentToken({
-                                "Id": 0,
+                                "StudentTokenId": 0,
                                 "ValidFrom": "",
                                 "ValidUpto": "",
                                 "TokenFee": "",
@@ -114,6 +120,8 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 "BatchId": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.goBack();
                         }
@@ -127,7 +135,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Token Successfully')
                             setStudentToken({
-                                "Id": 0,
+                                "StudentTokenId": 0,
                                 "ValidFrom": "",
                                 "ValidUpto": "",
                                 "TokenFee": "",
@@ -135,6 +143,8 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 "BatchId": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.navigate('HomeScreen')
                         }
@@ -178,18 +188,18 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
         }
     };
     const handleCourseCategorySelect = (courseCategory) => {
-        setValue(courseCategory.id);
-        fetchCourseByCourseCategoryId(courseCategory.id);
+        setValue(courseCategory.courseCategoryId);
+        fetchCourseByCourseCategoryId(courseCategory.courseCategoryId);
     };
 
     const handleCourseSelect = (course) => {
-        setCourseValue(course.id);
-        fetchBatchByCourseId(course.id);
+        setCourseValue(course.courseId);
+        fetchBatchByCourseId(course.courseId);
     };
 
     const handleBatchSelect = (batch) => {
-        setStudentToken({ ...studentToken, BatchId: batch.id })
-        setBatchValue(batch.id)
+        setStudentToken({ ...studentToken, BatchId: batch.batchId })
+        setBatchValue(batch.batchId)
     }
 
     const getFormattedDate = (datestring) => {
@@ -203,7 +213,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
 
     const handleCancel = () => {
         setStudentToken({
-            "Id": 0,
+            "StudentTokenId": 0,
             "ValidFrom": "",
             "ValidUpto": "",
             "TokenFee": "",
@@ -211,6 +221,8 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             "BatchId": "",
             "IsActive": true,
             "CreatedAt": null,
+            "CreatedBy": user.userId,
+            "LastUpdatedBy": null,
         })
         navigation.goBack();
     }
@@ -333,7 +345,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 search
                                 maxHeight={300}
                                 labelField="courseCategoryName"
-                                valueField="id"
+                                valueField="courseCategoryId"
                                 placeholder={!isFocus ? 'Select Course Category' : '...'}
                                 searchPlaceholder="Search..."
                                 value={value}
@@ -366,7 +378,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 search
                                 maxHeight={300}
                                 labelField="courseName"
-                                valueField="id"
+                                valueField="courseId"
                                 placeholder={!isFocus ? 'Select Course' : '...'}
                                 searchPlaceholder="Search..."
                                 value={courseValue}
@@ -398,7 +410,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 search
                                 maxHeight={300}
                                 labelField="batchName"
-                                valueField="id"
+                                valueField="batchId"
                                 placeholder={!isFocus ? 'Select Batch' : '...'}
                                 searchPlaceholder="Search..."
                                 value={batchValue}
@@ -407,22 +419,22 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 onChange={handleBatchSelect}
                             />
                         </> : <>
-                        <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Batch Name :</Text>
-                        <TextInput
-                        style={{
-                            borderWidth: 1,
-                            borderColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingHorizontal: 10,
-                            paddingVertical: 8,
-                            marginBottom: 10,
-                            fontSize: 16,
-                            color: Colors.secondary
-                        }}
-                        editable={false}
-                        value={batchName}
-                    />
-                    </>
+                            <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Batch Name :</Text>
+                            <TextInput
+                                style={{
+                                    borderWidth: 1,
+                                    borderColor: Colors.primary,
+                                    borderRadius: 5,
+                                    paddingHorizontal: 10,
+                                    paddingVertical: 8,
+                                    marginBottom: 10,
+                                    fontSize: 16,
+                                    color: Colors.secondary
+                                }}
+                                editable={false}
+                                value={batchName}
+                            />
+                        </>
                     }
 
                     <TouchableOpacity style={{
@@ -432,7 +444,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                         marginTop: 10,
                         alignItems: 'center',
                     }} onPress={handleSaveStudentToken}>
-                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentToken.Id !== 0 ? "Save" : "Add"}</Text>
+                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentToken.StudentTokenId !== 0 ? "Save" : "Add"}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{
                         backgroundColor: '#f25252',

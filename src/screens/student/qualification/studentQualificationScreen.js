@@ -56,7 +56,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>
@@ -84,10 +84,10 @@ const StudentQualificationScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.grade}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.id)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.studentQualificationId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity  onPress={() => handleDeleteStudentQualification(item.id)}>
+        <TouchableOpacity  onPress={() => handleDeleteStudentQualification(item.studentQualificationId)}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -116,7 +116,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <FlatList
           data={qualificationList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.studentQualificationId.toString()}
           renderItem={renderTokenCard}
         />
       </View>

@@ -4,22 +4,25 @@ import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
+import { UserContext } from '../../../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Put as httpPut, Post as httpPost } from '../../../constants/httpService';
 
 const StudentBatchFormScreen = ({ route, navigation }) => {
-
+    const { user, setUser } = useContext(UserContext);
     const { batchId, studentId } = route.params;
     const [studentBatch, setStudentBatch] = useState({
-        "Id": 0,
+        "StudentBatchId": 0,
         "DateOfJoin": "",
         "BatchStartDate": "",
         "BatchEndDate": "",
-        "BatchFee": "",
         "StudentId": studentId,
         "BatchId": "",
         "RegistrationNumber": "",
         "IsActive": true,
         "CreatedAt": null,
+        "CreatedBy": user.userId,
+        "LastUpdatedBy": null,
     });
     const [courseCategoryList, setCourseCategoryList] = useState([]);
     const [courseList, setCourseList] = useState([]);
@@ -99,38 +102,40 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             .then((response) => {
                 console.log(response.data, "Get Batch By id")
                 setStudentBatch({
-                    Id: response.data.id,
+                    StudentBatchId: response.data.studentBatchId,
                     DateOfJoin: response.data.dateOfJoin,
                     BatchStartDate: response.data.batchStartDate,
                     BatchEndDate: response.data.batchEndDate,
-                    BatchFee: response.data.batchFee,
                     BatchId: response.data.batchId,
                     RegistrationNumber: response.data.registrationNumber,
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
+                    CreatedBy: response.data.createdBy,
+                    LastUpdatedBy: user.userId
                 })
             })
     }
 
     const handleSaveStudentBatch = async () => {
         try {
-            if (studentBatch.Id !== 0) {
+            if (studentBatch.StudentBatchId !== 0) {
                 await httpPut("StudentBatch/put", studentBatch)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Batch Successfully')
                             setStudentBatch({
-                                "Id": 0,
+                                "StudentBatchId": 0,
                                 "DateOfJoin": "",
                                 "BatchStartDate": "",
                                 "BatchEndDate": "",
-                                "BatchFee": "",
                                 "StudentId": studentId,
                                 "BatchId": "",
                                 "RegistrationNumber": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.goBack();
                         }
@@ -144,16 +149,17 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Batch Successfully')
                             setStudentBatch({
-                                "Id": 0,
+                                "StudentBatchId": 0,
                                 "DateOfJoin": "",
                                 "BatchStartDate": "",
                                 "BatchEndDate": "",
-                                "BatchFee": "",
                                 "StudentId": studentId,
                                 "BatchId": "",
                                 "RegistrationNumber": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.navigate('HomeScreen')
                         }
@@ -197,18 +203,18 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
         }
     };
     const handleCourseCategorySelect = (courseCategory) => {
-        setValue(courseCategory.id);
-        fetchCourseByCourseCategoryId(courseCategory.id);
+        setValue(courseCategory.courseCategoryId);
+        fetchCourseByCourseCategoryId(courseCategory.courseCategoryId);
     };
 
     const handleCourseSelect = (course) => {
-        setCourseValue(course.id);
-        fetchBatchByCourseId(course.id);
+        setCourseValue(course.courseId);
+        fetchBatchByCourseId(course.courseId);
     };
 
     const handleBatchSelect = (batch) => {
-        setStudentBatch({ ...studentBatch, BatchId: batch.id })
-        setBatchValue(batch.id)
+        setStudentBatch({ ...studentBatch, BatchId: batch.batchId })
+        setBatchValue(batch.batchId)
     }
 
     const getFormattedDate = (datestring) => {
@@ -222,7 +228,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
 
     const handleCancel = () => {
         setStudentBatch({
-            "Id": 0,
+            "StudentBatchId": 0,
             "DateOfJoin": "",
             "BatchStartDate": "",
             "BatchEndDate": "",
@@ -232,6 +238,8 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             "RegistrationNumber": "",
             "IsActive": true,
             "CreatedAt": null,
+            "CreatedBy": user.userId,
+            "LastUpdatedBy": null,
         })
         navigation.goBack();
     }
@@ -366,7 +374,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         search
                         maxHeight={300}
                         labelField="courseCategoryName"
-                        valueField="id"
+                        valueField="courseCategoryId"
                         placeholder={!isFocus ? 'Select Course Category' : '...'}
                         searchPlaceholder="Search..."
                         value={value}
@@ -399,7 +407,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         search
                         maxHeight={300}
                         labelField="courseName"
-                        valueField="id"
+                        valueField="courseId"
                         placeholder={!isFocus ? 'Select Course' : '...'}
                         searchPlaceholder="Search..."
                         value={courseValue}
@@ -432,7 +440,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         search
                         maxHeight={300}
                         labelField="batchName"
-                        valueField="id"
+                        valueField="batchId"
                         placeholder={!isFocus ? 'Select Batch' : '...'}
                         searchPlaceholder="Search..."
                         value={batchValue}
@@ -464,7 +472,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         marginTop: 10,
                         alignItems: 'center',
                     }} onPress={handleSaveStudentBatch}>
-                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentBatch.Id !== 0 ? "Save" : "Add"}</Text>
+                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentBatch.StudentBatchId !== 0 ? "Save" : "Add"}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{
                         backgroundColor: '#f25252',

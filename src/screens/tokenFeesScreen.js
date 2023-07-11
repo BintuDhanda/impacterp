@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import Colors from '../constants/Colors';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Post as httpPost } from '../constants/httpService';
 
 const StudentTokenFeesScreen = ({ navigation }) => {
+    const { user, setUser } = useContext(UserContext);
     const [tokenNumber, setTokenNumber] = useState({ "TokenNumber": "" })
-    const [studentTokenFeesDeposit, setStudentTokenFeesDeposit] = useState({ "Id": 0, "TokenNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
-    const [studentTokenFeesRefund, setStudentTokenFeesRefund] = useState({ "Id": 0, "TokenNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, });
+    const [studentTokenFeesDeposit, setStudentTokenFeesDeposit] = useState({ "StudentTokenFeesId": 0, "TokenNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, "CreatedBy": user.userId });
+    const [studentTokenFeesRefund, setStudentTokenFeesRefund] = useState({ "StudentTokenFeesId": 0, "TokenNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, "CreatedBy": user.userId });
     const [studentTokenFeesList, setStudentTokenFeesList] = useState([]);
     const [depositModalVisible, setDepositModalVisible] = useState(false);
     const [refundModalVisible, setRefundModalVisible] = useState(false);
@@ -85,7 +86,6 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                 });
             }
             else {
-                // if (studentTokenFeesDeposit.Deposit !== 0) {
                 httpPost("StudentTokenFees/post", studentTokenFeesDeposit)
                     .then((response) => {
                         if (response.status === 200) {
@@ -118,7 +118,6 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                 });
                         }
                     })
-                // }
                 setDepositModalVisible(false);
             }
         })
@@ -138,7 +137,6 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                 });
             }
             else {
-                // if (studentTokenFeesRefund.Refund !== 0) {
                 httpPost("StudentTokenFees/post", studentTokenFeesRefund)
                     .then((response) => {
                         if (response.status === 200) {
@@ -171,7 +169,6 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                 });
                         }
                     })
-                // }
                 setRefundModalVisible(false);
             }
         })
@@ -399,7 +396,7 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentTokenFeesDeposit.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentTokenFeesDeposit.StudentTokenFeesId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',
@@ -469,7 +466,7 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                                 color: Colors.background,
                                                 fontSize: 14,
                                                 fontWeight: 'bold',
-                                            }}>{studentTokenFeesRefund.Id === 0 ? 'Add' : 'Save'}</Text>
+                                            }}>{studentTokenFeesRefund.StudentTokenFeesId === 0 ? 'Add' : 'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={{
                                             backgroundColor: '#f25252',

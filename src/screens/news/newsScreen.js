@@ -224,9 +224,6 @@ const NewsScreen = ({ navigation }) => {
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={{
                             fontSize: 18,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
                             flex: 1,
                             color: Colors.secondary,
                         }}>Total News : {newsList.length === 0 ? null : newsList[0].totalNews}</Text>

@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 
 const CityScreen = ({ route }) => {
+    const { user, setUser } = useContext(UserContext);
     const { stateId, stateName } = route.params;
-    const [city, setCity] = useState({ "Id": 0, "CityName": "", "IsActive": true, "StateId": stateId });
+    const [city, setCity] = useState({ "CityId": 0, "CityName": "", "IsActive": true, "StateId": stateId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [cityList, setCityList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -26,10 +29,13 @@ const CityScreen = ({ route }) => {
 
     const handleAddCity = () => {
         setCity({
-            Id: 0,
+            CityId: 0,
             CityName: "",
             IsActive: true,
-            StateId: stateId
+            StateId: stateId,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setModalVisible(true);
     };
@@ -40,10 +46,13 @@ const CityScreen = ({ route }) => {
                 console.log(result);
                 setCity(
                     {
-                        Id: result.data.id,
+                        CityId: result.data.cityId,
                         CityName: result.data.cityName,
                         StateId: result.data.stateId,
-                        IsActive: result.data.isActive
+                        IsActive: result.data.isActive,
+                        CreatedAt: result.data.createdAt,
+                        CreatedBy: result.data.createdBy,
+                        LastUpdatedBy: user.userId,
                     }
                 );
             })
@@ -62,17 +71,20 @@ const CityScreen = ({ route }) => {
 
     const handleSaveCity = async () => {
         try {
-            if (city.Id !== 0) {
+            if (city.CityId !== 0) {
                 await httpPut("City/put", city)
                     .then((response) => {
                         if (response.status === 200) {
                             fetchCityByStateId(response.data.stateId);
                             Alert.alert('Success', 'City Update successfully');
                             setCity({
-                                "Id": 0,
+                                "CityId": 0,
                                 "CityName": "",
                                 "StateId": stateId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
@@ -84,10 +96,13 @@ const CityScreen = ({ route }) => {
                             fetchCityByStateId(response.data.stateId);
                             Alert.alert('Success', 'City is Added Successfully')
                             setCity({
-                                "Id": 0,
+                                "CityId": 0,
                                 "CityName": "",
                                 "StateId": stateId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
@@ -125,10 +140,10 @@ const CityScreen = ({ route }) => {
                 fontWeight: 'bold',
             }}>{item.cityName}</Text>
             <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCity(item.id)}>
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCity(item.cityId)}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteCity(item.id)}>
+                <TouchableOpacity onPress={() => handleDeleteCity(item.cityId)}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -159,7 +174,7 @@ const CityScreen = ({ route }) => {
                 </TouchableOpacity>
                 <FlatList
                     data={cityList}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.cityId.toString()}
                     renderItem={renderCityCard}
                 />
 
@@ -203,7 +218,7 @@ const CityScreen = ({ route }) => {
                                             color: Colors.background,
                                             fontSize: 14,
                                             fontWeight: 'bold',
-                                        }}>{city.Id === 0 ? 'Add' : 'Save'}</Text>
+                                        }}>{city.CityId === 0 ? 'Add' : 'Save'}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{
                                         backgroundColor: '#f25252',

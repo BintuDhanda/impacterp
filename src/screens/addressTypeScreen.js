@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const AddressTypeScreen = () => {
-  const [addressType, setAddressType] = useState({ "Id": 0, "AddressTypeName": "", "IsActive": true });
+  const { user, setUser } = useContext(UserContext);
+  const [addressType, setAddressType] = useState({ "AddressTypeId": 0, "AddressTypeName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [addressTypeList, setAddressTypeList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -22,25 +25,31 @@ const AddressTypeScreen = () => {
   }
   const handleAddAddressType = () => {
     setAddressType({
-      Id: 0,
+      AddressTypeId: 0,
       AddressTypeName: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
 
   const handleSaveAddressType = () => {
     try {
-      if (addressType.Id !== 0) {
+      if (addressType.AddressTypeId !== 0) {
         httpPut("AddressType/put", addressType)
           .then((response) => {
             if (response.status === 200) {
               GetAddressTypeList();
               Alert.alert('Sucees', 'Update AddressType Successfully')
               setAddressType({
-                "Id": 0,
+                "AddressTypeId": 0,
                 "AddressTypeName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -53,9 +62,12 @@ const AddressTypeScreen = () => {
               GetAddressTypeList();
               Alert.alert('Success', 'Add AddressType Successfully')
               setAddressType({
-                "Id": 0,
+                "AddressTypeId": 0,
                 "AddressTypeName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -81,9 +93,12 @@ const AddressTypeScreen = () => {
     httpGet(`AddressType/getById?Id=${addressTypeId}`)
       .then((response) => {
         setAddressType({
-          Id: response.data.id,
+          AddressTypeId: response.data.addressTypeId,
           AddressTypeName: response.data.addressTypeName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
         })
       })
       .catch(error => console.log('AddressType Get By Id :', error))
@@ -117,10 +132,10 @@ const AddressTypeScreen = () => {
           fontWeight: 'bold',
         }}>{item.addressTypeName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressType(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressType(item.addressTypeId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteAddressType(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteAddressType(item.addressTypeId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -186,7 +201,7 @@ const AddressTypeScreen = () => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{addressType.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{addressType.AddressTypeId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -211,7 +226,7 @@ const AddressTypeScreen = () => {
         <FlatList
           data={addressTypeList}
           renderItem={renderAddressTypeCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.addressTypeId.toString()}
           contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>

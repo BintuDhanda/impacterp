@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CourseScreen = ({ route, navigation }) => {
+  const { user, setUser } = useContext(UserContext);
   const { courseCategoryId, courseCategoryName } = route.params;
-  const [course, setCourse] = useState({ "Id": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId });
+  const [course, setCourse] = useState({ "CourseId": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -25,12 +28,15 @@ const CourseScreen = ({ route, navigation }) => {
 
   const handleAddCourse = () => {
     setCourse({
-      Id: 0,
+      CourseId: 0,
       CourseName: "",
       Fees: "",
       Duration: "",
       IsActive: true,
-      CourseCategoryId: courseCategoryId
+      CourseCategoryId: courseCategoryId,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
@@ -41,12 +47,15 @@ const CourseScreen = ({ route, navigation }) => {
         console.log(result);
         setCourse(
           {
-            Id: result.data.id,
+            CourseId: result.data.courseId,
             CourseName: result.data.courseName,
             Fees: result.data.fees,
             Duration: result.data.duration,
             CourseCategoryId: result.data.courseCategoryId,
-            IsActive: result.data.isActive
+            IsActive: result.data.isActive,
+            CreatedAt: result.data.createdAt,
+            CreatedBy: result.data.CreatedBy,
+            LastUpdatedBy: user.userId
           }
         );
       })
@@ -65,19 +74,22 @@ const CourseScreen = ({ route, navigation }) => {
 
   const handleSaveCourse = async () => {
     try {
-      if (course.Id !== 0) {
+      if (course.CourseId !== 0) {
         await httpPut("Course/put", course)
           .then((response) => {
             if (response.status === 200) {
               fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
               Alert.alert('Sucess', 'Data fetched successfully');
               setCourse({
-                "Id": 0,
+                "CourseId": 0,
                 "CourseName": "",
                 "Fees": "",
                 "Duration": "",
                 "CourseCategoryId": courseCategoryId,
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId, 
+                "LastUpdatedBy": null,
               });
             }
           })
@@ -89,12 +101,15 @@ const CourseScreen = ({ route, navigation }) => {
               fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
               Alert.alert('Sucess', 'Course is Added Successfully')
               setCourse({
-                "Id": 0,
+                "CourseId": 0,
                 "CourseName": "",
                 "Fees": "",
                 "Duration": "",
                 "CourseCategoryId": courseCategoryId,
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               });
             }
           })
@@ -133,15 +148,15 @@ const CourseScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16 }}>Course Name : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.courseName}</Text>
       <View style={{ flex:1, flexDirection: 'row',  justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.id)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.courseId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.courseName)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.courseId, item.courseName)}>
           <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDeleteCourse(item.id)}>
+        <TouchableOpacity onPress={() => handleDeleteCourse(item.courseId)}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -172,7 +187,7 @@ const CourseScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <FlatList
           data={courseList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.courseId.toString()}
           renderItem={renderCourseCard}
         />
 
@@ -243,7 +258,7 @@ const CourseScreen = ({ route, navigation }) => {
                       color: Colors.background,
                       fontSize: 14,
                       fontWeight: 'bold',
-                    }}>{course.Id === 0 ? 'Add' : 'Save'}</Text>
+                    }}>{course.CourseId === 0 ? 'Add' : 'Save'}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={{
                     backgroundColor: '#f25252',

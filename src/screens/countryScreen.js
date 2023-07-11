@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const CountryScreen = ({ navigation }) => {
-  const [country, setCountry] = useState({ "Id": 0, "CountryName": "", "IsActive": true });
+  const { user, setUser } = useContext(UserContext);
+  const [country, setCountry] = useState({ "CountryId": 0, "CountryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [countryList, setCountryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -22,25 +25,31 @@ const CountryScreen = ({ navigation }) => {
   }
   const handleAddCountry = () => {
     setCountry({
-      Id: 0,
+      CountryId: 0,
       CountryName: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
 
   const handleSaveCountry = () => {
     try {
-      if (country.Id !== 0) {
+      if (country.CountryId !== 0) {
         httpPut("Country/put", country)
           .then((response) => {
             if (response.status === 200) {
               GetCountryList();
               Alert.alert('Sucees', 'Update Country Successfully')
               setCountry({
-                "Id": 0,
+                "CountryId": 0,
                 "CountryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -53,9 +62,12 @@ const CountryScreen = ({ navigation }) => {
               GetCountryList();
               Alert.alert('Success', 'Add Country Successfully')
               setCountry({
-                "Id": 0,
+                "CountryId": 0,
                 "CountryName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -85,9 +97,12 @@ const CountryScreen = ({ navigation }) => {
     httpGet(`Country/getById?Id=${countryId}`)
       .then((response) => {
         setCountry({
-          Id: response.data.id,
+          CountryIdId: response.data.countryId,
           CountryName: response.data.countryName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
         })
       })
       .catch(error => console.log('Country Get By Id :', error))
@@ -123,15 +138,15 @@ const CountryScreen = ({ navigation }) => {
         }}>{item.countryName}</Text>
 
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCountry(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCountry(item.countryId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.id, item.countryName)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.countryId, item.countryName)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleDeleteCountry(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteCountry(item.countryId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -197,7 +212,7 @@ const CountryScreen = ({ navigation }) => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{country.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{country.CountryId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -222,7 +237,7 @@ const CountryScreen = ({ navigation }) => {
         <FlatList
           data={countryList}
           renderItem={renderCountryCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.countryId.toString()}
         // contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>

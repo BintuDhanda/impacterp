@@ -1,12 +1,14 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const QualificationScreen = () => {
-  const [qualification, setQualification] = useState({ "Id": 0, "QualificationName": "", "IsActive": true });
+  const { user, setUser } = useContext(UserContext);
+  const [qualification, setQualification] = useState({ "QualificationId": 0, "QualificationName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [qualificationList, setQualificationList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -23,25 +25,31 @@ const QualificationScreen = () => {
   }
   const handleAddQualification = () => {
     setQualification({
-      Id: 0,
+      QualificationId: 0,
       QualificationName: "",
       IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
 
   const handleSaveQualification = () => {
     try {
-      if (qualification.Id !== 0) {
+      if (qualification.QualificationId !== 0) {
         httpPut("Qualification/put", qualification)
           .then((response) => {
             if (response.status === 200) {
               GetQualificationList();
               Alert.alert('Sucees', 'Update Qualification Successfully')
               setQualification({
-                "Id": 0,
+                "QualificationId": 0,
                 "QualificationName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -54,9 +62,12 @@ const QualificationScreen = () => {
               GetQualificationList();
               Alert.alert('Success', 'Add Qualification Successfully')
               setQualification({
-                "Id": 0,
+                "QualificationId": 0,
                 "QualificationName": "",
-                "IsActive": true
+                "IsActive": true,
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -82,9 +93,12 @@ const QualificationScreen = () => {
     httpGet(`Qualification/getById?Id=${qualificationId}`)
       .then((response) => {
         setQualification({
-          Id: response.data.id,
+          QualificationId: response.data.qualificationId,
           QualificationName: response.data.qualificationName,
-          IsActive: response.data.isActive
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
         })
       })
       .catch(error => console.log('Qualification Get By Id :', error))
@@ -118,10 +132,10 @@ const QualificationScreen = () => {
           fontWeight: 'bold',
         }}>{item.qualificationName}</Text>
         <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualification(item.id)} >
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualification(item.qualificationId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteQualification(item.id)}>
+          <TouchableOpacity onPress={() => handleDeleteQualification(item.qualificationId)}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -187,7 +201,7 @@ const QualificationScreen = () => {
                   fontSize: 16,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                }}>{qualification.Id !== 0 ? 'Save' : 'Add'}</Text>
+                }}>{qualification.QualificationId !== 0 ? 'Save' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -212,7 +226,7 @@ const QualificationScreen = () => {
         <FlatList
           data={qualificationList}
           renderItem={renderQualificationCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.qualificationId.toString()}
         // contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>

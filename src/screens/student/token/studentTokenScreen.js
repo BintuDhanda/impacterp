@@ -63,7 +63,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>
@@ -87,11 +87,11 @@ const StudentTokenScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenStatus === true ? "Active" : "InActive"}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.id, item.batchName)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.studentTokenId, item.batchName)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDeleteToken(item.id)}>
+        <TouchableOpacity onPress={() => handleDeleteToken(item.studentTokenId)}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -120,7 +120,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <FlatList
           data={tokenList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.studentTokenId.toString()}
           renderItem={renderTokenCard}
         />
       </View>

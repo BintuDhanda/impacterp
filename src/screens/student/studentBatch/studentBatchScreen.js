@@ -65,7 +65,7 @@ const StudentBatchScreen = ({ route, navigation }) => {
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>

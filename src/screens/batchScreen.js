@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import axios from 'axios';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const BatchScreen = ({ route }) => {
+    const { user, setUser } = useContext(UserContext);
     const { courseId, courseName } = route.params;
-    const [batch, setBatch] = useState({ "Id": 0, "BatchName": "", "Code": "", "StartDate": "", "EndDate": "", "IsActive": true, "CourseId": courseId });
+    const [batch, setBatch] = useState({ "BatchId": 0, "BatchName": "", "Code": "", "StartDate": "", "EndDate": "", "IsActive": true, "CourseId": courseId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [batchList, setBatchList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -65,30 +67,36 @@ const BatchScreen = ({ route }) => {
 
     const handleAddBatch = () => {
         setBatch({
-            Id: 0,
+            BatchId: 0,
             BatchName: "",
             Code: "",
             StartDate: "",
             EndDate: "",
             IsActive: true,
-            CourseId: courseId
+            CourseId: courseId,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setModalVisible(true);
     };
 
     const handleEditBatch = (id) => {
-        axios.get(`http://192.168.1.7:5291/api/Batch/getById?Id=${id}`)
+        httpGet(`Batch/getById?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 setBatch(
                     {
-                        Id: result.data.id,
+                        BatchId: result.data.batchId,
                         BatchName: result.data.batchName,
                         Code: result.data.code,
                         StartDate: result.data.startDate,
                         EndDate: result.data.endDate,
                         CourseId: result.data.courseId,
-                        IsActive: result.data.isActive
+                        IsActive: result.data.isActive,
+                        CreatedAt: result.data.createdAt,
+                        CreatedBy: result.data.createdBy,
+                        LastUpdatedBy: user.userId
                     }
                 );
             })
@@ -97,7 +105,7 @@ const BatchScreen = ({ route }) => {
     };
 
     const handleDeleteBatch = (id) => {
-        axios.delete(`http://192.168.1.7:5291/api/Batch/delete?Id=${id}`)
+        httpDelete(`Batch/delete?Id=${id}`)
             .then((result) => {
                 console.log(result);
                 fetchBatchByCourseId(result.data.courseId)
@@ -107,46 +115,44 @@ const BatchScreen = ({ route }) => {
 
     const handleSaveBatch = async () => {
         try {
-            if (batch.Id !== 0) {
-                await axios.put(`http://192.168.1.7:5291/api/Batch/put`, JSON.stringify(batch), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+            if (batch.BatchId !== 0) {
+                await httpPut("Batch/put", batch)
                     .then((response) => {
                         if (response.status === 200) {
                             fetchBatchByCourseId(response.data.courseId);
                             Alert.alert('Success', 'Batch Update successfully');
                             setBatch({
-                                "Id": 0,
+                                "BatchId": 0,
                                 "BatchName": "",
                                 "Code": "",
                                 "StartDate": "",
                                 "EndDate": "",
                                 "CourseId": courseId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
                     .catch(err => console.error("Update error in Batch", err));
             } else {
-                await axios.post('http://192.168.1.7:5291/api/Batch/post', JSON.stringify(batch), {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                await httpPost("Batch/post", batch)
                     .then((response) => {
                         if (response.status === 200) {
                             fetchBatchByCourseId(response.data.courseId);
                             Alert.alert('Success', 'Batch is Added Successfully')
                             setBatch({
-                                "Id": 0,
+                                "BatchId": 0,
                                 "BatchName": "",
                                 "Code": "",
                                 "StartDate": "",
                                 "EndDate": "",
                                 "CourseId": courseId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
@@ -203,10 +209,10 @@ const BatchScreen = ({ route }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.endDate)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.id)}>
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.batchId)}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteBatch(item.id)}>
+                <TouchableOpacity onPress={() => handleDeleteBatch(item.batchId)}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -237,7 +243,7 @@ const BatchScreen = ({ route }) => {
                 </TouchableOpacity>
                 <FlatList
                     data={batchList}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.batchId.toString()}
                     renderItem={renderBatchCard}
                 />
 
@@ -354,7 +360,7 @@ const BatchScreen = ({ route }) => {
                                             color: Colors.background,
                                             fontSize: 14,
                                             fontWeight: 'bold',
-                                        }}>{batch.Id === 0 ? 'Add' : 'Save'}</Text>
+                                        }}>{batch.BatchId === 0 ? 'Add' : 'Save'}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{
                                         backgroundColor: '#f25252',

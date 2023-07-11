@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
+import { UserContext } from '../../../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../../constants/httpService';
 
 const StudentQualificationFormScreen = ({ route, navigation }) => {
-
+    const { user, setUser } = useContext(UserContext);
     const { qualificationId, studentId } = route.params;
     const [studentQualification, setStudentQualification] = useState({
-        "Id": 0,
+        "StudentQualificationId": 0,
         "QualificationId": "",
         "Subject": "",
         "MaximumMark": "",
@@ -18,6 +20,8 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
         "StudentId": studentId,
         "IsActive": true,
         "CreatedAt": null,
+        "CreatedBy": user.userId,
+        "LastUpdatedBy": null,
     });
     const [qualificationList, setQualificationList] = useState([]);
 
@@ -46,7 +50,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
         httpGet(`StudentQualification/getById?Id=${qualificationId}`)
             .then((response) => {
                 setStudentQualification({
-                    Id: response.data.id,
+                    StudentQualificationId: response.data.studentQualificationId,
                     QualificationId: response.data.qualificationId,
                     Subject: response.data.subject,
                     MaximumMark: response.data.maximumMark,
@@ -56,6 +60,8 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
+                    CreatedBy: response.data.createdBy,
+                    LastUpdatedBy: user.userId,
                 })
             })
     }
@@ -73,13 +79,13 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
 
     const handleSaveStudentQualification = async () => {
         try {
-            if (studentQualification.Id !== 0) {
+            if (studentQualification.StudentQualificationId !== 0) {
                 await httpPut("StudentQualification/put", studentQualification)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Qualification Successfully')
                             setStudentQualification({
-                                "Id": 0,
+                                "StudentQualificationId": 0,
                                 "QualificationId": "",
                                 "Subject": "",
                                 "MaximumMark": "",
@@ -89,6 +95,8 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                                 "StudentId": studentId,
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.goBack();
                         }
@@ -102,7 +110,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Qualification Successfully')
                             setStudentQualification({
-                                "Id": 0,
+                                "StudentQualificationId": 0,
                                 "QualificationId": "",
                                 "Subject": "",
                                 "MaximumMark": "",
@@ -112,6 +120,8 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                                 "StudentId": studentId,
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                             navigation.navigate('HomeScreen')
                         }
@@ -126,7 +136,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
 
     const handleCancel = () => {
         setStudentQualification({
-            "Id": 0,
+            "StudentQualificationId": 0,
             "QualificationId": "",
             "Subject": "",
             "MaximumMark": "",
@@ -136,6 +146,8 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
             "StudentId": studentId,
             "IsActive": true,
             "CreatedAt": null,
+            "CreatedBy": user.userId,
+            "LastUpdatedBy": null,
         })
         navigation.goBack();
     }
@@ -177,13 +189,13 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                         search
                         maxHeight={300}
                         labelField="qualificationName"
-                        valueField="id"
+                        valueField="qualificationId"
                         placeholder={!isFocus ? 'Select Qualification' : '...'}
                         searchPlaceholder="Search..."
                         value={studentQualification.QualificationId}
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
-                        onChange={(value) => setStudentQualification({ ...studentQualification, QualificationId: value.id })}
+                        onChange={(value) => setStudentQualification({ ...studentQualification, QualificationId: value.qualificationId })}
                     />
 
                     <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Subject :</Text>
@@ -273,7 +285,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                         marginTop: 10,
                         alignItems: 'center',
                     }} onPress={handleSaveStudentQualification}>
-                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentQualification.Id !== 0 ? "Save" : "Add"}</Text>
+                        <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentQualification.StudentQualificationId !== 0 ? "Save" : "Add"}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{
                         backgroundColor: '#f25252',
