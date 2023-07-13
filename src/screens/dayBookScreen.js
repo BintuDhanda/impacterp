@@ -37,6 +37,8 @@ const DayBookScreen = () => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
     const [sumCreditAndDebitDayBook, setSumCreditAndDebitDayBook] = useState({});
+    const [dayBookDeleteId, setDayBookDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     const GetSumDayBookCreditAndDebitDayBook = () => {
         const filter = { "From": fromDate, "To": toDate }
@@ -165,14 +167,25 @@ const DayBookScreen = () => {
         setDebitModalVisible(true);
     };
 
-    const handleDeleteDayBook = (id) => {
-        httpDelete(`DayBook/delete?Id=${id}`)
+    const DeleteDayBookIdConfirm = (dayBookid) => {
+        setDayBookDeleteId(dayBookid);
+    }
+
+    const DeleteDayBookIdConfirmYes = () => {
+        httpDelete(`DayBook/delete?Id=${dayBookDeleteId}`)
             .then((result) => {
                 console.log(result);
-                setDayBookList([]);
+                GetDayBookList();
                 setSkip(0);
+                setDayBookDeleteId(0);
+                setShowDelete(false);
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch(error => console.error('Delete DayBook error', error))
+    }
+
+    const DeleteDayBookIdConfirmNo = () => {
+        setDayBookDeleteId(0);
+        setShowDelete(false);
     }
 
     const handleSaveDayBookCredit = async () => {
@@ -299,7 +312,7 @@ const DayBookScreen = () => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.account}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => handleDeleteDayBook(item.dayBookId)}>
+                <TouchableOpacity onPress={() => { DeleteDayBookIdConfirm(item.dayBookId); setShowDelete(true); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -478,6 +491,54 @@ const DayBookScreen = () => {
                                             setShowSearch(false);
                                         }}>
                                             <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+
+                    {showDelete && (
+                        <Modal transparent visible={showDelete}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 28,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                }}>
+                                    <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            DeleteDayBookIdConfirmYes();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            DeleteDayBookIdConfirmNo();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>

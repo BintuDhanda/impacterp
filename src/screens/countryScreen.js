@@ -11,6 +11,8 @@ const CountryScreen = ({ navigation }) => {
   const [country, setCountry] = useState({ "CountryId": 0, "CountryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [countryList, setCountryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [countryDeleteId, setCountryDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     GetCountryList();
@@ -80,14 +82,25 @@ const CountryScreen = ({ navigation }) => {
     }
   }
 
-  const handleDeleteCountry = (countryId) => {
-    httpDelete(`Country/delete?Id=${countryId}`)
+  const DeleteCountryIdConfirm = (countryid) => {
+    setCountryDeleteId(countryid);
+  }
+
+  const DeleteCountryIdConfirmYes = () => {
+    httpDelete(`Country/delete?Id=${countryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetCountryList();
+        setCountryDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
-  };
+      .catch(error => console.error('Delete Country error', error))
+  }
+
+  const DeleteCountryIdConfirmNo = () => {
+    setCountryDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleNavigate = (countryId, countryName) => {
     navigation.navigate('StateScreen', { countryId: countryId, countryName: countryName })
@@ -146,7 +159,7 @@ const CountryScreen = ({ navigation }) => {
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleDeleteCountry(item.countryId)}>
+          <TouchableOpacity onPress={() => { DeleteCountryIdConfirm(item.countryId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -171,6 +184,54 @@ const CountryScreen = ({ navigation }) => {
             textAlign: 'center',
           }}>Add Country</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteCountryIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteCountryIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={{

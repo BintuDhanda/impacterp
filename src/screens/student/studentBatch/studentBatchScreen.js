@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
@@ -8,6 +8,8 @@ import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpSer
 const StudentBatchScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
   const [batchList, setBatchList] = useState([]);
+  const [studentBatchDeleteId, setStudentBatchDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -34,6 +36,26 @@ const StudentBatchScreen = ({ route, navigation }) => {
     navigation.navigate('StudentBatchFormScreen', { studentId: studentId, batchId: batchId })
   }
 
+  const DeleteStudentBatchIdConfirm = (studentBatchid) => {
+    setStudentBatchDeleteId(studentBatchid);
+  }
+
+  const DeleteStudentBatchIdConfirmYes = () => {
+    httpDelete(`StudentBatch/delete?Id=${studentBatchDeleteId}`)
+      .then((result) => {
+        console.log(result);
+        GetStudentBatchByStudentId();
+        setStudentBatchDeleteId(0);
+        setShowDelete(false);
+      })
+      .catch(error => console.error('Delete Student Batch error', error))
+  }
+
+  const DeleteStudentBatchIdConfirmNo = () => {
+    setStudentBatchDeleteId(0);
+    setShowDelete(false);
+  }
+
   const handleDeleteStudentBatch = (id) => {
     httpDelete(`StudentBatch/delete?Id=${id}`)
       .then((result) => {
@@ -52,7 +74,7 @@ const StudentBatchScreen = ({ route, navigation }) => {
     return `${year}-${month}-${day}`;
   }
 
-  const renderTokenCard = ({ item }) => (
+  const renderBatchCard = ({ item }) => (
     <View style={{
       justifyContent: 'space-between',
       backgroundColor: Colors.background,
@@ -92,7 +114,7 @@ const StudentBatchScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{marginRight: 10,}} onPress={() => handleEditStudentBatchNavigate(item.studentBatchId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDeleteStudentBatch(item.studentBatchId)}>
+        <TouchableOpacity onPress={() => {DeleteStudentBatchIdConfirm(item.studentBatchId), setShowDelete(true);}}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -119,10 +141,59 @@ const StudentBatchScreen = ({ route, navigation }) => {
             textAlign: 'center'
           }}>Add Batch</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteStudentBatchIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteStudentBatchIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={batchList}
           keyExtractor={(item) => item.studentBatchId.toString()}
-          renderItem={renderTokenCard}
+          renderItem={renderBatchCard}
         />
       </View>
     </ScrollView>

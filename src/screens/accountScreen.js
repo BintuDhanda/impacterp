@@ -12,6 +12,8 @@ const AccountScreen = ({ route, navigation }) => {
   const [account, setAccount] = useState({ "AccountId": 0, "AccountName": "", "IsActive": true, "AccCategoryId": accountCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [accountList, setAccountList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [accountDeleteId, setAccountDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     fetchAccountsByAccCategoryId();
@@ -59,6 +61,26 @@ const AccountScreen = ({ route, navigation }) => {
       .catch(err => console.error("Get By Id Error", err));
     setModalVisible(true);
   };
+
+  const DeleteAccountIdConfirm = (accountid) => {
+    setAccountDeleteId(accountid);
+  }
+
+  const DeleteAccountIdConfirmYes = () => {
+    httpDelete(`Account/delete?Id=${accountDeleteId}`)
+      .then((result) => {
+        console.log(result);
+        fetchAccountsByAccCategoryId();
+        setAccountDeleteId(0);
+        setShowDelete(false);
+      })
+      .catch(error => console.error('Delete Account error', error))
+  }
+
+  const DeleteAccountIdConfirmNo = () => {
+    setAccountDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleDeleteAccount = (id) => {
     httpDelete(`Account/delete?Id=${id}`)
@@ -149,7 +171,7 @@ const AccountScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.accountId, item.accountName)}>
           <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDeleteAccount(item.accountId)}>
+        <TouchableOpacity onPress={() => { DeleteAccountIdConfirm(item.accountId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -178,6 +200,55 @@ const AccountScreen = ({ route, navigation }) => {
             textAlign: 'center',
           }}>Add Account</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteAccountIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteAccountIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={accountList}
           keyExtractor={(item) => item.accountId.toString()}

@@ -113,7 +113,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Add Student Details Successfully')
                             setUser({
-                                "Id": 0,
+                                "StudentId": 0,
                                 "FirstName": "",
                                 "LastName": "",
                                 "FatherName": "",

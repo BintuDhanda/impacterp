@@ -11,6 +11,8 @@ const QualificationScreen = () => {
   const [qualification, setQualification] = useState({ "QualificationId": 0, "QualificationName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [qualificationList, setQualificationList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [qualificationDeleteId, setQualificationDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     GetQualificationList();
@@ -80,14 +82,25 @@ const QualificationScreen = () => {
     }
   }
 
-  const handleDeleteQualification = (qualificationId) => {
-    httpDelete(`Qualification/delete?Id=${qualificationId}`)
+  const DeleteQualificationIdConfirm = (qualificationid) => {
+    setQualificationDeleteId(qualificationid);
+  }
+
+  const DeleteQualificationIdConfirmYes = () => {
+    httpDelete(`Qualification/delete?Id=${qualificationDeleteId}`)
       .then((result) => {
         console.log(result);
         GetQualificationList();
+        setQualificationDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
-  };
+      .catch(error => console.error('Delete Qualification error', error))
+  }
+
+  const DeleteQualificationIdConfirmNo = () => {
+    setQualificationDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleEditQualification = (qualificationId) => {
     httpGet(`Qualification/getById?Id=${qualificationId}`)
@@ -135,7 +148,7 @@ const QualificationScreen = () => {
           <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualification(item.qualificationId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteQualification(item.qualificationId)}>
+          <TouchableOpacity onPress={() => { DeleteQualificationIdConfirm(item.qualificationId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -160,6 +173,54 @@ const QualificationScreen = () => {
             textAlign: 'center',
           }}>Add Qualification</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteQualificationIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteQualificationIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={{

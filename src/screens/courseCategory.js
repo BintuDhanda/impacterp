@@ -12,6 +12,8 @@ const CourseCategoryScreen = ({ navigation }) => {
   const [courseCategory, setCourseCategory] = useState({ "CourseCategoryId": 0, "CourseCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": user.userId });
   const [courseCategoryList, setCourseCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [courseCategoryDeleteId, setCourseCategoryDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     GetCourseCategoryList();
@@ -81,14 +83,25 @@ const CourseCategoryScreen = ({ navigation }) => {
     }
   }
 
-  const handleDeleteCourseCategory = (courseCategoryId) => {
-    httpDelete(`CourseCategory/delete?Id=${courseCategoryId}`)
+  const DeleteCourseCategoryIdConfirm = (courseCategoryid) => {
+    setCourseCategoryDeleteId(courseCategoryid);
+  }
+
+  const DeleteCourseCategoryIdConfirmYes = () => {
+    httpDelete(`CourseCategory/delete?Id=${courseCategoryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetCourseCategoryList();
+        setCourseCategoryDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
-  };
+      .catch(error => console.error('Delete Course Category error', error))
+  }
+
+  const DeleteCourseCategoryIdConfirmNo = () => {
+    setCourseCategoryDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleEditCourseCategory = (courseCategoryId) => {
     httpGet(`CourseCategory/getById?Id=${courseCategoryId}`)
@@ -97,7 +110,7 @@ const CourseCategoryScreen = ({ navigation }) => {
           CourseCategoryId: response.data.courseCategoryId,
           CourseCategoryName: response.data.courseCategoryName,
           IsActive: response.data.isActive,
-          CreatedAt: response.data.createdAt, 
+          CreatedAt: response.data.createdAt,
           CreatedBy: response.data.createdBy,
           LastUpdatedBy: response.data.lastUpdatedBy
         })
@@ -145,7 +158,7 @@ const CourseCategoryScreen = ({ navigation }) => {
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleDeleteCourseCategory(item.courseCategoryId)}>
+          <TouchableOpacity onPress={() => {DeleteCourseCategoryIdConfirm(item.courseCategoryId); setShowDelete(true);}}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -170,6 +183,54 @@ const CourseCategoryScreen = ({ navigation }) => {
             textAlign: 'center',
           }}>Add Course Category</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteCourseCategoryIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteCourseCategoryIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={{

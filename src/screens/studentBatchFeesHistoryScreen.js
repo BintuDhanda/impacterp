@@ -16,6 +16,8 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
     const [sumDepositAndRefund, setSumDepositAndRefund] = useState({});
+    const [studentBatchFeesDeleteId, setStudentBatchFeesDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -60,13 +62,24 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
             });
     }
 
-    const handleDeleteStudentBatchFees = (id) => {
-        httpDelete(`StudentBatchFees/delete?Id=${id}`)
+    const DeleteStudentBatchFeesIdConfirm = (studentBatchFeesid) => {
+        setStudentBatchFeesDeleteId(studentBatchFeesid);
+    }
+
+    const DeleteStudentBatchFeesIdConfirmYes = () => {
+        httpDelete(`StudentBatchFees/delete?Id=${studentBatchFeesDeleteId}`)
             .then((result) => {
                 console.log(result);
                 navigation.goBack();
+                setStudentBatchFeesDeleteId(0);
+                setShowDelete(false);
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch(error => console.error('Delete StudentBatchFees error', error))
+    }
+
+    const DeleteStudentBatchFeesIdConfirmNo = () => {
+        setStudentBatchFeesDeleteId(0);
+        setShowDelete(false);
     }
 
     const handleLoadMore = async () => {
@@ -135,7 +148,7 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => handleDeleteStudentBatchFees(item.studentBatchFeesId)}>
+                <TouchableOpacity onPress={() => {DeleteStudentBatchFeesIdConfirm(item.studentBatchFeesId); setShowDelete(true);}}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -170,6 +183,55 @@ const StudentBatchFeesHistoryScreen = ({ route, navigation }) => {
                             color: Colors.background
                         }}>Total Refund : {sumDepositAndRefund.refund} Rs/-</Text>
                     </View>
+
+                    {showDelete && (
+                        <Modal transparent visible={showDelete}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 28,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                }}>
+                                    <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            DeleteStudentBatchFeesIdConfirmYes();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            DeleteStudentBatchFeesIdConfirmNo();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+
                     <FlatList
                         data={studentBatchFeesList}
                         keyExtractor={(item) => item.studentBatchFeesId.toString()}

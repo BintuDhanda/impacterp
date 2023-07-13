@@ -12,9 +12,11 @@ const CourseScreen = ({ route, navigation }) => {
   const [course, setCourse] = useState({ "CourseId": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [courseDeleteId, setCourseDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
-    fetchCoursesByCourseCategoryId(courseCategoryId);
+    fetchCoursesByCourseCategoryId();
   }, []);
 
   const fetchCoursesByCourseCategoryId = async () => {
@@ -63,13 +65,24 @@ const CourseScreen = ({ route, navigation }) => {
     setModalVisible(true);
   };
 
-  const handleDeleteCourse = (id) => {
-    httpDelete(`Course/delete?Id=${id}`)
+  const DeleteCourseIdConfirm = (courseid) => {
+    setCourseDeleteId(courseid);
+  }
+
+  const DeleteCourseIdConfirmYes = () => {
+    httpDelete(`Course/delete?Id=${courseDeleteId}`)
       .then((result) => {
         console.log(result);
-        fetchCoursesByCourseCategoryId(result.data.courseCategoryId)
+        fetchCoursesByCourseCategoryId();
+        setCourseDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
+      .catch(error => console.error('Delete Course error', error))
+  }
+
+  const DeleteCourseIdConfirmNo = () => {
+    setCourseDeleteId(0);
+    setShowDelete(false);
   }
 
   const handleSaveCourse = async () => {
@@ -78,7 +91,7 @@ const CourseScreen = ({ route, navigation }) => {
         await httpPut("Course/put", course)
           .then((response) => {
             if (response.status === 200) {
-              fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
+              fetchCoursesByCourseCategoryId();
               Alert.alert('Sucess', 'Data fetched successfully');
               setCourse({
                 "CourseId": 0,
@@ -88,7 +101,7 @@ const CourseScreen = ({ route, navigation }) => {
                 "CourseCategoryId": courseCategoryId,
                 "IsActive": true,
                 "CreatedAt": null,
-                "CreatedBy": user.userId, 
+                "CreatedBy": user.userId,
                 "LastUpdatedBy": null,
               });
             }
@@ -98,7 +111,7 @@ const CourseScreen = ({ route, navigation }) => {
         await httpPost("Course/post", course)
           .then((response) => {
             if (response.status === 200) {
-              fetchCoursesByCourseCategoryId(response.data.courseCategoryId);
+              fetchCoursesByCourseCategoryId();
               Alert.alert('Sucess', 'Course is Added Successfully')
               setCourse({
                 "CourseId": 0,
@@ -147,19 +160,19 @@ const CourseScreen = ({ route, navigation }) => {
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Course Name : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.courseName}</Text>
-      <View style={{ flex:1, flexDirection: 'row',  justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.courseId)}>
-          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
-        </TouchableOpacity>
+        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.courseId)}>
+            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+          </TouchableOpacity>
 
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.courseId, item.courseName)}>
-          <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
-        </TouchableOpacity>
+          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.courseId, item.courseName)}>
+            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDeleteCourse(item.courseId)}>
-          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => {DeleteCourseIdConfirm(item.courseId); setShowDelete(true);}}>
+            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -185,6 +198,55 @@ const CourseScreen = ({ route, navigation }) => {
             textAlign: 'center',
           }}>Add Course</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteCourseIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteCourseIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={courseList}
           keyExtractor={(item) => item.courseId.toString()}

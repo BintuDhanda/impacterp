@@ -16,6 +16,8 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
     const [sumDepositAndRefund, setSumDepositAndRefund] = useState({});
+    const [studentTokenFeesDeleteId, setStudentTokenFeesDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -60,13 +62,24 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
             });
     }
 
-    const handleDeleteStudentTokenFees = (id) => {
-        httpDelete(`StudentTokenFees/delete?Id=${id}`)
+    const DeleteStudentTokenFeesIdConfirm = (studentTokenFeesid) => {
+        setStudentTokenFeesDeleteId(studentTokenFeesid);
+    }
+
+    const DeleteStudentTokenFeesIdConfirmYes = () => {
+        httpDelete(`StudentTokenFees/delete?Id=${studentTokenFeesDeleteId}`)
             .then((result) => {
                 console.log(result);
                 navigation.goBack();
+                setStudentTokenFeesDeleteId(0);
+                setShowDelete(false);
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch(error => console.error('Delete StudentTokenFees error', error))
+    }
+
+    const DeleteStudentTokenFeesIdConfirmNo = () => {
+        setStudentTokenFeesDeleteId(0);
+        setShowDelete(false);
     }
 
     const handleLoadMore = async () => {
@@ -111,7 +124,7 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.studentName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
+                <Text style={{ fontSize: 16 }}>Token Name : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
@@ -135,7 +148,7 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => handleDeleteStudentTokenFees(item.studentTokenFeesId)}>
+                <TouchableOpacity onPress={() => {DeleteStudentTokenFeesIdConfirm(item.studentTokenFeesId); setShowDelete(true);}}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -170,6 +183,55 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
                             color: Colors.background
                         }}>Total Refund : {sumDepositAndRefund.refund} Rs/-</Text>
                     </View>
+
+                    {showDelete && (
+                        <Modal transparent visible={showDelete}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 28,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                }}>
+                                    <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            DeleteStudentTokenFeesIdConfirmYes();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            DeleteStudentTokenFeesIdConfirmNo();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+
                     <FlatList
                         data={studentTokenFeesList}
                         keyExtractor={(item) => item.studentTokenFeesId.toString()}

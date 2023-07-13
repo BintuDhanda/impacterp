@@ -11,6 +11,8 @@ const AccountCategoryScreen = ({ navigation }) => {
   const [accountCategory, setAccountCategory] = useState({ "AccountCategoryId": 0, "AccCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [accountCategoryList, setAccountCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [accountCategoryDeleteId, setAccountCategoryDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     GetAccountCategoryList();
@@ -80,14 +82,25 @@ const AccountCategoryScreen = ({ navigation }) => {
     }
   }
 
-  const handleDeleteAccountCategory = (accountCategoryId) => {
-    httpDelete(`AccountCategory/delete?Id=${accountCategoryId}`)
+  const DeleteAccountCategoryIdConfirm = (accountCategoryid) => {
+    setAccountCategoryDeleteId(accountCategoryid);
+  }
+
+  const DeleteAccountCategoryIdConfirmYes = () => {
+    httpDelete(`AccountCategory/delete?Id=${accountCategoryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetAccountCategoryList();
+        setAccountCategoryDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
-  };
+      .catch(error => console.error('Delete Account Category error', error))
+  }
+
+  const DeleteAccountCategoryIdConfirmNo = () => {
+    setAccountCategoryDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleEditAccountCategory = (accountCategoryId) => {
     httpGet(`AccountCategory/getById?Id=${accountCategoryId}`)
@@ -142,7 +155,7 @@ const AccountCategoryScreen = ({ navigation }) => {
           <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.accountCategoryId, item.accCategoryName)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteAccountCategory(item.accountCategoryId)}>
+          <TouchableOpacity onPress={() => {DeleteAccountCategoryIdConfirm(item.accountCategoryId); setShowDelete(true);}}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -167,6 +180,54 @@ const AccountCategoryScreen = ({ navigation }) => {
             textAlign: 'center',
           }}>Add Account Category</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteAccountCategoryIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteAccountCategoryIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={{

@@ -18,7 +18,8 @@ const BatchScreen = ({ route }) => {
     const [selectEndDate, setSelectEndDate] = useState(new Date())
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-    console.log(batch, "Batch")
+    const [batchDeleteId, setBatchDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     const handleStartDateChange = (event, date) => {
         if (date !== undefined) {
@@ -52,7 +53,7 @@ const BatchScreen = ({ route }) => {
     };
 
     useEffect(() => {
-        fetchBatchByCourseId(courseId);
+        fetchBatchByCourseId();
     }, []);
 
     const fetchBatchByCourseId = async () => {
@@ -104,13 +105,24 @@ const BatchScreen = ({ route }) => {
         setModalVisible(true);
     };
 
-    const handleDeleteBatch = (id) => {
-        httpDelete(`Batch/delete?Id=${id}`)
+    const DeleteBatchIdConfirm = (batchid) => {
+        setBatchDeleteId(batchid);
+    }
+
+    const DeleteBatchIdConfirmYes = () => {
+        httpDelete(`Batch/delete?Id=${batchDeleteId}`)
             .then((result) => {
                 console.log(result);
-                fetchBatchByCourseId(result.data.courseId)
+                fetchBatchByCourseId();
+                setBatchDeleteId(0);
+                setShowDelete(false);
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch(error => console.error('Delete Batch error', error))
+    }
+
+    const DeleteBatchIdConfirmNo = () => {
+        setBatchDeleteId(0);
+        setShowDelete(false);
     }
 
     const handleSaveBatch = async () => {
@@ -119,7 +131,7 @@ const BatchScreen = ({ route }) => {
                 await httpPut("Batch/put", batch)
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchBatchByCourseId(response.data.courseId);
+                            fetchBatchByCourseId();
                             Alert.alert('Success', 'Batch Update successfully');
                             setBatch({
                                 "BatchId": 0,
@@ -140,7 +152,7 @@ const BatchScreen = ({ route }) => {
                 await httpPost("Batch/post", batch)
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchBatchByCourseId(response.data.courseId);
+                            fetchBatchByCourseId();
                             Alert.alert('Success', 'Batch is Added Successfully')
                             setBatch({
                                 "BatchId": 0,
@@ -212,7 +224,7 @@ const BatchScreen = ({ route }) => {
                 <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.batchId)}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteBatch(item.batchId)}>
+                <TouchableOpacity onPress={() => {DeleteBatchIdConfirm(item.batchId); setShowDelete(true);}}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -241,6 +253,55 @@ const BatchScreen = ({ route }) => {
                         textAlign: 'center',
                     }}>Add Batch</Text>
                 </TouchableOpacity>
+
+                {showDelete && (
+                    <Modal transparent visible={showDelete}>
+                        <View style={{
+                            flex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <View style={{
+                                backgroundColor: Colors.background,
+                                borderRadius: 10,
+                                padding: 28,
+                                shadowColor: Colors.shadow,
+                                width: '80%',
+                            }}>
+                                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                    <TouchableOpacity style={{
+                                        backgroundColor: Colors.primary,
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                        marginRight: 3,
+                                    }} onPress={() => {
+                                        DeleteBatchIdConfirmYes();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: '#f25252',
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                    }} onPress={() => {
+                                        DeleteBatchIdConfirmNo();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                )}
+
                 <FlatList
                     data={batchList}
                     keyExtractor={(item) => item.batchId.toString()}

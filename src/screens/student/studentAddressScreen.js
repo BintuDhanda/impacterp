@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,6 +8,8 @@ import { Get as httpGet, Delete as httpDelete } from '../../constants/httpServic
 const AddressScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
   const [addressList, setAddressList] = useState([]);
+  const [studentAddressDeleteId, setStudentAddressDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -26,13 +28,24 @@ const AddressScreen = ({ route, navigation }) => {
       });
   }
 
-  const handleDeleteStudentAddress = (id) => {
-    httpDelete(`StudentAddress/delete?Id=${id}`)
+  const DeleteStudentAddressIdConfirm = (studentAddressid) => {
+    setStudentAddressDeleteId(studentAddressid);
+  }
+
+  const DeleteStudentAddressIdConfirmYes = () => {
+    httpDelete(`StudentAddress/delete?Id=${studentAddressDeleteId}`)
       .then((result) => {
         console.log(result);
         GetStudentAddressByStudentId();
+        setStudentAddressDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
+      .catch(error => console.error('Delete Student Address error', error))
+  }
+
+  const DeleteStudentAddressIdConfirmNo = () => {
+    setStudentAddressDeleteId(0);
+    setShowDelete(false);
   }
 
   const handleAddAddressNavigate = () => {
@@ -50,13 +63,12 @@ const AddressScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
       shadowRadius: 10,
       elevation: 10,
-      borderWidth: 0.5,
+      borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
       <View style={{ flexDirection: 'row' }}>
@@ -87,7 +99,7 @@ const AddressScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressNavigate(item.studentAddressId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDeleteStudentAddress(item.studentAddressId)}>
+        <TouchableOpacity onPress={() => {DeleteStudentAddressIdConfirm(item.studentAddressId); setShowDelete(true);}}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -114,6 +126,55 @@ const AddressScreen = ({ route, navigation }) => {
             textAlign: 'center'
           }}>Add Address</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteStudentAddressIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteStudentAddressIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={addressList}
           keyExtractor={(item) => item.studentAddressId.toString()}

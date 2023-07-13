@@ -16,9 +16,11 @@ const UserRoleScreen = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-  console.log(userRole, "userRole")
+  const [userRoleDeleteId, setUserRoleDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
+
   useEffect(() => {
-    fetchUserRolesByUserId(userId);
+    fetchUserRolesByUserId();
     GetRoleList();
   }, []);
 
@@ -46,20 +48,31 @@ const UserRoleScreen = ({ route }) => {
     setModalVisible(true);
   };
 
-  const handleDeleteUserRole = (id) => {
-    httpDelete(`UserRole/delete?Id=${id}`)
+  const DeleteUserRoleIdConfirm = (userRoleid) => {
+    setUserRoleDeleteId(userRoleid);
+  }
+
+  const DeleteUserRoleIdConfirmYes = () => {
+    httpDelete(`UserRole/delete?Id=${userRoleDeleteId}`)
       .then((result) => {
         console.log(result);
-        fetchUserRolesByUserId(result.data.userId)
+        fetchUserRolesByUserId();
+        setUserRoleDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
+      .catch(error => console.error('Delete User Role error', error))
+  }
+
+  const DeleteUserRoleIdConfirmNo = () => {
+    setUserRoleDeleteId(0);
+    setShowDelete(false);
   }
 
   const handleSaveUserRole = async () => {
     await httpPost("UserRole/post", userRole)
       .then((response) => {
         if (response.status === 200) {
-          fetchUserRolesByUserId(response.data.userId);
+          fetchUserRolesByUserId();
           Alert.alert('Sucess', 'User Role is Added Successfully')
           setUserRole({
             "UserRoleId": 0,
@@ -104,7 +117,7 @@ const UserRoleScreen = ({ route }) => {
 
       <View style={{ flexDirection: 'row' }}>
 
-        <TouchableOpacity onPress={() => handleDeleteUserRole(item.userRoleId)}>
+        <TouchableOpacity onPress={() => { DeleteUserRoleIdConfirm(item.userRoleId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -131,6 +144,55 @@ const UserRoleScreen = ({ route }) => {
             textAlign: 'center',
           }}>Add User Role</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteUserRoleIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteUserRoleIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={userRoleList}
           keyExtractor={(item) => item.userRoleId.toString()}

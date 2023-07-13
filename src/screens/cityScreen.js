@@ -12,9 +12,11 @@ const CityScreen = ({ route }) => {
     const [city, setCity] = useState({ "CityId": 0, "CityName": "", "IsActive": true, "StateId": stateId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [cityList, setCityList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
+    const [cityDeleteId, setCityDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     useEffect(() => {
-        fetchCityByStateId(stateId);
+        fetchCityByStateId();
     }, []);
 
     const fetchCityByStateId = async () => {
@@ -60,13 +62,24 @@ const CityScreen = ({ route }) => {
         setModalVisible(true);
     };
 
-    const handleDeleteCity = (id) => {
-        httpDelete(`City/delete?Id=${id}`)
+    const DeleteCityIdConfirm = (cityid) => {
+        setCityDeleteId(cityid);
+    }
+
+    const DeleteCityIdConfirmYes = () => {
+        httpDelete(`City/delete?Id=${cityDeleteId}`)
             .then((result) => {
                 console.log(result);
-                fetchCityByStateId(result.data.stateId)
+                fetchCityByStateId();
+                setCityDeleteId(0);
+                setShowDelete(false);
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch(error => console.error('Delete City error', error))
+    }
+
+    const DeleteCityIdConfirmNo = () => {
+        setCityDeleteId(0);
+        setShowDelete(false);
     }
 
     const handleSaveCity = async () => {
@@ -75,7 +88,7 @@ const CityScreen = ({ route }) => {
                 await httpPut("City/put", city)
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchCityByStateId(response.data.stateId);
+                            fetchCityByStateId();
                             Alert.alert('Success', 'City Update successfully');
                             setCity({
                                 "CityId": 0,
@@ -93,7 +106,7 @@ const CityScreen = ({ route }) => {
                 await httpPost("City/post", city)
                     .then((response) => {
                         if (response.status === 200) {
-                            fetchCityByStateId(response.data.stateId);
+                            fetchCityByStateId();
                             Alert.alert('Success', 'City is Added Successfully')
                             setCity({
                                 "CityId": 0,
@@ -143,7 +156,7 @@ const CityScreen = ({ route }) => {
                 <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCity(item.cityId)}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteCity(item.cityId)}>
+                <TouchableOpacity onPress={() => { DeleteCityIdConfirm(item.cityId); setShowDelete(true); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -172,6 +185,55 @@ const CityScreen = ({ route }) => {
                         textAlign: 'center',
                     }}>Add City</Text>
                 </TouchableOpacity>
+
+                {showDelete && (
+                    <Modal transparent visible={showDelete}>
+                        <View style={{
+                            flex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <View style={{
+                                backgroundColor: Colors.background,
+                                borderRadius: 10,
+                                padding: 28,
+                                shadowColor: Colors.shadow,
+                                width: '80%',
+                            }}>
+                                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                    <TouchableOpacity style={{
+                                        backgroundColor: Colors.primary,
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                        marginRight: 3,
+                                    }} onPress={() => {
+                                        DeleteCityIdConfirmYes();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{
+                                        backgroundColor: '#f25252',
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                    }} onPress={() => {
+                                        DeleteCityIdConfirmNo();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                )}
+
                 <FlatList
                     data={cityList}
                     keyExtractor={(item) => item.cityId.toString()}

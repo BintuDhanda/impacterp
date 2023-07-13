@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,6 +8,8 @@ import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpSer
 const StudentQualificationScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
   const [qualificationList, setQualificationList] = useState([]);
+  const [studentQualificationDeleteId, setStudentQualificationDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -24,6 +26,26 @@ const StudentQualificationScreen = ({ route, navigation }) => {
       .catch((error) => {
         console.error(error, "Get Student Qualification By Student Id Error");
       });
+  }
+
+  const DeleteStudentQualificationIdConfirm = (studentQualificationid) => {
+    setStudentQualificationDeleteId(studentQualificationid);
+  }
+
+  const DeleteStudentQualificationIdConfirmYes = () => {
+    httpDelete(`StudentQualification/delete?Id=${studentQualificationDeleteId}`)
+      .then((result) => {
+        console.log(result);
+        GetStudentQualificationByStudentId();
+        setStudentQualificationDeleteId(0);
+        setShowDelete(false);
+      })
+      .catch(error => console.error('Delete Student Qualification error', error))
+  }
+
+  const DeleteStudentQualificationIdConfirmNo = () => {
+    setStudentQualificationDeleteId(0);
+    setShowDelete(false);
   }
 
   const handleDeleteStudentQualification = (id) => {
@@ -43,7 +65,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
     navigation.navigate('StudentQualificationFormScreen', { studentId: studentId, qualificationId: qualificationId })
   }
 
-  const renderTokenCard = ({ item }) => (
+  const renderQualificationCard = ({ item }) => (
     <View style={{
       justifyContent: 'space-between',
       backgroundColor: Colors.background,
@@ -87,7 +109,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.studentQualificationId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity  onPress={() => handleDeleteStudentQualification(item.studentQualificationId)}>
+        <TouchableOpacity  onPress={() => {DeleteStudentQualificationIdConfirm(item.studentQualificationId); setShowDelete(true);}}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -114,10 +136,59 @@ const StudentQualificationScreen = ({ route, navigation }) => {
             textAlign: 'center'
           }}>Add Qualification</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteStudentQualificationIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteStudentQualificationIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={qualificationList}
           keyExtractor={(item) => item.studentQualificationId.toString()}
-          renderItem={renderTokenCard}
+          renderItem={renderQualificationCard}
         />
       </View>
     </ScrollView>

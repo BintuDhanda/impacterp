@@ -12,9 +12,11 @@ const StateScreen = ({ route, navigation }) => {
   const [state, setState] = useState({ "StateId": 0, "StateName": "", "IsActive": true, "CountryId": countryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [stateList, setStateList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [stateDeleteId, setStateDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
-    fetchStatesByCountryId(countryId);
+    fetchStatesByCountryId();
   }, []);
 
   const handleNavigate = (stateId, stateName) => {
@@ -64,13 +66,24 @@ const StateScreen = ({ route, navigation }) => {
     setModalVisible(true);
   };
 
-  const handleDeleteState = (id) => {
-    httpDelete(`State/delete?Id=${id}`)
+  const DeleteStateIdConfirm = (stateid) => {
+    setStateDeleteId(stateid);
+  }
+
+  const DeleteStateIdConfirmYes = () => {
+    httpDelete(`State/delete?Id=${stateDeleteId}`)
       .then((result) => {
         console.log(result);
-        fetchStatesByCountryId(result.data.countryId)
+        fetchStatesByCountryId();
+        setStateDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => console.error("Delete Error", err));
+      .catch(error => console.error('Delete State error', error))
+  }
+
+  const DeleteStateIdConfirmNo = () => {
+    setStateDeleteId(0);
+    setShowDelete(false);
   }
 
   const handleSaveState = async () => {
@@ -79,7 +92,7 @@ const StateScreen = ({ route, navigation }) => {
         await httpPut("State/put", state)
           .then((response) => {
             if (response.status === 200) {
-              fetchStatesByCountryId(response.data.countryId);
+              fetchStatesByCountryId();
               Alert.alert('Sucess', 'State Update successfully');
               setState({
                 "StateId": 0,
@@ -97,7 +110,7 @@ const StateScreen = ({ route, navigation }) => {
         await httpPost("State/post", state)
           .then((response) => {
             if (response.status === 200) {
-              fetchStatesByCountryId(response.data.countryId);
+              fetchStatesByCountryId();
               Alert.alert('Sucess', 'State is Added Successfully')
               setState({
                 "StateId": 0,
@@ -146,15 +159,15 @@ const StateScreen = ({ route, navigation }) => {
 
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditState(item.stateId)}>
-            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.stateId, item.stateName)} >
-            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleDeleteState(item.stateId)}>
-            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+        <TouchableOpacity onPress={() => {DeleteStateIdConfirm(item.stateId); setShowDelete(true);}}>
+          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
     </View>
@@ -179,6 +192,55 @@ const StateScreen = ({ route, navigation }) => {
             textAlign: 'center',
           }}>Add State</Text>
         </TouchableOpacity>
+
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 28,
+                shadowColor: Colors.shadow,
+                width: '80%',
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                  <TouchableOpacity style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }} onPress={() => {
+                    DeleteStateIdConfirmYes();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    backgroundColor: '#f25252',
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                  }} onPress={() => {
+                    DeleteStateIdConfirmNo();
+                  }}>
+                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
         <FlatList
           data={stateList}
           keyExtractor={(item) => item.stateId.toString()}

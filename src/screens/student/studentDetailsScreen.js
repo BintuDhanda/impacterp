@@ -120,7 +120,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                     totalStudent: studentDetails.totalStudent
                 }));
                 setLoading(false);
-                if (studentDetailsArray.length >= 0){
+                if (studentDetailsArray.length >= 0) {
                     setIsEndReached(false);
                     setStudentDetailsList([...studentDetailsList, ...studentDetailsArray]);
                     setSkip(skip + 10)
@@ -128,26 +128,17 @@ const StudentDetailsScreen = ({ navigation }) => {
                 if (studentDetailsArray.length === 0) {
                     setIsEndReached(true);
                     Toast.show({
-                      type: 'info',
-                      text1: 'No records found',
-                      position: 'bottom',
-                      visibilityTime: 2000,
-                      autoHide: true,
+                        type: 'info',
+                        text1: 'No records found',
+                        position: 'bottom',
+                        visibilityTime: 2000,
+                        autoHide: true,
                     });
-                  }
+                }
             })
             .catch((error) => {
                 console.error(error);
             });
-    }
-
-    const handleDeleteStudentDetails = (id) => {
-        httpDelete(`StudentDetails/delete?Id=${id}`)
-            .then((result) => {
-                console.log(result);
-                GetStudentList();
-            })
-            .catch(err => console.error("Delete Error", err));
     }
 
     const getFormattedDate = (datestring) => {

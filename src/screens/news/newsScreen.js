@@ -234,7 +234,7 @@ const NewsScreen = ({ navigation }) => {
                         }}>Total News : {newsList.length === 0 ? null : newsList[0].totalNews}</Text>
                     </View>
                     <TouchableOpacity onPress={() => { setShowSearch(true); setNewsList([]); }}>
-                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
                             <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>
