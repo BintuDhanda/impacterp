@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AccountDayBookScreen = ({ route }) => {
     const { accountId, accountName } = route.params;
@@ -150,13 +149,12 @@ const AccountDayBookScreen = ({ route }) => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -193,7 +191,7 @@ const AccountDayBookScreen = ({ route }) => {
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
                     <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Account Name : {accountName}</Text>
                     <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
-                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
                             <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>

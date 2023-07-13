@@ -27,6 +27,8 @@ const StudentDetailsScreen = ({ navigation }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
+    const [studentDeleteId, setStudentDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
@@ -64,8 +66,27 @@ const StudentDetailsScreen = ({ navigation }) => {
         setSkip(0);
         GetStudentList();
         setShowSearch(false);
-        console.log(selectFromDate, selectToDate, skip)
     };
+
+    const DeleteStudentIdConfirm = (studentid) => {
+        setStudentDeleteId(studentid);
+    }
+
+    const DeleteStudentIdConfirmYes = () => {
+        httpDelete(`StudentDetails/delete?Id=${studentDeleteId}`)
+            .then((result) => {
+                console.log(result);
+                GetStudentList();
+                setStudentDeleteId(0);
+                setShowDelete(false);
+            })
+            .catch(error => console.error('Delete Student error', error))
+    }
+
+    const DeleteStudentIdConfirmNo = () => {
+        setStudentDeleteId(0);
+        setShowDelete(false);
+    }
 
     const handleNavigate = (studentId) => {
         navigation.navigate('StudentFormScreen', { studentId: studentId })
@@ -98,8 +119,22 @@ const StudentDetailsScreen = ({ navigation }) => {
                     mobile: studentDetails.mobile,
                     totalStudent: studentDetails.totalStudent
                 }));
-                setStudentDetailsList(studentDetailsArray);
                 setLoading(false);
+                if (studentDetailsArray.length >= 0){
+                    setIsEndReached(false);
+                    setStudentDetailsList([...studentDetailsList, ...studentDetailsArray]);
+                    setSkip(skip + 10)
+                }
+                if (studentDetailsArray.length === 0) {
+                    setIsEndReached(true);
+                    Toast.show({
+                      type: 'info',
+                      text1: 'No records found',
+                      position: 'bottom',
+                      visibilityTime: 2000,
+                      autoHide: true,
+                    });
+                  }
             })
             .catch((error) => {
                 console.error(error);
@@ -146,7 +181,6 @@ const StudentDetailsScreen = ({ navigation }) => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
@@ -241,7 +275,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                 <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { handleNavigate(item.value); setStudentDetailsList([]); }} >
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => { handleDeleteStudentDetails(item.value); setStudentDetailsList([]); }}>
+                <TouchableOpacity onPress={() => { DeleteStudentIdConfirm(item.value); setShowDelete(true); setStudentDetailsList([]); setSkip(0); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -373,6 +407,54 @@ const StudentDetailsScreen = ({ navigation }) => {
                                             setShowSearch(false);
                                         }}>
                                             <Text style={{ fontSize: 16, color: Colors.background }}>Close</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+
+                    {showDelete && (
+                        <Modal transparent visible={showDelete}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 28,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                }}>
+                                    <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            DeleteStudentIdConfirmYes();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            DeleteStudentIdConfirmNo();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>

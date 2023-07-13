@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AccountCategoryScreen = ({ navigation }) => {
-  const [accountCategory, setAccountCategory] = useState({ "AccountCategoryId": 0, "AccCategoryName": "", "IsActive": true, "CreatedAt": null });
+  const { user, setUser } = useContext(UserContext);
+  const [accountCategory, setAccountCategory] = useState({ "AccountCategoryId": 0, "AccCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [accountCategoryList, setAccountCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -26,6 +29,8 @@ const AccountCategoryScreen = ({ navigation }) => {
       AccCategoryName: "",
       IsActive: true,
       CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
@@ -42,7 +47,9 @@ const AccountCategoryScreen = ({ navigation }) => {
                 "AccountCategoryId": 0,
                 "AccCategoryName": "",
                 "IsActive": true,
-                "CreatedAt": null
+                "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -59,6 +66,8 @@ const AccountCategoryScreen = ({ navigation }) => {
                 "AccCategoryName": "",
                 "IsActive": true,
                 "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               })
             }
           })
@@ -87,7 +96,9 @@ const AccountCategoryScreen = ({ navigation }) => {
           AccountCategoryId: response.data.accountCategoryId,
           AccCategoryName: response.data.accCategoryName,
           IsActive: response.data.isActive,
-          CreatedAt: response.data.createdAt
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
         })
       })
       .catch(error => console.log('AccountCategory Get By AccountCategoryId :', error))

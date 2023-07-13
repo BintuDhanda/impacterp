@@ -9,7 +9,7 @@ import { useContext } from 'react';
 const NewsCommentScreen = ({ route }) => {
     const { newsId } = route.params;
     const { user, setUser } = useContext(UserContext);
-    const [newsComment, setNewsComment] = useState({ "Id": 0, "Comment": "", "NewsId": newsId, "IsActive": true, "CreatedBy": user.userId });
+    const [newsComment, setNewsComment] = useState({ "NewsCommentId": 0, "Comment": "", "NewsId": newsId, "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [newsCommentList, setNewsCommentList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -31,6 +31,9 @@ const NewsCommentScreen = ({ route }) => {
             NewsId: newsId,
             CreatedBy: user.userId,
             IsActive: true,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setModalVisible(true);
     };
@@ -48,7 +51,10 @@ const NewsCommentScreen = ({ route }) => {
                                 "Comment": "",
                                 "NewsId": newsId,
                                 "CreatedBy": user.userId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                         }
                     })
@@ -65,7 +71,10 @@ const NewsCommentScreen = ({ route }) => {
                                 "Comment": "",
                                 "NewsId": newsId,
                                 "CreatedBy": user.userId,
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                         }
                     })
@@ -95,7 +104,10 @@ const NewsCommentScreen = ({ route }) => {
                     Comment: response.data.comment,
                     NewsId: response.data.newsId,
                     CreatedBy: response.data.createdBy,
-                    IsActive: response.data.isActive
+                    IsActive: response.data.isActive,
+                    CreatedAt: response.data.createdAt,
+                    CreatedBy: response.data.createdBy,
+                    LastUpdatedBy: user.userId,
                 })
             })
             .catch(error => console.log('News Comment Get By Id :', error))

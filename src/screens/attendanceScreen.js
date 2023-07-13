@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost,Delete as httpDelete } from '../constants/httpService';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
+import { Post as httpPost } from '../constants/httpService';
 
 const AttendanceScreen = ({navigation}) => {
-    const [attendance, setAttendance] = useState({ "Id": 0, "AttendanceType": "", "RegistrationNumber": "", "IsActive": true });
+    const { user, setUser } = useContext(UserContext);
+    const [attendance, setAttendance] = useState({ "AttendanceId": 0, "AttendanceType": "", "RegistrationNumber": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [attendanceList, setAttendanceList] = useState([]);
     const moveToRight = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
@@ -30,35 +33,7 @@ const AttendanceScreen = ({navigation}) => {
             navigation.navigate("AttendanceHistoryScreen", {registrationNumber: attendance.RegistrationNumber})
         }
     };
-
-    const GetAttendanceList = () => {
-        setLoading(true);
-        const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
-        httpPost("Attendance/getAttendanceByRegistrationNumber", filter)
-            .then((response) => {
-                console.log(attendanceList, "AttendanceList")
-                setLoading(false);
-                if (response.data.length >= 0) {
-                    setIsEndReached(false);
-                    setAttendanceList(response.data);
-                }
-                if (response.data.length === 0) {
-                    setIsEndReached(true);
-                    Toast.show({
-                        type: 'info',
-                        text1: 'No records found',
-                        position: 'bottom',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                    });
-                }
-            })
-            .catch((error) => {
-                setLoading(false);
-                console.error(error);
-            });
-    }
-
+    
     const handleAddCheckedInAttendance = () => {
         const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
         httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
@@ -72,7 +47,7 @@ const AttendanceScreen = ({navigation}) => {
                 });
             }
             else {
-                httpPost("Attendance/post", { "Id": 0, "AttendanceType": "CheckedIn", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true })
+                httpPost("Attendance/post", { "AttendanceId": 0, "AttendanceType": "CheckedIn", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, })
                     .then((response) => {
                         if (response.status === 200) {
                             setAttendanceList([]);
@@ -122,7 +97,7 @@ const AttendanceScreen = ({navigation}) => {
                 });
             }
             else {
-                httpPost("Attendance/post", { "Id": 0, "AttendanceType": "CheckedOut", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true })
+                httpPost("Attendance/post", { "AttendanceId": 0, "AttendanceType": "CheckedOut", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, })
                     .then((response) => {
                         if (response.status === 200) {
                             setAttendanceList([]);
@@ -204,7 +179,7 @@ const AttendanceScreen = ({navigation}) => {
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -238,7 +213,7 @@ const AttendanceScreen = ({navigation}) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                    <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                    <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
                         <Icon style={{ textAlignVertical: 'center' }} name="search" size={20} />
                         <TextInput style={{ flex: 1, marginLeft: 10 }}
                             placeholder="Enter Registration Number"

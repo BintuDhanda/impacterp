@@ -84,10 +84,10 @@ const AddressScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.pincode}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressNavigate(item.id)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressNavigate(item.studentAddressId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDeleteStudentAddress(item.id)}>
+        <TouchableOpacity onPress={() => handleDeleteStudentAddress(item.studentAddressId)}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -116,7 +116,7 @@ const AddressScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <FlatList
           data={addressList}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.studentAddressId.toString()}
           renderItem={renderTokenCard}
         />
       </View>

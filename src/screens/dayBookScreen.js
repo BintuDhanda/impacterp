@@ -5,15 +5,18 @@ import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const DayBookScreen = () => {
+    const { user, setUser } = useContext(UserContext);
     const ToDate = new Date();
     ToDate.setDate(ToDate.getDate() + 1)
     const FromDate = new Date();
     FromDate.setDate(FromDate.getDate() - 7);
-    const [dayBookCredit, setDayBookCredit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null });
-    const [dayBookDebit, setDayBookDebit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null });
+    const [dayBookCredit, setDayBookCredit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
+    const [dayBookDebit, setDayBookDebit] = useState({ "DayBookId": 0, "Particulars": "", "Credit": 0, "Debit": 0, "IsActive": true, "AccountId": "", "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [dayBookList, setDayBookList] = useState([]);
     const [creditModalVisible, setCreditModalVisible] = useState(false);
     const [debitModalVisible, setDebitModalVisible] = useState(false);
@@ -91,11 +94,6 @@ const DayBookScreen = () => {
         }
     }, []);
 
-    // useEffect(() => {
-    //     setLoading(true);
-    //     GetDayBookList();
-    // }, [skip])
-
     const GetAccountList = () => {
         httpGet("Account/get")
             .then((response) => {
@@ -147,6 +145,8 @@ const DayBookScreen = () => {
             IsActive: true,
             CreatedAt: null,
             AccountId: "",
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setCreditModalVisible(true);
     };
@@ -159,6 +159,8 @@ const DayBookScreen = () => {
             IsActive: true,
             AccountId: "",
             CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setDebitModalVisible(true);
     };
@@ -190,6 +192,8 @@ const DayBookScreen = () => {
                                 "AccountId": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
@@ -217,6 +221,8 @@ const DayBookScreen = () => {
                                 "AccountId": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             });
                         }
                     })
@@ -264,13 +270,12 @@ const DayBookScreen = () => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
             shadowRadius: 10,
             elevation: 10,
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
             <View style={{ flexDirection: 'row' }}>
@@ -331,7 +336,7 @@ const DayBookScreen = () => {
                         }}>Total Debit : {sumCreditAndDebitDayBook.debit} Rs/-</Text>
                     </View>
                     <TouchableOpacity onPress={() => { setShowSearch(true); setDayBookList([]); }}>
-                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
+                        <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
                             <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
                             <Icon style={{ textAlignVertical: 'center' }} name="search" size={30} />
                         </View>

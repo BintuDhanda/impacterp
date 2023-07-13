@@ -4,7 +4,8 @@ import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
+import { Post as httpPost, Delete as httpDelete, } from '../constants/httpService';
+import { News_URL } from '../constants/constant';
 
 
 const NewsCardComponent = ({ item, navigation }) => {
@@ -63,7 +64,7 @@ const NewsCardComponent = ({ item, navigation }) => {
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{cardNews.newsTitle}</Text>
             </View>
-            {(cardNews.newsImage !== null && cardNews.newsImage !== "") && (<Image source={{ uri: `http://192.168.1.6:5291${cardNews.newsImage}` }} style={{ width: width * 0.8, height: (width * 0.8 / 1.5), resizeMode: 'cover', borderRadius: 10, alignSelf: 'center', }} />)}
+            {(cardNews.newsImage !== null && cardNews.newsImage !== "") && (<Image source={{ uri: News_URL+cardNews.newsImage }} style={{ width: width * 0.8, height: (width * 0.8 / 1.5), resizeMode: 'cover', borderRadius: 10, alignSelf: 'center', }} />)}
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}> {cardNews.newsText} </Text>
             </View>

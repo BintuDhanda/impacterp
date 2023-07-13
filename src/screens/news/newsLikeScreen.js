@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../../constants/httpService';
+import { Get as httpGet, Delete as httpDelete } from '../../constants/httpService';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const NewsLikeScreen = ({ route }) => {

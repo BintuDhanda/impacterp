@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { UserContext } from '../../App';
+import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
 
 const AccountScreen = ({ route, navigation }) => {
+  const { user, setUser } = useContext(UserContext);
   const { accountCategoryId, accCategoryName } = route.params;
-  const [account, setAccount] = useState({ "AccountId": 0, "AccountName": "", "IsActive": true, "AccCategoryId": accountCategoryId, "CreatedAt": null });
+  const [account, setAccount] = useState({ "AccountId": 0, "AccountName": "", "IsActive": true, "AccCategoryId": accountCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [accountList, setAccountList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -31,6 +34,8 @@ const AccountScreen = ({ route, navigation }) => {
       IsActive: true,
       AccCategoryId: accountCategoryId,
       CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
     });
     setModalVisible(true);
   };
@@ -46,6 +51,8 @@ const AccountScreen = ({ route, navigation }) => {
             AccCategoryId: result.data.accCategoryId,
             IsActive: result.data.isActive,
             CreatedAt: result.data.createdAt,
+            CreatedBy: result.data.createdBy,
+            LastUpdatedBy: user.userId,
           }
         );
       })
@@ -80,6 +87,8 @@ const AccountScreen = ({ route, navigation }) => {
                 "AccCategoryId": accountCategoryId,
                 "IsActive": true,
                 "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               });
             }
           })
@@ -96,6 +105,8 @@ const AccountScreen = ({ route, navigation }) => {
                 "AccCategoryId": accountCategoryId,
                 "IsActive": true,
                 "CreatedAt": null,
+                "CreatedBy": user.userId,
+                "LastUpdatedBy": null,
               });
             }
           })

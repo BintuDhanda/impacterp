@@ -31,7 +31,7 @@ const NewsScreen = ({ navigation }) => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
 
-    const [news, setNews] = useState({ "NewsId": 0, "NewsText": "", "NewsTitle": "", "IsActive": true });
+    const [news, setNews] = useState({ "NewsId": 0, "NewsText": "", "NewsTitle": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [newsList, setNewsList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -75,13 +75,6 @@ const NewsScreen = ({ navigation }) => {
         console.log(selectFromDate, selectToDate, skip)
     };
 
-    const handleNavigate = (newsId) => {
-        navigation.navigate('StudentFormScreen', { newsId: newsId })
-    }
-    const handleManageNavigate = (newsId, newsTitle) => {
-        navigation.navigate('NewsRoleScreen', { newsId: newsId, newsTitle: newsTitle })
-    }
-
     const GetNewsList = () => {
         setLoading(true);
         const filter = { "From": fromDate, "To": toDate, "Take": take, "Skip": skip, "NewsTitle": newsTitle, "CreatedBy": user.userId }
@@ -113,6 +106,9 @@ const NewsScreen = ({ navigation }) => {
             NewsTitle: "",
             NewsText: "",
             IsActive: true,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
         });
         setModalVisible(true);
     };
@@ -131,7 +127,10 @@ const NewsScreen = ({ navigation }) => {
                                 "NewsId": 0,
                                 "NewsTitle": "",
                                 "NewsText": "",
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                         }
                     })
@@ -149,7 +148,10 @@ const NewsScreen = ({ navigation }) => {
                                 "NewsId": 0,
                                 "NewsTitle": "",
                                 "NewsText": "",
-                                "IsActive": true
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": null,
                             })
                         }
                     })
@@ -180,7 +182,10 @@ const NewsScreen = ({ navigation }) => {
                     NewsId: response.data.newsId,
                     NewsTitle: response.data.newsTitle,
                     NewsText: response.data.newsText,
-                    IsActive: response.data.isActive
+                    IsActive: response.data.isActive,
+                    CreatedAt: response.data.createdAt,
+                    CreatedBy: response.data.createdBy,
+                    LastUpdatedBy: user.userId,
                 })
             })
             .catch(error => console.error('News Get By Id :', error))

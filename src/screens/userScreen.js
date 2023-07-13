@@ -30,6 +30,8 @@ const UserScreen = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
   const [showSearch, setShowSearch] = useState(true);
+  const [userDeleteId, setUserDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
   const [users, setUsers] = useState({ "UsersId": 0, "UserMobile": "", "UserPassword": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, "IsEmailConfirmed": null, "IsMobileConfirmed": null });
   const [userList, setUserList] = useState([]);
@@ -74,6 +76,26 @@ const UserScreen = ({ navigation }) => {
     setShowSearch(false);
     console.log(selectFromDate, selectToDate, skip)
   };
+
+  const DeleteUserIdConfirm = (userid) => {
+    setUserDeleteId(userid);
+  }
+
+  const DeleteUserIdConfirmYes = () => {
+    httpDelete(`User/delete?Id=${userDeleteId}`)
+      .then((result) => {
+        console.log(result);
+        GetUserList();
+        setUserDeleteId(0);
+        setShowDelete(false);
+      })
+      .catch(error => console.error('Delete User error', error))
+  }
+
+  const DeleteUserIdConfirmNo = () => {
+    setUserDeleteId(0);
+    setShowDelete(false);
+  }
 
   const handleNavigate = (userId) => {
     navigation.navigate('StudentFormScreen', { userId: userId })
@@ -269,7 +291,7 @@ const UserScreen = ({ navigation }) => {
           {item.isStudentCreated !== true ? (<TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.usersId)} >
             <Icon name="user" size={20} color={'#8c53a4'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>) : null}
-          <TouchableOpacity onPress={() => handleDeleteUser(item.usersId)}>
+          <TouchableOpacity onPress={() => {DeleteUserIdConfirm(item.usersId); setUserList([]); setSkip(0); setShowDelete(true);}}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -288,7 +310,7 @@ const UserScreen = ({ navigation }) => {
               color: Colors.secondary,
             }}>Total User : {userList.length === 0 ? null : userList[0].totalUser}</Text>
           </View>
-          <TouchableOpacity onPress={() => { setShowSearch(true); setUserList([]); }}>
+          <TouchableOpacity onPress={() => { setShowSearch(true); setUserList([]); setSkip(0); }}>
             <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, marginBottom: 10, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
               <TextInput style={{ flex: 1, fontWeight: 'bold' }} editable={false} placeholder="Search..." />
               <Icon style={{ textAlignVertical: 'center' }} name="search" size={25} />
@@ -300,7 +322,7 @@ const UserScreen = ({ navigation }) => {
             paddingVertical: 10,
             paddingHorizontal: 20,
             marginBottom: 20,
-          }} onPress={handleAddUser}>
+          }} onPress={() => {handleAddUser(); setUserList([]); setSkip(0);}}>
             <Text style={{
               color: Colors.background,
               fontSize: 16,
@@ -436,6 +458,54 @@ const UserScreen = ({ navigation }) => {
             </Modal>
           )}
 
+          {showDelete && (
+            <Modal transparent visible={showDelete}>
+              <View style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <View style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                  <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                    <TouchableOpacity style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }} onPress={() => {
+                      DeleteUserIdConfirmYes();
+                    }}>
+                      <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }} onPress={() => {
+                      DeleteUserIdConfirmNo();
+                    }}>
+                      <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          )}
+
           <FlatList
             data={userList}
             keyExtractor={(item) => item.usersId.toString()}
@@ -495,7 +565,7 @@ const UserScreen = ({ navigation }) => {
                     borderRadius: 5,
                     paddingVertical: 8,
                     paddingHorizontal: 12,
-                  }} onPress={() => { handleSaveUser(); setUserList([]); }}>
+                  }} onPress={() => { handleSaveUser(); }}>
                     <Text style={{
                       color: Colors.background,
                       fontSize: 16,
