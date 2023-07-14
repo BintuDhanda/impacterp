@@ -63,10 +63,10 @@ const LogInScreen = ({ navigation }) => {
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: Colors.background }}>
                 <View style={{ paddingHorizontal: 25 }}>
                     <View style={{ alignItems: 'center' }}>
-                        <Image source={require('../assets/impact.png')} />
+                        <Image source={require('../assets/impact.png')} style={{borderRadius: 200}}/>
                     </View>
                     <View style={{ alignItems: 'center' }}>
                         <Text style={{
@@ -93,7 +93,7 @@ const LogInScreen = ({ navigation }) => {
                             onChangeText={(text) => setPhone(text)}
                         />
                     </View>
-                    <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
+                    <TouchableOpacity style={{flex: 1, backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
                         <Text style={{ textAlign: 'center',  fontSize: 16, color: '#fff', }}>Login</Text>
                     </TouchableOpacity>
                     <Toast ref={(ref) => Toast.setRef(ref)} />
