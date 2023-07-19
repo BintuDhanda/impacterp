@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet, Delete as httpDelete } from '../../constants/httpService';
+import { Get as httpGet } from '../../constants/httpService';
 
 const AddressScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
@@ -25,6 +26,13 @@ const AddressScreen = ({ route, navigation }) => {
       })
       .catch((error) => {
         console.error(error, "Get Student Address By Student Id Error");
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       });
   }
 
@@ -33,14 +41,23 @@ const AddressScreen = ({ route, navigation }) => {
   }
 
   const DeleteStudentAddressIdConfirmYes = () => {
-    httpDelete(`StudentAddress/delete?Id=${studentAddressDeleteId}`)
+    httpGet(`StudentAddress/delete?Id=${studentAddressDeleteId}`)
       .then((result) => {
         console.log(result);
         GetStudentAddressByStudentId();
         setStudentAddressDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Student Address error', error))
+      .catch((error) => {
+        console.error('Delete Student Address error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteStudentAddressIdConfirmNo = () => {
@@ -99,7 +116,7 @@ const AddressScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressNavigate(item.studentAddressId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {DeleteStudentAddressIdConfirm(item.studentAddressId); setShowDelete(true);}}>
+        <TouchableOpacity onPress={() => { DeleteStudentAddressIdConfirm(item.studentAddressId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -180,6 +197,7 @@ const AddressScreen = ({ route, navigation }) => {
           keyExtractor={(item) => item.studentAddressId.toString()}
           renderItem={renderTokenCard}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

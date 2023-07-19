@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../constants/httpService';
 
 const AccountDayBookScreen = ({ route }) => {
     const { accountId, accountName } = route.params;
@@ -36,6 +36,16 @@ const AccountDayBookScreen = ({ route }) => {
         httpPost("DayBook/sumCreditAndDebit", filter)
             .then((response) => {
                 setSumCreditAndDebit(response.data);
+            })
+            .catch((err) => {
+                console.log('Sum Credit And Debit Error : ', err)
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             })
     }
 
@@ -106,6 +116,13 @@ const AccountDayBookScreen = ({ route }) => {
             .catch((error) => {
                 setLoading(false);
                 console.error('Get DayBook List Error : ', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -114,7 +131,7 @@ const AccountDayBookScreen = ({ route }) => {
     }
 
     const DeleteAccountDayBookIdConfirmYes = () => {
-        httpDelete(`DayBook/delete?Id=${accountDayBookDeleteId}`)
+        httpGet(`DayBook/delete?Id=${accountDayBookDeleteId}`)
             .then((result) => {
                 console.log(result);
                 setDayBookList([]);
@@ -122,7 +139,16 @@ const AccountDayBookScreen = ({ route }) => {
                 setAccountDayBookDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete DayBook error', error))
+            .catch((error) => {
+                console.error('Delete DayBook error', error)
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteAccountDayBookIdConfirmNo = () => {
@@ -191,7 +217,7 @@ const AccountDayBookScreen = ({ route }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.account}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => {DeleteAccountDayBookIdConfirm(item.dayBookId); setShowDelete(true);}}>
+                <TouchableOpacity onPress={() => { DeleteAccountDayBookIdConfirm(item.dayBookId); setShowDelete(true); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>

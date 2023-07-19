@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import Toast from 'react-native-toast-message';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
 
 const StudentFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -28,7 +29,7 @@ const StudentFormScreen = ({ route, navigation }) => {
 
     console.log(formData, "Formdata")
     useEffect(() => {
-        if (formData.Id !== 0) {
+        if (formData.StudentId !== 0) {
             handleEditStudentDetails();
         }
     }, [])
@@ -64,8 +65,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                         FatherName: result.data.fatherName,
                         MotherName: result.data.motherName,
                         Gender: result.data.gender,
-                        StudentHeight: result.data.studentHeight,
-                        StudentWeight: result.data.studentWeight,
+                        StudentHeight: result.data.studentHeight.toString(),
+                        StudentWeight: result.data.studentWeight.toString(),
                         BodyRemark: result.data.bodyRemark,
                         UserId: result.data.userId,
                         IsActive: result.data.isActive,
@@ -75,14 +76,23 @@ const StudentFormScreen = ({ route, navigation }) => {
                     }
                 );
             })
-            .catch(err => console.error("Get By Id Error", err));
+            .catch((err) => {
+                console.error("Get By Id Error", err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            });
     };
 
     const handleSaveStudentDetails = async () => {
         try {
-            if (formData.Id !== 0) {
+            if (formData.StudentId !== 0) {
                 console.log(JSON.stringify(formData), "Form data request")
-                await httpPut("StudentDetails/put", formData)
+                await httpPost("StudentDetails/put", formData)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Student Successfully')
@@ -105,7 +115,16 @@ const StudentFormScreen = ({ route, navigation }) => {
                             navigation.goBack();
                         }
                     })
-                    .catch(err => console.error("Student Details update error : ", err));
+                    .catch((err) => {
+                        console.error("Student Details update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 await httpPost("StudentDetails/post", formData)
@@ -131,11 +150,27 @@ const StudentFormScreen = ({ route, navigation }) => {
                             navigation.navigate('StudentDetailsScreen')
                         }
                     })
-                    .catch(err => console.error('Student Details Add error :', err));
+                    .catch((err) => {
+                        console.error('Student Details Add error :', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
         }
         catch (error) {
             console.error('Error saving Student Detail:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
@@ -260,11 +295,17 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 >
                                     <Text style={{ fontSize: 16, }}>Female</Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{ paddingVertical: 8, }}
+                                    onPress={() => selectGender('Other')}
+                                >
+                                    <Text style={{ fontSize: 16, }}>Other</Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                     </TouchableOpacity>
 
-                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Height:</Text>
+                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Height (inch):</Text>
                     <TextInput
                         style={{
                             borderWidth: 1,
@@ -275,13 +316,13 @@ const StudentFormScreen = ({ route, navigation }) => {
                             marginBottom: 10,
                             fontSize: 16,
                         }}
-                        value={formData.StudentHeight.toString()}
-                        onChangeText={(value) => setFormData({ ...formData, StudentHeight: isNaN(parseInt(value)) ? "" : parseInt(value) })}
+                        value={formData.StudentHeight}
+                        onChangeText={(value) => setFormData({ ...formData, StudentHeight: value })}
                         placeholder="Enter height"
                         keyboardType="numeric"
                     />
 
-                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Weight:</Text>
+                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Weight (Kg):</Text>
                     <TextInput
                         style={{
                             borderWidth: 1,
@@ -292,8 +333,8 @@ const StudentFormScreen = ({ route, navigation }) => {
                             marginBottom: 10,
                             fontSize: 16,
                         }}
-                        value={formData.StudentWeight.toString()}
-                        onChangeText={(value) => setFormData({ ...formData, StudentWeight: isNaN(parseInt(value)) ? "" : parseInt(value) })}
+                        value={formData.StudentWeight}
+                        onChangeText={(value) => setFormData({ ...formData, StudentWeight: value })}
                         placeholder="Enter weight"
                         keyboardType="numeric"
                     />
@@ -333,6 +374,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                         <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </View>
     );

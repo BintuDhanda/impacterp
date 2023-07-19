@@ -4,6 +4,7 @@ import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
+import Toast from 'react-native-toast-message';
 import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
 
 const RoleScreen = () => {
@@ -18,12 +19,21 @@ const RoleScreen = () => {
     GetRoleList();
   }, []);
   const GetRoleList = () => {
-    httpGet("Role/get")
+    httpGet("Role/roleGet")
       .then((result) => {
         console.log(result.data)
         setRoleList(result.data)
       })
-      .catch(err => console.log('Get Role error :', err))
+      .catch((err) => {
+        console.log('Get Role error :', err)
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddRole = () => {
     setRole({
@@ -39,8 +49,9 @@ const RoleScreen = () => {
 
   const handleSaveRole = () => {
     try {
-      if (role.Id !== 0) {
-        httpPut("Role/put", role)
+      console.log(role, "role")
+      if (role.RolesId !== 0) {
+        httpPost("Role/roleUpdate", role)
           .then((response) => {
             if (response.status === 200) {
               GetRoleList();
@@ -55,10 +66,19 @@ const RoleScreen = () => {
               })
             }
           })
-          .catch(err => console.log("Role update error : ", err));
+          .catch((err) => {
+            console.log("Role update error : ", err)
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
-        httpPost("Role/post", role)
+        httpPost("Role/rolePost", role)
           .then((response) => {
             if (response.status === 200) {
               GetRoleList();
@@ -73,12 +93,28 @@ const RoleScreen = () => {
               })
             }
           })
-          .catch(err => console.log('Role Add error :', err));
+          .catch((err) => {
+            console.log('Role Add error :', err)
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving Role:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -87,14 +123,23 @@ const RoleScreen = () => {
   }
 
   const DeleteRoleIdConfirmYes = () => {
-    httpDelete(`Role/delete?Id=${roleDeleteId}`)
+    httpGet(`Role/roleDelete?Id=${roleDeleteId}`)
       .then((result) => {
         console.log(result);
         GetRoleList();
         setRoleDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Role error', error))
+      .catch((error) => {
+        console.error('Delete Role error', error)
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteRoleIdConfirmNo = () => {
@@ -103,7 +148,7 @@ const RoleScreen = () => {
   }
 
   const handleEditRole = (roleId) => {
-    httpGet(`Role/getById?Id=${roleId}`)
+    httpGet(`Role/roleGetById?Id=${roleId}`)
       .then((response) => {
         setRole({
           RolesId: response.data.rolesId,
@@ -114,7 +159,16 @@ const RoleScreen = () => {
           LastUpdatedBy: user.userId,
         })
       })
-      .catch(error => console.log('Role Get By Id :', error))
+      .catch((error) => {
+        console.log('Role Get By Id :', error)
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -291,6 +345,7 @@ const RoleScreen = () => {
           contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
     </ScrollView>
   );
 };

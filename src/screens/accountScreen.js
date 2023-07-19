@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
@@ -25,6 +26,13 @@ const AccountScreen = ({ route, navigation }) => {
       setAccountList(response.data);
     } catch (error) {
       console.log('Error fetching Accounts:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -58,7 +66,16 @@ const AccountScreen = ({ route, navigation }) => {
           }
         );
       })
-      .catch(err => console.error("Get By Id Error", err));
+      .catch((err) => {
+        console.error("Get By Id Error", err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
     setModalVisible(true);
   };
 
@@ -67,28 +84,28 @@ const AccountScreen = ({ route, navigation }) => {
   }
 
   const DeleteAccountIdConfirmYes = () => {
-    httpDelete(`Account/delete?Id=${accountDeleteId}`)
+    httpGet(`Account/delete?Id=${accountDeleteId}`)
       .then((result) => {
         console.log(result);
         fetchAccountsByAccCategoryId();
         setAccountDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Account error', error))
+      .catch((error) => {
+        console.error('Delete Account error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteAccountIdConfirmNo = () => {
     setAccountDeleteId(0);
     setShowDelete(false);
-  }
-
-  const handleDeleteAccount = (id) => {
-    httpDelete(`Account/delete?Id=${id}`)
-      .then((result) => {
-        console.log(result);
-        fetchAccountsByAccCategoryId();
-      })
-      .catch(err => console.error("Delete Error", err));
   }
 
   const handleNavigate = (accountId, accountName) => {
@@ -98,7 +115,7 @@ const AccountScreen = ({ route, navigation }) => {
   const handleSaveAccount = async () => {
     try {
       if (account.AccountId !== 0) {
-        await httpPut("Account/put", account)
+        await httpPost("Account/put", account)
           .then((response) => {
             if (response.status === 200) {
               fetchAccountsByAccCategoryId();
@@ -114,7 +131,16 @@ const AccountScreen = ({ route, navigation }) => {
               });
             }
           })
-          .catch(err => console.error("Post error in Account", err));
+          .catch((err) => {
+            console.error("Post error in Account", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       } else {
         await httpPost("Account/post", account)
           .then((response) => {
@@ -136,6 +162,13 @@ const AccountScreen = ({ route, navigation }) => {
       setModalVisible(false);
     } catch (error) {
       console.log('Error saving Account:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+    });
     }
   };
 
@@ -151,7 +184,6 @@ const AccountScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
@@ -317,6 +349,7 @@ const AccountScreen = ({ route, navigation }) => {
             </View>
           </Modal>
         )}
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const CountryScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -23,7 +24,16 @@ const CountryScreen = ({ navigation }) => {
         console.log(result.data)
         setCountryList(result.data)
       })
-      .catch(err => console.log('Get Country error :', err))
+      .catch((err) => {
+        console.log('Get Country error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddCountry = () => {
     setCountry({
@@ -40,7 +50,7 @@ const CountryScreen = ({ navigation }) => {
   const handleSaveCountry = () => {
     try {
       if (country.CountryId !== 0) {
-        httpPut("Country/put", country)
+        httpPost("Country/put", country)
           .then((response) => {
             if (response.status === 200) {
               GetCountryList();
@@ -55,7 +65,16 @@ const CountryScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.log("Country update error : ", err));
+          .catch((err) => {
+            console.log("Country update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("Country/post", country)
@@ -73,7 +92,16 @@ const CountryScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.log('Country Add error :', err));
+          .catch((err) => {
+            console.log('Country Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
@@ -87,14 +115,23 @@ const CountryScreen = ({ navigation }) => {
   }
 
   const DeleteCountryIdConfirmYes = () => {
-    httpDelete(`Country/delete?Id=${countryDeleteId}`)
+    httpGet(`Country/delete?Id=${countryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetCountryList();
         setCountryDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Country error', error))
+      .catch((error) => {
+        console.error('Delete Country error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteCountryIdConfirmNo = () => {
@@ -110,7 +147,7 @@ const CountryScreen = ({ navigation }) => {
     httpGet(`Country/getById?Id=${countryId}`)
       .then((response) => {
         setCountry({
-          CountryIdId: response.data.countryId,
+          CountryId: response.data.countryId,
           CountryName: response.data.countryName,
           IsActive: response.data.isActive,
           CreatedAt: response.data.createdAt,
@@ -118,7 +155,16 @@ const CountryScreen = ({ navigation }) => {
           LastUpdatedBy: user.userId,
         })
       })
-      .catch(error => console.log('Country Get By Id :', error))
+      .catch((error) => {
+        console.log('Country Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -302,6 +348,7 @@ const CountryScreen = ({ navigation }) => {
         // contentContainerStyle={{ flexGrow: 1, }}
         />
       </View>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
     </ScrollView>
   );
 };

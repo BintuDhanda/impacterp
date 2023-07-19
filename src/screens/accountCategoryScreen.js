@@ -4,6 +4,7 @@ import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
+import Toast from 'react-native-toast-message';
 import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
 
 const AccountCategoryScreen = ({ navigation }) => {
@@ -23,7 +24,16 @@ const AccountCategoryScreen = ({ navigation }) => {
         console.log(result.data)
         setAccountCategoryList(result.data)
       })
-      .catch(err => console.log('Get AccountCategory error :', err))
+      .catch((err) => {
+        console.log('Get AccountCategory error :', err)
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddAccountCategory = () => {
     setAccountCategory({
@@ -40,7 +50,7 @@ const AccountCategoryScreen = ({ navigation }) => {
   const handleSaveAccountCategory = () => {
     try {
       if (accountCategory.AccountCategoryId !== 0) {
-        httpPut("AccountCategory/put", accountCategory)
+        httpPost("AccountCategory/put", accountCategory)
           .then((response) => {
             if (response.status === 200) {
               GetAccountCategoryList();
@@ -55,7 +65,16 @@ const AccountCategoryScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.log("Account Category update error : ", err));
+          .catch((err) => {
+            console.log("Account Category update error : ", err)
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("AccountCategory/post", accountCategory)
@@ -73,12 +92,28 @@ const AccountCategoryScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.log('Account Category Add error :', err));
+          .catch((err) => {
+            console.log('Account Category Add error :', err)
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+        });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving AccountCategory:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -87,14 +122,23 @@ const AccountCategoryScreen = ({ navigation }) => {
   }
 
   const DeleteAccountCategoryIdConfirmYes = () => {
-    httpDelete(`AccountCategory/delete?Id=${accountCategoryDeleteId}`)
+    httpGet(`AccountCategory/delete?Id=${accountCategoryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetAccountCategoryList();
         setAccountCategoryDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Account Category error', error))
+      .catch(error => {
+        console.error('Delete Account Category error', error)
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteAccountCategoryIdConfirmNo = () => {
@@ -114,7 +158,16 @@ const AccountCategoryScreen = ({ navigation }) => {
           LastUpdatedBy: user.userId,
         })
       })
-      .catch(error => console.log('AccountCategory Get By AccountCategoryId :', error))
+      .catch((error) => {
+        console.log('AccountCategory Get By AccountCategoryId :', error)
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -155,7 +208,7 @@ const AccountCategoryScreen = ({ navigation }) => {
           <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.accountCategoryId, item.accCategoryName)} >
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {DeleteAccountCategoryIdConfirm(item.accountCategoryId); setShowDelete(true);}}>
+          <TouchableOpacity onPress={() => { DeleteAccountCategoryIdConfirm(item.accountCategoryId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -296,6 +349,7 @@ const AccountCategoryScreen = ({ navigation }) => {
           renderItem={renderAccountCategoryCard}
           keyExtractor={(item) => item.accountCategoryId.toString()}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

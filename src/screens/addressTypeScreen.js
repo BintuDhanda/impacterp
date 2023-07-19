@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const AddressTypeScreen = () => {
   const { user, setUser } = useContext(UserContext);
@@ -23,7 +24,16 @@ const AddressTypeScreen = () => {
         console.log(result.data)
         setAddressTypeList(result.data)
       })
-      .catch(err => console.log('Get AddressType error :', err))
+      .catch((err) => {
+        console.log('Get AddressType error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddAddressType = () => {
     setAddressType({
@@ -40,7 +50,7 @@ const AddressTypeScreen = () => {
   const handleSaveAddressType = () => {
     try {
       if (addressType.AddressTypeId !== 0) {
-        httpPut("AddressType/put", addressType)
+        httpPost("AddressType/put", addressType)
           .then((response) => {
             if (response.status === 200) {
               GetAddressTypeList();
@@ -55,7 +65,16 @@ const AddressTypeScreen = () => {
               })
             }
           })
-          .catch(err => console.log("AddressType update error : ", err));
+          .catch((err) => {
+            console.log("AddressType update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("AddressType/post", addressType)
@@ -73,12 +92,28 @@ const AddressTypeScreen = () => {
               })
             }
           })
-          .catch(err => console.log('AddressType Add error :', err));
+          .catch((err) => {
+            console.log('AddressType Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving AddressType:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -87,14 +122,23 @@ const AddressTypeScreen = () => {
   }
 
   const DeleteAddressTypeIdConfirmYes = () => {
-    httpDelete(`AddressType/delete?Id=${addressTypeDeleteId}`)
+    httpGet(`AddressType/delete?Id=${addressTypeDeleteId}`)
       .then((result) => {
         console.log(result);
         GetAddressTypeList();
         setAddressTypeDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Address Type error', error))
+      .catch((error) => {
+        console.error('Delete Address Type error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteAddressTypeIdConfirmNo = () => {
@@ -114,7 +158,16 @@ const AddressTypeScreen = () => {
           LastUpdatedBy: user.userId,
         })
       })
-      .catch(error => console.log('AddressType Get By Id :', error))
+      .catch((error) => {
+        console.log('AddressType Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -148,7 +201,7 @@ const AddressTypeScreen = () => {
           <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditAddressType(item.addressTypeId)} >
             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {DeleteAddressTypeIdConfirm(item.addressTypeId); setShowDelete(true);}}>
+          <TouchableOpacity onPress={() => { DeleteAddressTypeIdConfirm(item.addressTypeId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -290,6 +343,7 @@ const AddressTypeScreen = () => {
           keyExtractor={(item) => item.addressTypeId.toString()}
           contentContainerStyle={{ flexGrow: 1, }}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const BatchScreen = ({ route }) => {
     const { user, setUser } = useContext(UserContext);
@@ -63,6 +64,13 @@ const BatchScreen = ({ route }) => {
             console.log(batchList, 'BatchList')
         } catch (error) {
             console.error('Error fetching Batch:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -101,7 +109,16 @@ const BatchScreen = ({ route }) => {
                     }
                 );
             })
-            .catch(err => console.error("Get By Id Error", err));
+            .catch((err) => {
+                console.error("Get By Id Error", err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            });
         setModalVisible(true);
     };
 
@@ -110,14 +127,23 @@ const BatchScreen = ({ route }) => {
     }
 
     const DeleteBatchIdConfirmYes = () => {
-        httpDelete(`Batch/delete?Id=${batchDeleteId}`)
+        httpGet(`Batch/delete?Id=${batchDeleteId}`)
             .then((result) => {
                 console.log(result);
                 fetchBatchByCourseId();
                 setBatchDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete Batch error', error))
+            .catch((error) => {
+                console.error('Delete Batch error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteBatchIdConfirmNo = () => {
@@ -128,7 +154,7 @@ const BatchScreen = ({ route }) => {
     const handleSaveBatch = async () => {
         try {
             if (batch.BatchId !== 0) {
-                await httpPut("Batch/put", batch)
+                await httpPost("Batch/put", batch)
                     .then((response) => {
                         if (response.status === 200) {
                             fetchBatchByCourseId();
@@ -147,7 +173,16 @@ const BatchScreen = ({ route }) => {
                             });
                         }
                     })
-                    .catch(err => console.error("Update error in Batch", err));
+                    .catch((err) => {
+                        console.error("Update error in Batch", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             } else {
                 await httpPost("Batch/post", batch)
                     .then((response) => {
@@ -172,6 +207,13 @@ const BatchScreen = ({ route }) => {
             setModalVisible(false);
         } catch (error) {
             console.error('Error saving Batch:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -220,11 +262,15 @@ const BatchScreen = ({ route }) => {
                 <Text style={{ fontSize: 16 }}>End Date : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.endDate)}</Text>
             </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Duration : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
+            </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
                 <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.batchId)}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {DeleteBatchIdConfirm(item.batchId); setShowDelete(true);}}>
+                <TouchableOpacity onPress={() => { DeleteBatchIdConfirm(item.batchId); setShowDelete(true); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>
@@ -344,7 +390,6 @@ const BatchScreen = ({ route }) => {
                                     }}
                                     placeholder="Batch Code"
                                     value={batch.Code.toString()}
-                                    keyboardType='numeric'
                                     onChangeText={(text) => setBatch({ ...batch, Code: text })}
                                 />
                                 <View style={{
@@ -441,6 +486,7 @@ const BatchScreen = ({ route }) => {
                         </View>
                     </Modal>
                 )}
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </ScrollView>
     );

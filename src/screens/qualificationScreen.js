@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
@@ -23,7 +24,16 @@ const QualificationScreen = () => {
         console.log(result.data)
         setQualificationList(result.data)
       })
-      .catch(err => console.log('Get Qualification error :', err))
+      .catch((err) => {
+        console.log('Get Qualification error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddQualification = () => {
     setQualification({
@@ -40,7 +50,7 @@ const QualificationScreen = () => {
   const handleSaveQualification = () => {
     try {
       if (qualification.QualificationId !== 0) {
-        httpPut("Qualification/put", qualification)
+        httpPost("Qualification/put", qualification)
           .then((response) => {
             if (response.status === 200) {
               GetQualificationList();
@@ -55,7 +65,16 @@ const QualificationScreen = () => {
               })
             }
           })
-          .catch(err => console.log("Qualification update error : ", err));
+          .catch((err) => {
+            console.log("Qualification update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("Qualification/post", qualification)
@@ -73,12 +92,28 @@ const QualificationScreen = () => {
               })
             }
           })
-          .catch(err => console.log('Qualification Add error :', err));
+          .catch((err) => {
+            console.log('Qualification Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving Qualification:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -87,14 +122,23 @@ const QualificationScreen = () => {
   }
 
   const DeleteQualificationIdConfirmYes = () => {
-    httpDelete(`Qualification/delete?Id=${qualificationDeleteId}`)
+    httpGet(`Qualification/delete?Id=${qualificationDeleteId}`)
       .then((result) => {
         console.log(result);
         GetQualificationList();
         setQualificationDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Qualification error', error))
+      .catch((error) => {
+        console.error('Delete Qualification error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteQualificationIdConfirmNo = () => {
@@ -114,7 +158,16 @@ const QualificationScreen = () => {
           LastUpdatedBy: user.userId,
         })
       })
-      .catch(error => console.log('Qualification Get By Id :', error))
+      .catch((error) => {
+        console.log('Qualification Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -288,8 +341,8 @@ const QualificationScreen = () => {
           data={qualificationList}
           renderItem={renderQualificationCard}
           keyExtractor={(item) => item.qualificationId.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

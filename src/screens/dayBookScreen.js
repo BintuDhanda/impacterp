@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const DayBookScreen = () => {
     const { user, setUser } = useContext(UserContext);
@@ -45,6 +45,15 @@ const DayBookScreen = () => {
         httpPost("DayBook/sumCreditAndDebitDayBook", filter)
             .then((response) => {
                 setSumCreditAndDebitDayBook(response.data);
+            }).catch((err) => {
+                console.error('Sum Credit And Debit DayBook', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             })
     }
 
@@ -108,6 +117,13 @@ const DayBookScreen = () => {
             })
             .catch((error) => {
                 console.error(error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
     const GetDayBookList = () => {
@@ -135,6 +151,13 @@ const DayBookScreen = () => {
             .catch((error) => {
                 setLoading(false);
                 console.error('Get DayBook List Error : ', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -172,7 +195,7 @@ const DayBookScreen = () => {
     }
 
     const DeleteDayBookIdConfirmYes = () => {
-        httpDelete(`DayBook/delete?Id=${dayBookDeleteId}`)
+        httpGet(`DayBook/delete?Id=${dayBookDeleteId}`)
             .then((result) => {
                 console.log(result);
                 GetDayBookList();
@@ -180,7 +203,16 @@ const DayBookScreen = () => {
                 setDayBookDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete DayBook error', error))
+            .catch((error) => {
+                console.error('Delete DayBook error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteDayBookIdConfirmNo = () => {
@@ -196,6 +228,7 @@ const DayBookScreen = () => {
                         if (response.status === 200) {
                             setDayBookList([]);
                             setSkip(0);
+                            GetDayBookList();
                             Alert.alert('Sucess', 'DayBook Credit is Added Successfully')
                             setDayBookCredit({
                                 "DayBookId": 0,
@@ -214,6 +247,13 @@ const DayBookScreen = () => {
             setCreditModalVisible(false);
         } catch (error) {
             console.error('Error saving DayBook:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -225,6 +265,7 @@ const DayBookScreen = () => {
                         if (response.status === 200) {
                             setDayBookList([]);
                             setSkip(0);
+                            GetDayBookList();
                             Alert.alert('Sucess', 'DayBook Debit is Added Successfully')
                             setDayBookDebit({
                                 "DayBookId": 0,
@@ -243,6 +284,13 @@ const DayBookScreen = () => {
             setDebitModalVisible(false);
         } catch (error) {
             console.error('Error saving DayBook:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -363,7 +411,7 @@ const DayBookScreen = () => {
                             paddingHorizontal: 12,
                             marginTop: 10,
                             marginRight: 3,
-                        }} onPress={handleAddCreditDayBook}>
+                        }} onPress={() => {handleAddCreditDayBook(); setDayBookList([]); setSkip(0);}}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -378,7 +426,7 @@ const DayBookScreen = () => {
                             paddingVertical: 8,
                             paddingHorizontal: 12,
                             marginTop: 10,
-                        }} onPress={handleAddDebitDayBook}>
+                        }} onPress={() => {handleAddDebitDayBook(); setDayBookList([]); setSkip(0);}}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Put as httpPut, Post as httpPost } from '../../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
 
 const StudentBatchFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -14,11 +15,10 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     const [studentBatch, setStudentBatch] = useState({
         "StudentBatchId": 0,
         "DateOfJoin": "",
-        "BatchStartDate": "",
-        "BatchEndDate": "",
         "StudentId": studentId,
         "BatchId": "",
         "RegistrationNumber": "",
+        "TokenNumber": "",
         "IsActive": true,
         "CreatedAt": null,
         "CreatedBy": user.userId,
@@ -104,10 +104,9 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                 setStudentBatch({
                     StudentBatchId: response.data.studentBatchId,
                     DateOfJoin: response.data.dateOfJoin,
-                    BatchStartDate: response.data.batchStartDate,
-                    BatchEndDate: response.data.batchEndDate,
                     BatchId: response.data.batchId,
                     RegistrationNumber: response.data.registrationNumber,
+                    TokenNumber: response.data.tokenNumber,
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
@@ -115,23 +114,32 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                     LastUpdatedBy: user.userId
                 })
             })
+            .catch((err) => {
+                console.error('Get StudentBatch Get By Id Error : ', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const handleSaveStudentBatch = async () => {
         try {
             if (studentBatch.StudentBatchId !== 0) {
-                await httpPut("StudentBatch/put", studentBatch)
+                await httpPost("StudentBatch/put", studentBatch)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Batch Successfully')
                             setStudentBatch({
                                 "StudentBatchId": 0,
                                 "DateOfJoin": "",
-                                "BatchStartDate": "",
-                                "BatchEndDate": "",
                                 "StudentId": studentId,
                                 "BatchId": "",
                                 "RegistrationNumber": "",
+                                "TokenNumber": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
@@ -140,35 +148,101 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                             navigation.goBack();
                         }
                     })
-                    .catch(err => console.error("Batch update error : ", err));
+                    .catch((err) => {
+                        console.error("Batch update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 console.log(studentBatch, "studentBatch")
-                await httpPost("StudentBatch/post", studentBatch)
+                httpPost(`StudentBatch/IsExistsRegistration?RegistrationNumber=${studentBatch.RegistrationNumber}`)
                     .then((response) => {
-                        if (response.status === 200) {
-                            Alert.alert('Success', 'Add Batch Successfully')
-                            setStudentBatch({
-                                "StudentBatchId": 0,
-                                "DateOfJoin": "",
-                                "BatchStartDate": "",
-                                "BatchEndDate": "",
-                                "StudentId": studentId,
-                                "BatchId": "",
-                                "RegistrationNumber": "",
-                                "IsActive": true,
-                                "CreatedAt": null,
-                                "CreatedBy": user.userId,
-                                "LastUpdatedBy": null,
-                            })
-                            navigation.navigate('HomeScreen')
+                        if (response.data == true) {
+                            Toast.show({
+                                type: 'error',
+                                text1: "This Registration Number is Already Exist",
+                                position: 'bottom',
+                                visibilityTime: 2000,
+                                autoHide: true,
+                            });
                         }
+                        else {
+                            httpPost(`StudentBatch/IsExistsToken?TokenNumber=${studentBatch.TokenNumber}`)
+                                .then((response) => {
+                                    if (response.data == true) {
+                                        Toast.show({
+                                            type: 'error',
+                                            text1: "This Token Number is Already Exist",
+                                            position: 'bottom',
+                                            visibilityTime: 2000,
+                                            autoHide: true,
+                                        });
+                                    }
+                                    else {
+                                        httpPost("StudentBatch/post", studentBatch).then((response) => {
+                                            if (response.status === 200) {
+                                                Alert.alert('Success', 'Add Batch Successfully')
+                                                setStudentBatch({
+                                                    "StudentBatchId": 0,
+                                                    "DateOfJoin": "",
+                                                    "StudentId": studentId,
+                                                    "BatchId": "",
+                                                    "RegistrationNumber": "",
+                                                    "TokenNumber": "",
+                                                    "IsActive": true,
+                                                    "CreatedAt": null,
+                                                    "CreatedBy": user.userId,
+                                                    "LastUpdatedBy": null,
+                                                })
+                                                navigation.goBack();
+                                            }
+                                        }).catch((err) => {
+                                            console.error('Batch Add error :', err);
+                                            Toast.show({
+                                                type: 'error',
+                                                text1: `${err}`,
+                                                position: 'bottom',
+                                                visibilityTime: 2000,
+                                                autoHide: true,
+                                            });
+                                        });
+                                    }
+                                }).catch((err) => {
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${err}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
+                                })
+                        }
+                    }).catch((err) => {
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
                     })
-                    .catch(err => console.error('Batch Add error :', err));
             }
         }
         catch (error) {
             console.error('Error saving Batch:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
@@ -180,6 +254,13 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             })
             .catch((error) => {
                 console.error(error, "Get CourseCategory List Error");
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -190,6 +271,13 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             setCourseList(response.data);
         } catch (error) {
             console.error('Error fetching Course:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -200,6 +288,13 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
             setBatchList(response.data);
         } catch (error) {
             console.error('Error fetching Batch:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
     const handleCourseCategorySelect = (courseCategory) => {
@@ -230,12 +325,11 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
         setStudentBatch({
             "StudentBatchId": 0,
             "DateOfJoin": "",
-            "BatchStartDate": "",
-            "BatchEndDate": "",
             "BatchFee": "",
             "StudentId": studentId,
             "BatchId": "",
             "RegistrationNumber": "",
+            "TokenNumber": "",
             "IsActive": true,
             "CreatedAt": null,
             "CreatedBy": user.userId,
@@ -285,68 +379,6 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                             onChange={handleDateOfJoinChange}
                             onConfirm={handleConfirmDateOfJoinPicker}
                             onCancel={handleConfirmDateOfJoinPicker}
-                        />
-                    )}
-
-                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Select Batch Start Date:</Text>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 10,
-                        paddingHorizontal: 10,
-                        borderWidth: 1,
-                        borderColor: Colors.primary,
-                        borderRadius: 8,
-                    }}>
-                        <TouchableOpacity onPress={handleOpenBatchStartDatePicker}>
-                            <Icon name={'calendar'} size={25} />
-                        </TouchableOpacity>
-                        <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                            value={studentBatch.BatchStartDate === "" || studentBatch.BatchStartDate === null ? ("Select Batch Start Date") : (getFormattedDate(studentBatch.BatchStartDate))}
-                            placeholder="Select Batch Start Date"
-                            editable={false}
-                        />
-
-                    </View>
-                    {showBatchStartDatePicker && (
-                        <DateTimePicker
-                            value={selectBatchStartDate}
-                            mode="date"
-                            display="default"
-                            onChange={handleBatchStartDateChange}
-                            onConfirm={handleConfirmBatchStartDatePicker}
-                            onCancel={handleConfirmBatchStartDatePicker}
-                        />
-                    )}
-
-                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Select Batch End Date:</Text>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginBottom: 10,
-                        paddingHorizontal: 10,
-                        borderWidth: 1,
-                        borderColor: Colors.primary,
-                        borderRadius: 8,
-                    }}>
-                        <TouchableOpacity onPress={handleOpenBatchEndDatePicker}>
-                            <Icon name={'calendar'} size={25} />
-                        </TouchableOpacity>
-                        <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                            value={studentBatch.BatchEndDate === "" || studentBatch.BatchEndDate === null ? ("Select Batch End Date") : (getFormattedDate(studentBatch.BatchEndDate))}
-                            placeholder="Select Batch End Date"
-                            editable={false}
-                        />
-
-                    </View>
-                    {showBatchEndDatePicker && (
-                        <DateTimePicker
-                            value={selectBatchEndDate}
-                            mode="date"
-                            display="default"
-                            onChange={handleBatchEndDateChange}
-                            onConfirm={handleConfirmBatchEndDatePicker}
-                            onCancel={handleConfirmBatchEndDatePicker}
                         />
                     )}
 
@@ -464,6 +496,22 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         onChangeText={(value) => setStudentBatch({ ...studentBatch, RegistrationNumber: value })}
                         placeholder="Enter Registeration Number"
                     />
+                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Token Number :</Text>
+                    <TextInput
+                        style={{
+                            borderWidth: 1,
+                            borderColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingHorizontal: 10,
+                            paddingVertical: 8,
+                            marginBottom: 10,
+                            fontSize: 16,
+                        }}
+                        value={studentBatch.TokenNumber}
+                        keyboardType='numeric'
+                        onChangeText={(value) => setStudentBatch({ ...studentBatch, TokenNumber: value })}
+                        placeholder="Enter Token Number"
+                    />
 
                     <TouchableOpacity style={{
                         backgroundColor: Colors.primary,
@@ -484,6 +532,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                         <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </View>
     );

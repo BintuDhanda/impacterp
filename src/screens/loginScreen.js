@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native'
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Post as httpPost } from '../constants/httpService';
 import Toast from 'react-native-toast-message';
 import { sendOTP } from '../constants/smsService';
@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 const LogInScreen = ({ navigation }) => {
 
     const [phone, setPhone] = useState('');
+    const [isPress, setIsPress] = useState({ "IsPress": false });
 
     const handleLogin = () => {
         // Handle login logic
@@ -24,6 +25,7 @@ const LogInScreen = ({ navigation }) => {
                     visibilityTime: 2000,
                     autoHide: true,
                 });
+                setIsPress({ ...isPress, isPress: !isPress });
             }
             else {
                 //send otp 
@@ -33,15 +35,42 @@ const LogInScreen = ({ navigation }) => {
                 let msg = 'Dear Student, Your Registration OTP is 1234 Mobile No. 9050546000 Impact Academy, Hisar'
                 sendOTP(otp, phone).then((res) => {
                     console.log(res.data, "Response otp")
-                        if (res.status == 200) {
-                            navigation.navigate("VerifyOTPScreen", { mobile: phone, verifyOtp: otp })
-                        }
+                    if (res.status == 200) {
+                        navigation.navigate("VerifyOTPScreen", { mobile: phone, verifyOtp: otp })
                     }
-                ).catch(err => console.error("Send Otp Error : ", err))
+                    else {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'OTP Send is Fail Please Send Again',
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                        setIsPress({ ...isPress, isPress: !isPress });
+                    }
+                }
+                ).catch((err) => {
+                    console.error("Send Otp Error : ", err)
+                    Toast.show({
+                        type: 'error',
+                        text1: `${err}`,
+                        position: 'bottom',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                    });
+                })
 
             }
-        }).catch(err => console.error("IsExist Error : ", err))
-
+        }).catch((err) => {
+            console.error("IsExist Error : ", err)
+            Toast.show({
+                type: 'error',
+                text1: `${err}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
+        })
     };
 
 
@@ -66,7 +95,7 @@ const LogInScreen = ({ navigation }) => {
             <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: Colors.background }}>
                 <View style={{ paddingHorizontal: 25 }}>
                     <View style={{ alignItems: 'center' }}>
-                        <Image source={require('../assets/impact.png')} style={{borderRadius: 200}}/>
+                        <Image source={require('../assets/impact.png')} style={{ borderRadius: 200 }} />
                     </View>
                     <View style={{ alignItems: 'center' }}>
                         <Text style={{
@@ -83,7 +112,7 @@ const LogInScreen = ({ navigation }) => {
                         paddingBottom: 8,
                         marginBottom: 25
                     }}>
-                        <Icon name="phone" style={{ marginRight: 5 }} size={20} color= "#666" />
+                        <Icon name="mobile" style={{ marginRight: 5 }} size={20} color="#666" />
                         <TextInput
                             placeholder="Phone No."
                             style={{ flex: 1, paddingVertical: 0 }}
@@ -93,11 +122,11 @@ const LogInScreen = ({ navigation }) => {
                             onChangeText={(text) => setPhone(text)}
                         />
                     </View>
-                    <TouchableOpacity style={{flex: 1, backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleLogin}>
-                        <Text style={{ textAlign: 'center',  fontSize: 16, color: '#fff', }}>Login</Text>
+                    <TouchableOpacity style={{ flex: 1, backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} disabled={isPress.IsPress === true ? true : false} onPress={() => { handleLogin(); setIsPress(true); }}>
+                        <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Login</Text>
                     </TouchableOpacity>
-                    <Toast ref={(ref) => Toast.setRef(ref)} />
                 </View>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </SafeAreaView>
         </ScrollView>
     );

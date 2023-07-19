@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 
 const FeeTypeScreen = () => {
   const [feeType, setFeeType] = useState({ "Id": 0, "FeeTypeName": "", "IsActive": true });
@@ -18,7 +19,16 @@ const FeeTypeScreen = () => {
         console.log(result.data)
         setFeeTypeList(result.data)
       })
-      .catch(err => console.log('Get FeeType error :', err))
+      .catch((err) => {
+        console.log('Get FeeType error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddFeeType = () => {
     setFeeType({
@@ -32,7 +42,7 @@ const FeeTypeScreen = () => {
   const handleSaveFeeType = () => {
     try {
       if (feeType.Id !== 0) {
-        httpPut("FeeType/put", feeType)
+        httpPost("FeeType/put", feeType)
           .then((response) => {
             if (response.status === 200) {
               GetFeeTypeList();
@@ -44,7 +54,16 @@ const FeeTypeScreen = () => {
               })
             }
           })
-          .catch(err => console.log("FeeType update error : ", err));
+          .catch((err) => {
+            console.log("FeeType update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("FeeType/post", feeType)
@@ -59,22 +78,47 @@ const FeeTypeScreen = () => {
               })
             }
           })
-          .catch(err => console.log('FeeType Add error :', err));
+          .catch((err) => {
+            console.log('FeeType Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving FeeType:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
   const handleDeleteFeeType = (feeTypeId) => {
-    httpDelete(`FeeType/delete?Id=${feeTypeId}`)
+    httpGet(`FeeType/delete?Id=${feeTypeId}`)
       .then((result) => {
         console.log(result);
         GetFeeTypeList();
       })
-      .catch(err => console.error("Delete Error", err));
+      .catch((err) => {
+        console.error("Delete Error", err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
   };
 
   const handleEditFeeType = (feeTypeId) => {
@@ -86,7 +130,16 @@ const FeeTypeScreen = () => {
           IsActive: response.data.isActive
         })
       })
-      .catch(error => console.log('FeeType Get By Id :', error))
+      .catch((error) => {
+        console.log('FeeType Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -214,6 +267,7 @@ const FeeTypeScreen = () => {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ flexGrow: 1, }}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

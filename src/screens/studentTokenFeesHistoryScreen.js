@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
-import { Post as httpPost, Get as httpGet, Delete as httpDelete } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../constants/httpService';
 
 const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
     const { tokenNumber } = route.params;
@@ -30,6 +30,15 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
         httpGet(`StudentTokenFees/sumDepositAndRefund?studentTokenId=${tokenNumber}`)
             .then((response) => {
                 setSumDepositAndRefund(response.data);
+            }).catch((err) => {
+                console.error('Sum Deposit And Refund Error : ', err)
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             })
     }
 
@@ -59,6 +68,13 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
             .catch((error) => {
                 setLoading(false);
                 console.error(error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -67,14 +83,23 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
     }
 
     const DeleteStudentTokenFeesIdConfirmYes = () => {
-        httpDelete(`StudentTokenFees/delete?Id=${studentTokenFeesDeleteId}`)
+        httpGet(`StudentTokenFees/delete?Id=${studentTokenFeesDeleteId}`)
             .then((result) => {
                 console.log(result);
                 navigation.goBack();
                 setStudentTokenFeesDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete StudentTokenFees error', error))
+            .catch((error) => {
+                console.error('Delete StudentTokenFees error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteStudentTokenFeesIdConfirmNo = () => {
@@ -110,7 +135,6 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
@@ -148,7 +172,7 @@ const StudentTokenFeesHistoryScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.createdAt)}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => {DeleteStudentTokenFeesIdConfirm(item.studentTokenFeesId); setShowDelete(true);}}>
+                <TouchableOpacity onPress={() => { DeleteStudentTokenFeesIdConfirm(item.studentTokenFeesId); setShowDelete(true); }}>
                     <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
             </View>

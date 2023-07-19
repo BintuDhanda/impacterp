@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, ScrollView, Modal, TouchableOpacity } from 'react-native';
 import Colors from '../../../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
-import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
+import { Get as httpGet } from '../../../constants/httpService';
 
 const StudentBatchScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
@@ -25,6 +26,13 @@ const StudentBatchScreen = ({ route, navigation }) => {
       })
       .catch((error) => {
         console.error(error, "Get Student Batch By Student Id Error");
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       });
   }
 
@@ -41,28 +49,28 @@ const StudentBatchScreen = ({ route, navigation }) => {
   }
 
   const DeleteStudentBatchIdConfirmYes = () => {
-    httpDelete(`StudentBatch/delete?Id=${studentBatchDeleteId}`)
+    httpGet(`StudentBatch/delete?Id=${studentBatchDeleteId}`)
       .then((result) => {
         console.log(result);
         GetStudentBatchByStudentId();
         setStudentBatchDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Student Batch error', error))
+      .catch((error) => {
+        console.error('Delete Student Batch error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteStudentBatchIdConfirmNo = () => {
     setStudentBatchDeleteId(0);
     setShowDelete(false);
-  }
-
-  const handleDeleteStudentBatch = (id) => {
-    httpDelete(`StudentBatch/delete?Id=${id}`)
-      .then((result) => {
-        console.log(result);
-        GetStudentBatchByStudentId();
-      })
-      .catch(err => console.error("Delete Error", err));
   }
 
   const getFormattedDate = (datestring) => {
@@ -81,7 +89,6 @@ const StudentBatchScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
@@ -99,22 +106,18 @@ const StudentBatchScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.dateOfJoin)}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Batch Start Date : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.batchStartDate)}</Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Batch End Date : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{getFormattedDate(item.batchEndDate)}</Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Registration Number : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.registrationNumber}</Text>
       </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Token Number : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenNumber}</Text>
+      </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{marginRight: 10,}} onPress={() => handleEditStudentBatchNavigate(item.studentBatchId)}>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentBatchNavigate(item.studentBatchId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {DeleteStudentBatchIdConfirm(item.studentBatchId), setShowDelete(true);}}>
+        <TouchableOpacity onPress={() => { DeleteStudentBatchIdConfirm(item.studentBatchId), setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -195,6 +198,7 @@ const StudentBatchScreen = ({ route, navigation }) => {
           keyExtractor={(item) => item.studentBatchId.toString()}
           renderItem={renderBatchCard}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

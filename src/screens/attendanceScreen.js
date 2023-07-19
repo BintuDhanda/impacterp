@@ -7,7 +7,7 @@ import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Post as httpPost } from '../constants/httpService';
 
-const AttendanceScreen = ({navigation}) => {
+const AttendanceScreen = ({ navigation }) => {
     const { user, setUser } = useContext(UserContext);
     const [attendance, setAttendance] = useState({ "AttendanceId": 0, "AttendanceType": "", "RegistrationNumber": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [attendanceList, setAttendanceList] = useState([]);
@@ -30,10 +30,10 @@ const AttendanceScreen = ({navigation}) => {
             });
         }
         else {
-            navigation.navigate("AttendanceHistoryScreen", {registrationNumber: attendance.RegistrationNumber})
+            navigation.navigate("AttendanceHistoryScreen", { registrationNumber: attendance.RegistrationNumber })
         }
     };
-    
+
     const handleAddCheckedInAttendance = () => {
         const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
         httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
@@ -75,14 +75,39 @@ const AttendanceScreen = ({navigation}) => {
                                 })
                                 .catch((error) => {
                                     setLoading(false);
-                                    console.error('Error in Get Attendance after Add CheckedIn',error);
+                                    console.error('Error in Get Attendance after Add CheckedIn', error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
-                    .catch(err => console.error('Error saving Attendance:', err))
+                    .catch((err) => {
+                        console.error('Error saving Attendance:', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    })
             }
         })
-            .catch(err => console.error('Error in Registration IsExists', err))
+            .catch((err) => {
+                console.error('Error in Registration IsExists', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     };
     const handleAddCheckedOutAttendance = () => {
         const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
@@ -111,7 +136,7 @@ const AttendanceScreen = ({navigation}) => {
                                     if (response.data.length >= 0) {
                                         setIsEndReached(false);
                                         setAttendanceList(response.data);
-                                        setSkip(skip+10)
+                                        setSkip(skip + 10)
                                     }
                                     if (response.data.length === 0) {
                                         setIsEndReached(true);
@@ -127,13 +152,38 @@ const AttendanceScreen = ({navigation}) => {
                                 .catch((error) => {
                                     setLoading(false);
                                     console.error('Error in Get Attendance after Add CheckedOut', error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
-                    .catch(err => console.error('Error saving Attendance:', err))
+                    .catch((err) => {
+                        console.error('Error saving Attendance:', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    })
             }
         })
-            .catch(err => console.error('Error in Registration IsExists', err))
+            .catch((err) => {
+                console.error('Error in Registration IsExists', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     };
 
     const getFormattedDate = (datestring) => {
@@ -239,7 +289,7 @@ const AttendanceScreen = ({navigation}) => {
                             setAttendanceList([]);
                             setSkip(0);
                             handleAddCheckedInAttendance();
-                            }}>
+                        }}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,
@@ -259,7 +309,7 @@ const AttendanceScreen = ({navigation}) => {
                             setAttendanceList([]);
                             setSkip(0);
                             handleAddCheckedOutAttendance();
-                            }}>
+                        }}>
                             <Text style={{
                                 color: Colors.background,
                                 fontSize: 14,

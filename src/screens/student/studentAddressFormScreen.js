@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import Toast from 'react-native-toast-message';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
 
 const StudentAddressFormScreen = ({ route, navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -76,6 +77,16 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           LastUpdatedBy: user.userId,
         })
       })
+      .catch((err) => {
+        console.error('Get Student Address Get By Id : ', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const GetAddressTypeList = () => {
@@ -86,6 +97,13 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
       })
       .catch((error) => {
         console.error(error, "Get Address Type List Error");
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       });
   }
 
@@ -96,6 +114,13 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
       })
       .catch((error) => {
         console.error(error, "Get Country List Error");
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       });
   }
 
@@ -105,7 +130,14 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
         setStateList(response.data)
       })
       .catch((error) => {
-        console.error("Error Get State By Country Id", error)
+        console.error("Error Get State By Country Id", error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       })
   }
 
@@ -115,7 +147,14 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
         setCityList(response.data)
       })
       .catch((error) => {
-        console.error("Error Get City By State Id", error)
+        console.error("Error Get City By State Id", error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       })
   }
   const handleCountrySelect = (country) => {
@@ -136,7 +175,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
   const handleSaveStudentAddress = async () => {
     try {
       if (studentAddress.StudentAddressId !== 0) {
-        await httpPut('StudentAddress/put', studentAddress)
+        await httpPost('StudentAddress/put', studentAddress)
           .then((response) => {
             if (response.status === 200) {
               Alert.alert('Success', 'Update Address Successfully')
@@ -157,7 +196,16 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
               navigation.navigate('HomeScreen');
             }
           })
-          .catch(err => console.error("Address update error : ", err));
+          .catch((err) => {
+            console.error("Address update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         await httpPost("StudentAddress/post", studentAddress)
@@ -181,11 +229,27 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
               navigation.navigate('HomeScreen');
             }
           })
-          .catch(err => console.error('Address Add error :', err));
+          .catch((err) => {
+            console.error('Address Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
     }
     catch (error) {
       console.error('Error saving Address:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -401,6 +465,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
           </TouchableOpacity>
         </ScrollView>
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </View>
   );

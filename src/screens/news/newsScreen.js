@@ -6,7 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
-import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../../constants/httpService';
 import NewsCardComponent from '../../components/newsCardComponent';
 
 const NewsScreen = ({ navigation }) => {
@@ -98,7 +98,16 @@ const NewsScreen = ({ navigation }) => {
                     });
                 }
             })
-            .catch(err => console.error('Get News error :', err))
+            .catch((err) => {
+                console.error('Get News error :', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
     const handleAddNews = () => {
         setNews({
@@ -116,7 +125,7 @@ const NewsScreen = ({ navigation }) => {
     const handleSaveNews = () => {
         try {
             if (news.NewsId !== 0) {
-                httpPut("News/put", news)
+                httpPost("News/put", news)
                     .then((response) => {
                         if (response.status === 200) {
                             setNewsList([]);
@@ -134,7 +143,16 @@ const NewsScreen = ({ navigation }) => {
                             })
                         }
                     })
-                    .catch(err => console.error("News update error : ", err));
+                    .catch((err) => {
+                        console.error("News update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 httpPost("News/post", news)
@@ -155,24 +173,49 @@ const NewsScreen = ({ navigation }) => {
                             })
                         }
                     })
-                    .catch(err => console.error('News Add error :', err));
+                    .catch((err) => {
+                        console.error('News Add error :', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             setModalVisible(false);
         }
         catch (error) {
             console.error('Error saving News:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
     const handleDeleteNews = (newsId) => {
-        httpDelete(`News/delete?Id=${newsId}`)
+        httpGet(`News/delete?Id=${newsId}`)
             .then((result) => {
                 console.log(result);
                 setNewsList([]);
                 setSkip(0);
                 GetNewsList();
             })
-            .catch(err => console.error("Delete Error", err));
+            .catch((err) => {
+                console.error("Delete Error", err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            });
     };
 
     const handleEditNews = (newsId) => {
@@ -188,7 +231,16 @@ const NewsScreen = ({ navigation }) => {
                     LastUpdatedBy: user.userId,
                 })
             })
-            .catch(error => console.error('News Get By Id :', error))
+            .catch((error) => {
+                console.error('News Get By Id :', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
         setModalVisible(true);
     };
 
@@ -384,7 +436,7 @@ const NewsScreen = ({ navigation }) => {
                         data={newsList}
                         keyExtractor={(item) => item.newsId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={(item)=><NewsCardComponent item={item} navigation={navigation}/>}
+                        renderItem={(item) => <NewsCardComponent item={item} navigation={navigation} />}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();

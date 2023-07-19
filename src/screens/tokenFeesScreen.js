@@ -115,13 +115,29 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                 .catch((error) => {
                                     setLoading(false);
                                     console.error("Add Deposit Get Student Token Fees By Token Number error", error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
                 setDepositModalVisible(false);
             }
         })
-            .catch(err => console.error('Error in Token IsExists', err))
+            .catch((err) => {
+                console.error('Error in Token IsExists', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     };
 
     const handleSaveStudentTokenFeesRefund = () => {
@@ -166,13 +182,29 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                                 .catch((error) => {
                                     setLoading(false);
                                     console.error("Add Refund Get Student Token Fees By Token Number error", error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
                 setRefundModalVisible(false);
             }
         })
-            .catch(err => console.error('Get Student Token Fees Token Exist', err))
+            .catch((err) => {
+                console.error('Get Student Token Fees Token Exist', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
 
     };
 
@@ -332,7 +364,7 @@ const StudentTokenFeesScreen = ({ navigation }) => {
                             }}>History</Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                     <FlatList
                         data={studentTokenFeesList}
                         keyExtractor={(item) => item.studentTokenFeesId.toString()}

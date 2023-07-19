@@ -6,7 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Post as httpPost, Get as httpGet, Delete as httpDelete, Put as httpPut } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../constants/httpService';
 
 const UserScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -82,14 +82,23 @@ const UserScreen = ({ navigation }) => {
   }
 
   const DeleteUserIdConfirmYes = () => {
-    httpDelete(`User/delete?Id=${userDeleteId}`)
+    httpGet(`User/delete?Id=${userDeleteId}`)
       .then((result) => {
         console.log(result);
         GetUserList();
         setUserDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete User error', error))
+      .catch((error) => {
+        console.error('Delete User error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteUserIdConfirmNo = () => {
@@ -126,7 +135,16 @@ const UserScreen = ({ navigation }) => {
           });
         }
       })
-      .catch(err => console.error('Get User error :', err))
+      .catch((err) => {
+        console.error('Get User error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddUser = () => {
     setUsers({
@@ -146,7 +164,7 @@ const UserScreen = ({ navigation }) => {
   const handleSaveUser = () => {
     try {
       if (users.UsersId !== 0) {
-        httpPut("User/put", users)
+        httpPost("User/put", users)
           .then((response) => {
             if (response.status === 200) {
               setUserList([]);
@@ -166,7 +184,16 @@ const UserScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.error("User update error : ", err));
+          .catch((err) => {
+            console.error("User update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("User/post", users)
@@ -189,25 +216,30 @@ const UserScreen = ({ navigation }) => {
               })
             }
           })
-          .catch(err => console.error('User Add error :', err));
+          .catch((err) => {
+            console.error('User Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.error('Error saving User:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
-
-  const handleDeleteUser = (userId) => {
-    httpDelete(`User/delete?Id=${userId}`)
-      .then((result) => {
-        console.log(result);
-        setUserList([]);
-        setSkip(0);
-        GetUserList();
-      })
-      .catch(err => console.error("Delete Error", err));
-  };
 
   const handleEditUser = (userId) => {
     httpGet(`User/getById?Id=${userId}`)
@@ -224,7 +256,16 @@ const UserScreen = ({ navigation }) => {
           IsMobileConfirmed: response.data.isMobileConfirmed
         })
       })
-      .catch(error => console.error('User Get By Id :', error))
+      .catch((error) => {
+        console.error('User Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -291,7 +332,7 @@ const UserScreen = ({ navigation }) => {
           {item.isStudentCreated !== true ? (<TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.usersId)} >
             <Icon name="user" size={20} color={'#8c53a4'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>) : null}
-          <TouchableOpacity onPress={() => {DeleteUserIdConfirm(item.usersId); setUserList([]); setSkip(0); setShowDelete(true);}}>
+          <TouchableOpacity onPress={() => { DeleteUserIdConfirm(item.usersId); setUserList([]); setSkip(0); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -322,7 +363,7 @@ const UserScreen = ({ navigation }) => {
             paddingVertical: 10,
             paddingHorizontal: 20,
             marginBottom: 20,
-          }} onPress={() => {handleAddUser(); setUserList([]); setSkip(0);}}>
+          }} onPress={() => { handleAddUser(); setUserList([]); setSkip(0); }}>
             <Text style={{
               color: Colors.background,
               fontSize: 16,
@@ -346,8 +387,6 @@ const UserScreen = ({ navigation }) => {
                   marginBottom: 10,
                   shadowColor: Colors.shadow,
                   width: '80%',
-                  borderWidth: 0.5,
-                  borderColor: Colors.primary,
                 }}>
                   <Text style={{ fontSize: 16, marginBottom: 5 }}>From Date :</Text>
                   <View style={{
@@ -534,7 +573,7 @@ const UserScreen = ({ navigation }) => {
                 width: '80%',
               }}>
                 <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: Colors.primary, borderRadius: 8, marginBottom: 10 }}>
-                  <Icon name="phone" size={25} color={Colors.primary} style={{ marginRight: 8, marginLeft: 8, textAlignVertical: 'center' }} />
+                  <Icon name="mobile" size={25} color={Colors.primary} style={{ marginRight: 8, marginLeft: 8, textAlignVertical: 'center' }} />
                   <TextInput
                     style={{
                       flex: 1

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const UserRoleScreen = ({ route }) => {
   const { user, setUser } = useContext(UserContext);
@@ -32,16 +33,32 @@ const UserRoleScreen = ({ route }) => {
       console.log(userRoleList, 'UserRoleList')
     } catch (error) {
       console.error('Error fetching UserRoles:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
   const GetRoleList = () => {
-    httpGet("Role/get")
+    httpGet("Role/roleGet")
       .then((result) => {
         console.log(result.data)
         setRoleList(result.data)
       })
-      .catch(err => console.error('Get Role List error :', err))
+      .catch((err) => {
+        console.error('Get Role List error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const handleAddUserRole = () => {
@@ -53,14 +70,23 @@ const UserRoleScreen = ({ route }) => {
   }
 
   const DeleteUserRoleIdConfirmYes = () => {
-    httpDelete(`UserRole/delete?Id=${userRoleDeleteId}`)
+    httpGet(`UserRole/delete?Id=${userRoleDeleteId}`)
       .then((result) => {
         console.log(result);
         fetchUserRolesByUserId();
         setUserRoleDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete User Role error', error))
+      .catch((error) => {
+        console.error('Delete User Role error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteUserRoleIdConfirmNo = () => {
@@ -84,7 +110,16 @@ const UserRoleScreen = ({ route }) => {
           setModalVisible(false);
         }
       })
-      .catch(err => console.error("Add User Role Error", err))
+      .catch((err) => {
+        console.error("Add User Role Error", err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   };
 
   const handleCloseModal = () => {
@@ -287,6 +322,7 @@ const UserRoleScreen = ({ route }) => {
             </View>
           </Modal>
         )}
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

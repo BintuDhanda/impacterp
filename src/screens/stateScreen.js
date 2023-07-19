@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
@@ -30,6 +31,13 @@ const StateScreen = ({ route, navigation }) => {
       console.log(stateList, 'stateList')
     } catch (error) {
       console.log('Error fetching states:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -62,7 +70,16 @@ const StateScreen = ({ route, navigation }) => {
           }
         );
       })
-      .catch(err => console.error("Get By Id Error", err));
+      .catch((err) => {
+        console.error("Get By Id Error", err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
     setModalVisible(true);
   };
 
@@ -71,14 +88,23 @@ const StateScreen = ({ route, navigation }) => {
   }
 
   const DeleteStateIdConfirmYes = () => {
-    httpDelete(`State/delete?Id=${stateDeleteId}`)
+    httpGet(`State/delete?Id=${stateDeleteId}`)
       .then((result) => {
         console.log(result);
         fetchStatesByCountryId();
         setStateDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete State error', error))
+      .catch((error) => {
+        console.error('Delete State error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteStateIdConfirmNo = () => {
@@ -89,7 +115,7 @@ const StateScreen = ({ route, navigation }) => {
   const handleSaveState = async () => {
     try {
       if (state.StateId !== 0) {
-        await httpPut("State/put", state)
+        await httpPost("State/put", state)
           .then((response) => {
             if (response.status === 200) {
               fetchStatesByCountryId();
@@ -105,7 +131,16 @@ const StateScreen = ({ route, navigation }) => {
               });
             }
           })
-          .catch(err => console.error("Post error in state", err));
+          .catch((err) => {
+            console.error("Post error in state", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       } else {
         await httpPost("State/post", state)
           .then((response) => {
@@ -127,6 +162,13 @@ const StateScreen = ({ route, navigation }) => {
       setModalVisible(false);
     } catch (error) {
       console.log('Error saving state:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -166,7 +208,7 @@ const StateScreen = ({ route, navigation }) => {
           <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => {DeleteStateIdConfirm(item.stateId); setShowDelete(true);}}>
+        <TouchableOpacity onPress={() => { DeleteStateIdConfirm(item.stateId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -318,6 +360,7 @@ const StateScreen = ({ route, navigation }) => {
             </View>
           </Modal>
         )}
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

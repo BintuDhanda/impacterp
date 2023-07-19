@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
+import Toast from 'react-native-toast-message';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
 
 const StudentQualificationFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -64,6 +65,16 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                     LastUpdatedBy: user.userId,
                 })
             })
+            .catch((err) => {
+                console.error('Get Student Qualification Get By Id : ', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const GetQualificationList = () => {
@@ -74,13 +85,20 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
             })
             .catch((error) => {
                 console.error(error, "Get Qualification List Error");
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
     const handleSaveStudentQualification = async () => {
         try {
             if (studentQualification.StudentQualificationId !== 0) {
-                await httpPut("StudentQualification/put", studentQualification)
+                await httpPost("StudentQualification/put", studentQualification)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Qualification Successfully')
@@ -101,7 +119,16 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                             navigation.goBack();
                         }
                     })
-                    .catch(err => console.error("Qualification update error : ", err));
+                    .catch((err) => {
+                        console.error("Qualification update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 console.log(studentQualification, "studentQualification")
@@ -126,11 +153,27 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                             navigation.navigate('HomeScreen')
                         }
                     })
-                    .catch(err => console.error('Qualification Add error :', err));
+                    .catch((err) => {
+                        console.error('Qualification Add error :', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
         }
         catch (error) {
             console.error('Error saving Qualification:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
@@ -297,6 +340,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                         <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </View>
     );

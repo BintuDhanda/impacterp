@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
+import { Get as httpGet } from '../../../constants/httpService';
 
 const StudentQualificationScreen = ({ route, navigation }) => {
   const { studentId } = route.params;
@@ -25,6 +26,13 @@ const StudentQualificationScreen = ({ route, navigation }) => {
       })
       .catch((error) => {
         console.error(error, "Get Student Qualification By Student Id Error");
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       });
   }
 
@@ -33,28 +41,28 @@ const StudentQualificationScreen = ({ route, navigation }) => {
   }
 
   const DeleteStudentQualificationIdConfirmYes = () => {
-    httpDelete(`StudentQualification/delete?Id=${studentQualificationDeleteId}`)
+    httpGet(`StudentQualification/delete?Id=${studentQualificationDeleteId}`)
       .then((result) => {
         console.log(result);
         GetStudentQualificationByStudentId();
         setStudentQualificationDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Student Qualification error', error))
+      .catch((error) => {
+        console.error('Delete Student Qualification error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteStudentQualificationIdConfirmNo = () => {
     setStudentQualificationDeleteId(0);
     setShowDelete(false);
-  }
-
-  const handleDeleteStudentQualification = (id) => {
-    httpDelete(`StudentQualification/delete?Id=${id}`)
-      .then((result) => {
-        console.log(result);
-        GetStudentQualificationByStudentId();
-      })
-      .catch(err => console.error("Delete Error", err));
   }
 
   const handleAddQualificationNavigate = () => {
@@ -72,7 +80,6 @@ const StudentQualificationScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
@@ -109,7 +116,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.studentQualificationId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
-        <TouchableOpacity  onPress={() => {DeleteStudentQualificationIdConfirm(item.studentQualificationId); setShowDelete(true);}}>
+        <TouchableOpacity onPress={() => { DeleteStudentQualificationIdConfirm(item.studentQualificationId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -190,6 +197,7 @@ const StudentQualificationScreen = ({ route, navigation }) => {
           keyExtractor={(item) => item.studentQualificationId.toString()}
           renderItem={renderQualificationCard}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

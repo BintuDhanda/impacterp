@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
@@ -26,6 +27,13 @@ const CityScreen = ({ route }) => {
             console.log(cityList, 'cityList')
         } catch (error) {
             console.log('Error fetching citys:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -58,7 +66,16 @@ const CityScreen = ({ route }) => {
                     }
                 );
             })
-            .catch(err => console.error("Get By Id Error", err));
+            .catch((err) => {
+                console.error("Get By Id Error", err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            });
         setModalVisible(true);
     };
 
@@ -67,14 +84,23 @@ const CityScreen = ({ route }) => {
     }
 
     const DeleteCityIdConfirmYes = () => {
-        httpDelete(`City/delete?Id=${cityDeleteId}`)
+        httpGet(`City/delete?Id=${cityDeleteId}`)
             .then((result) => {
                 console.log(result);
                 fetchCityByStateId();
                 setCityDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete City error', error))
+            .catch((error) => {
+                console.error('Delete City error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteCityIdConfirmNo = () => {
@@ -85,7 +111,7 @@ const CityScreen = ({ route }) => {
     const handleSaveCity = async () => {
         try {
             if (city.CityId !== 0) {
-                await httpPut("City/put", city)
+                await httpPost("City/put", city)
                     .then((response) => {
                         if (response.status === 200) {
                             fetchCityByStateId();
@@ -101,7 +127,16 @@ const CityScreen = ({ route }) => {
                             });
                         }
                     })
-                    .catch(err => console.error("Update error in City", err));
+                    .catch((err) => {
+                        console.error("Update error in City", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             } else {
                 await httpPost("City/post", city)
                     .then((response) => {
@@ -123,6 +158,13 @@ const CityScreen = ({ route }) => {
             setModalVisible(false);
         } catch (error) {
             console.log('Error saving City:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -300,6 +342,7 @@ const CityScreen = ({ route }) => {
                         </View>
                     </Modal>
                 )}
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </ScrollView>
     );

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet, Delete as httpDelete } from '../../../constants/httpService';
+import { Get as httpGet } from '../../../constants/httpService';
 
 const StudentTokenScreen = ({ route, navigation }) => {
-  const { studentId } = route.params;
+  const { studentId, studentName } = route.params;
   const [tokenList, setTokenList] = useState([]);
   const [studentTokenDeleteId, setStudentTokenDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
@@ -24,6 +25,13 @@ const StudentTokenScreen = ({ route, navigation }) => {
       setTokenList(response.data);
     } catch (error) {
       console.error('Error fetching Student Token List:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -32,14 +40,23 @@ const StudentTokenScreen = ({ route, navigation }) => {
   }
 
   const DeleteStudentTokenIdConfirmYes = () => {
-    httpDelete(`StudentToken/delete?Id=${studentTokenDeleteId}`)
+    httpGet(`StudentToken/delete?Id=${studentTokenDeleteId}`)
       .then((result) => {
         console.log(result);
         GetStudentTokenByStudentId();
         setStudentTokenDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Student Token error', error))
+      .catch((error) => {
+        console.error('Delete Student Token error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteStudentTokenIdConfirmNo = () => {
@@ -71,7 +88,6 @@ const StudentTokenScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
@@ -80,6 +96,10 @@ const StudentTokenScreen = ({ route, navigation }) => {
       borderWidth: 1.5,
       borderColor: Colors.primary,
     }}>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Student Name : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{studentName}</Text>
+      </View>
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Batch Name : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
@@ -100,12 +120,20 @@ const StudentTokenScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16 }}>Token Status : </Text>
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenStatus === true ? "Active" : "InActive"}</Text>
       </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Token Number : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.studentTokenId}</Text>
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={{ fontSize: 16 }}>Is Valid For Admission : </Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.isValidForAdmissionNonMapped}</Text>
+      </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.studentTokenId, item.batchName)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => {DeleteStudentTokenIdConfirm(item.studentTokenId); setShowDelete(true);}}>
+        <TouchableOpacity onPress={() => { DeleteStudentTokenIdConfirm(item.studentTokenId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
       </View>
@@ -186,6 +214,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
           keyExtractor={(item) => item.studentTokenId.toString()}
           renderItem={renderTokenCard}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

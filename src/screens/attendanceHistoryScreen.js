@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, A
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../constants/httpService';
 
 const AttendanceHistoryScreen = ({ route, navigation }) => {
     const { registrationNumber } = route.params;
@@ -47,6 +47,13 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             .catch((error) => {
                 setLoading(false);
                 console.error(error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -55,28 +62,28 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
     }
 
     const DeleteAttendanceHistoryIdConfirmYes = () => {
-        httpDelete(`Attendance/delete?Id=${attendanceHistoryDeleteId}`)
+        httpGet(`Attendance/delete?Id=${attendanceHistoryDeleteId}`)
             .then((result) => {
                 console.log(result);
                 navigation.goBack();
                 setAttendanceHistoryDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete Attendance History error', error))
+            .catch((error) => {
+                console.error('Delete Attendance History error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteAttendanceHistoryIdConfirmNo = () => {
         setAttendanceHistoryDeleteId(0);
         setShowDelete(false);
-    }
-
-    const handleDeleteAttendance = (id) => {
-        httpDelete(`Attendance/delete?Id=${id}`)
-            .then((result) => {
-                console.log(result);
-                navigation.goBack();
-            })
-            .catch(err => console.error("Delete Error", err));
     }
 
     const handleLoadMore = async () => {

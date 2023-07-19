@@ -2,14 +2,15 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const CourseCategoryScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
-  const [courseCategory, setCourseCategory] = useState({ "CourseCategoryId": 0, "CourseCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": user.userId });
+  const [courseCategory, setCourseCategory] = useState({ "CourseCategoryId": 0, "CourseCategoryName": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null });
   const [courseCategoryList, setCourseCategoryList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [courseCategoryDeleteId, setCourseCategoryDeleteId] = useState(0);
@@ -24,7 +25,16 @@ const CourseCategoryScreen = ({ navigation }) => {
         console.log(result.data)
         setCourseCategoryList(result.data)
       })
-      .catch(err => console.log('Get CourseCategory error :', err))
+      .catch((err) => {
+        console.log('Get CourseCategory error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
   const handleAddCourseCategory = () => {
     setCourseCategory({
@@ -33,7 +43,7 @@ const CourseCategoryScreen = ({ navigation }) => {
       IsActive: true,
       CreatedAt: null,
       CreatedBy: user.userId,
-      LastUpdatedBy: user.userId
+      LastUpdatedBy: null
     });
     setModalVisible(true);
   };
@@ -41,7 +51,7 @@ const CourseCategoryScreen = ({ navigation }) => {
   const handleSaveCourseCategory = () => {
     try {
       if (courseCategory.CourseCategoryId !== 0) {
-        httpPut("CourseCategory/put", courseCategory)
+        httpPost("CourseCategory/put", courseCategory)
           .then((response) => {
             if (response.status === 200) {
               GetCourseCategoryList();
@@ -52,11 +62,20 @@ const CourseCategoryScreen = ({ navigation }) => {
                 "IsActive": true,
                 "CreatedAt": null,
                 "CreatedBy": user.userId,
-                "LastUpdatedBy": user.userId
+                "LastUpdatedBy": null
               })
             }
           })
-          .catch(err => console.log("CourseCategory update error : ", err));
+          .catch((err) => {
+            console.log("CourseCategory update error : ", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       else {
         httpPost("CourseCategory/post", courseCategory)
@@ -70,16 +89,32 @@ const CourseCategoryScreen = ({ navigation }) => {
                 "IsActive": true,
                 "CreatedAt": null,
                 "CreatedBy": user.userId,
-                "LastUpdatedBy": user.userId
+                "LastUpdatedBy": null
               })
             }
           })
-          .catch(err => console.log('CourseCategory Add error :', err));
+          .catch((err) => {
+            console.log('CourseCategory Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       }
       setModalVisible(false);
     }
     catch (error) {
       console.log('Error saving CourseCategory:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   }
 
@@ -88,14 +123,23 @@ const CourseCategoryScreen = ({ navigation }) => {
   }
 
   const DeleteCourseCategoryIdConfirmYes = () => {
-    httpDelete(`CourseCategory/delete?Id=${courseCategoryDeleteId}`)
+    httpGet(`CourseCategory/delete?Id=${courseCategoryDeleteId}`)
       .then((result) => {
         console.log(result);
         GetCourseCategoryList();
         setCourseCategoryDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Course Category error', error))
+      .catch((error) => {
+        console.error('Delete Course Category error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteCourseCategoryIdConfirmNo = () => {
@@ -112,10 +156,19 @@ const CourseCategoryScreen = ({ navigation }) => {
           IsActive: response.data.isActive,
           CreatedAt: response.data.createdAt,
           CreatedBy: response.data.createdBy,
-          LastUpdatedBy: response.data.lastUpdatedBy
+          LastUpdatedBy: user.userId
         })
       })
-      .catch(error => console.error('CourseCategory Get By Id :', error))
+      .catch((error) => {
+        console.error('CourseCategory Get By Id :', error);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     setModalVisible(true);
   };
 
@@ -158,7 +211,7 @@ const CourseCategoryScreen = ({ navigation }) => {
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {DeleteCourseCategoryIdConfirm(item.courseCategoryId); setShowDelete(true);}}>
+          <TouchableOpacity onPress={() => { DeleteCourseCategoryIdConfirm(item.courseCategoryId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -298,8 +351,8 @@ const CourseCategoryScreen = ({ navigation }) => {
           data={courseCategoryList}
           renderItem={renderCourseCategoryCard}
           keyExtractor={(item) => item.courseCategoryId.toString()}
-        // contentContainerStyle={{ flexGrow: 1, }}
         />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

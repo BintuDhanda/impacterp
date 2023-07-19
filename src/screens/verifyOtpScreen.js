@@ -46,6 +46,14 @@ const VerifyOTPScreen = ({ route, navigation }) => {
           AsyncStorage.setItem('user', JSON.stringify(response.data));
           setUser(response.data);
         }
+      }).catch((err) => {
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       })
     }
     // Navigate to the HomeScreen
@@ -71,12 +79,21 @@ const VerifyOTPScreen = ({ route, navigation }) => {
           setShowResend(false);
         }
       }
-      ).catch(err => console.error("Send Otp Error : ", err))
+      ).catch((err) => {
+        console.error("Send Otp Error : ", err)
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: Colors.background }}>
       <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
         <View style={{ paddingHorizontal: 25 }}>
           <View style={{ alignItems: 'center' }}>

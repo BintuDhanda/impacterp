@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import Colors from '../../../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut } from '../../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
 
 const StudentTokenFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -22,6 +23,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
         "CreatedAt": null,
         "CreatedBy": user.userId,
         "LastUpdatedBy": null,
+        "IsValidForAdmissionNonMapped": "false",
     });
     const [courseCategoryList, setCourseCategoryList] = useState([]);
     const [courseList, setCourseList] = useState([]);
@@ -35,6 +37,18 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
     const [selectValidUpto, setSelectValidUpto] = useState(new Date());
     const [showValidFromPicker, setShowValidFromPicker] = useState(false);
     const [showValidUptoPicker, setShowValidUptoPicker] = useState(false);
+    const [showValidAdmissionDropdown, setshowValidAdmissionDropdown] = useState(false);
+    const toggleValidAdmissionDropdown = () => {
+        setshowValidAdmissionDropdown(!showValidAdmissionDropdown);
+    };
+
+    const selectValidAdmission = (selectedValidAdmission) => {
+        setStudentToken((prevFormData) => ({
+            ...prevFormData,
+            IsValidForAdmissionNonMapped: selectedValidAdmission,
+        }));
+        setshowValidAdmissionDropdown(false);
+    };
 
     useEffect(() => {
         if (tokenId !== undefined) {
@@ -98,16 +112,27 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
-                    CreatedBy: response.data.CreatedBy,
+                    CreatedBy: response.data.createdBy,
                     LastUpdatedBy: user.userId,
+                    IsValidForAdmissionNonMapped: response.data.isValidForAdmissionNonMapped,
                 })
+            })
+            .catch((err) => {
+                console.error('Get Student Token Get By Id : ', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             })
     }
 
     const handleSaveStudentToken = async () => {
         try {
             if (studentToken.StudentTokenId !== 0) {
-                await httpPut("StudentToken/put", studentToken)
+                await httpPost("StudentToken/put", studentToken)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Token Successfully')
@@ -122,11 +147,21 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
                                 "LastUpdatedBy": null,
+                                "IsValidForAdmissionNonMapped": "false",
                             })
                             navigation.goBack();
                         }
                     })
-                    .catch(err => console.error("Token update error : ", err));
+                    .catch((err) => {
+                        console.error("Token update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 console.log(studentToken, "studentToken")
@@ -145,15 +180,32 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
                                 "LastUpdatedBy": null,
+                                "IsValidForAdmissionNonMapped": "false",
                             })
-                            navigation.navigate('HomeScreen')
+                            navigation.goBack();
                         }
                     })
-                    .catch(err => console.error('Token Add error :', err));
+                    .catch((err) => {
+                        console.error('Token Add error :', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
         }
         catch (error) {
             console.error('Error saving Token:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
@@ -164,7 +216,14 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                 setCourseCategoryList(response.data);
             })
             .catch((error) => {
-                console.error(error, "Get CourseCategory List Error");
+                console.error(error, "Get CourseCategory List Error", error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -175,6 +234,13 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             setCourseList(response.data);
         } catch (error) {
             console.error('Error fetching Course:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
 
@@ -185,6 +251,13 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             setBatchList(response.data);
         } catch (error) {
             console.error('Error fetching Batch:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     };
     const handleCourseCategorySelect = (courseCategory) => {
@@ -223,6 +296,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
             "CreatedAt": null,
             "CreatedBy": user.userId,
             "LastUpdatedBy": null,
+            "IsValidForAdmissionNonMapped": "false",
         })
         navigation.goBack();
     }
@@ -436,6 +510,49 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                             />
                         </>
                     }
+                    <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Is Valid For Admission :</Text>
+                    <TouchableOpacity
+                        style={{
+                            borderWidth: 1,
+                            borderColor: Colors.primary,
+                            borderRadius: 5,
+                            paddingHorizontal: 10,
+                            paddingVertical: 8,
+                            marginBottom: 10,
+                            position: 'relative',
+                            zIndex: 1,
+                        }}
+                        onPress={toggleValidAdmissionDropdown}
+                    >
+                        <Text style={{ fontSize: 16, }}>{studentToken.IsValidForAdmissionNonMapped || 'Select Valid'}</Text>
+                        {showValidAdmissionDropdown && (
+                            <View style={{
+                                position: 'absolute',
+                                top: 40,
+                                left: 0,
+                                right: 0,
+                                borderWidth: 1,
+                                borderColor: Colors.primary,
+                                backgroundColor: Colors.background,
+                                borderRadius: 5,
+                                padding: 10,
+                                marginTop: 5,
+                            }}>
+                                <TouchableOpacity
+                                    style={{ paddingVertical: 8, }}
+                                    onPress={() => selectValidAdmission("true")}
+                                >
+                                    <Text style={{ fontSize: 16, }}>True</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{ paddingVertical: 8, }}
+                                    onPress={() => selectValidAdmission("false")}
+                                >
+                                    <Text style={{ fontSize: 16, }}>False</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </TouchableOpacity>
 
                     <TouchableOpacity style={{
                         backgroundColor: Colors.primary,
@@ -456,6 +573,7 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                         <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </View>
     );

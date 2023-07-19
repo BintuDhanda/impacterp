@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
 
@@ -24,7 +25,16 @@ const NewsCommentScreen = ({ route }) => {
                 console.log(result.data)
                 setNewsCommentList(result.data)
             })
-            .catch(err => console.log('Get News Comment error :', err))
+            .catch((err) => {
+                console.log('Get News Comment error :', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
     const handleAddNewsComment = () => {
         setNewsComment({
@@ -43,7 +53,7 @@ const NewsCommentScreen = ({ route }) => {
     const handleSaveNewsComment = () => {
         try {
             if (newsComment.NewsCommentId !== 0) {
-                httpPut("NewsComment/put", newsComment)
+                httpPost("NewsComment/put", newsComment)
                     .then((response) => {
                         if (response.status === 200) {
                             GetNewsCommentList();
@@ -60,7 +70,16 @@ const NewsCommentScreen = ({ route }) => {
                             })
                         }
                     })
-                    .catch(err => console.log("News Comment update error : ", err));
+                    .catch((err) => {
+                        console.log("News Comment update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             else {
                 httpPost("NewsComment/post", newsComment)
@@ -80,34 +99,59 @@ const NewsCommentScreen = ({ route }) => {
                             })
                         }
                     })
-                    .catch(err => console.log('News Comment Add error :', err));
+                    .catch((err) => {
+                        console.log('News Comment Add error :', err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
             }
             setModalVisible(false);
         }
         catch (error) {
             console.log('Error saving News Comment:', error);
+            Toast.show({
+                type: 'error',
+                text1: `${error}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+            });
         }
     }
 
     const DeleteNewsCommentIdConfirm = (newsCommentid) => {
         setNewsCommentDeleteId(newsCommentid);
-      }
-    
-      const DeleteNewsCommentIdConfirmYes = () => {
-        httpDelete(`NewsComment/delete?Id=${newsCommentDeleteId}`)
-          .then((result) => {
-            console.log(result);
-            GetNewsCommentList();
-            setNewsCommentDeleteId(0);
-            setShowDelete(false);
-          })
-          .catch(error => console.error('Delete NewsComment error', error))
-      }
-    
-      const DeleteNewsCommentIdConfirmNo = () => {
+    }
+
+    const DeleteNewsCommentIdConfirmYes = () => {
+        httpGet(`NewsComment/delete?Id=${newsCommentDeleteId}`)
+            .then((result) => {
+                console.log(result);
+                GetNewsCommentList();
+                setNewsCommentDeleteId(0);
+                setShowDelete(false);
+            })
+            .catch((error) => {
+                console.error('Delete NewsComment error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
+    }
+
+    const DeleteNewsCommentIdConfirmNo = () => {
         setNewsCommentDeleteId(0);
         setShowDelete(false);
-      }
+    }
 
     const handleEditNewsComment = (newsCommentId) => {
         httpGet(`NewsComment/getById?Id=${newsCommentId}`)
@@ -123,7 +167,16 @@ const NewsCommentScreen = ({ route }) => {
                     LastUpdatedBy: user.userId,
                 })
             })
-            .catch(error => console.log('News Comment Get By Id :', error))
+            .catch((error) => {
+                console.log('News Comment Get By Id :', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
         setModalVisible(true);
     };
 
@@ -163,7 +216,7 @@ const NewsCommentScreen = ({ route }) => {
                             <Icon name="pencil" size={18} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => {DeleteNewsCommentIdConfirm(item.newsCommentId); setShowDelete(true);}}>
+                        <TouchableOpacity onPress={() => { DeleteNewsCommentIdConfirm(item.newsCommentId); setShowDelete(true); }}>
                             <Icon name="trash" size={18} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                         </TouchableOpacity>
                     </View>
@@ -305,6 +358,7 @@ const NewsCommentScreen = ({ route }) => {
                     renderItem={renderNewsCommentCard}
                     keyExtractor={(item) => item.newsCommentId.toString()}
                 />
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </ScrollView>
     );

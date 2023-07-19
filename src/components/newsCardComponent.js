@@ -4,7 +4,7 @@ import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Post as httpPost, Delete as httpDelete, } from '../constants/httpService';
+import { Post as httpPost, Get as httpGet } from '../constants/httpService';
 import { News_URL } from '../constants/constant';
 
 
@@ -25,7 +25,16 @@ const NewsCardComponent = ({ item, navigation }) => {
                     totalLikes: response.data.totalLikes,
                 });
             })
-            .catch(err => console.error("News Like Error", err))
+            .catch((err) => {
+                console.error("News Like Error", err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteNewsIdConfirm = (newsid) => {
@@ -33,7 +42,7 @@ const NewsCardComponent = ({ item, navigation }) => {
     }
 
     const DeleteNewsIdConfirmYes = () => {
-        httpDelete(`News/delete?Id=${newsDeleteId}`)
+        httpGet(`News/delete?Id=${newsDeleteId}`)
             .then((result) => {
                 console.log(result);
                 setNewsList([]);
@@ -42,7 +51,16 @@ const NewsCardComponent = ({ item, navigation }) => {
                 setNewsDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete News error', error))
+            .catch((error) => {
+                console.error('Delete News error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteNewsIdConfirmNo = () => {
@@ -147,7 +165,7 @@ const NewsCardComponent = ({ item, navigation }) => {
                             }} onPress={() => handleEditNews(cardNews.newsId)} >
                             <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => {DeleteNewsIdConfirm(cardNews.newsId); setShowDelete(true);}} >
+                        <TouchableOpacity onPress={() => { DeleteNewsIdConfirm(cardNews.newsId); setShowDelete(true); }} >
                             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
                         </TouchableOpacity>
                     </View>

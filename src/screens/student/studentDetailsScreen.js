@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Colors from '../../constants/Colors';
-import { Delete as httpDelete, Post as httpPost } from '../../constants/httpService';
+import { Post as httpPost } from '../../constants/httpService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -73,14 +73,23 @@ const StudentDetailsScreen = ({ navigation }) => {
     }
 
     const DeleteStudentIdConfirmYes = () => {
-        httpDelete(`StudentDetails/delete?Id=${studentDeleteId}`)
+        httpGet(`StudentDetails/delete?Id=${studentDeleteId}`)
             .then((result) => {
                 console.log(result);
                 GetStudentList();
                 setStudentDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete Student error', error))
+            .catch((error) => {
+                console.error('Delete Student error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteStudentIdConfirmNo = () => {
@@ -98,8 +107,8 @@ const StudentDetailsScreen = ({ navigation }) => {
     const handleAddStudentQualificationNavigate = (studentId) => {
         navigation.navigate('StudentQualificationScreen', { studentId: studentId })
     }
-    const handleAddStudentTokenNavigate = (studentId) => {
-        navigation.navigate('StudentTokenScreen', { studentId: studentId })
+    const handleAddStudentTokenNavigate = (studentId, label) => {
+        navigation.navigate('StudentTokenScreen', { studentId: studentId, studentName: label })
     }
     const handleAddStudentBatchNavigate = (studentId) => {
         navigation.navigate('StudentBatchScreen', { studentId: studentId })
@@ -138,6 +147,13 @@ const StudentDetailsScreen = ({ navigation }) => {
             })
             .catch((error) => {
                 console.error(error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
             });
     }
 
@@ -238,7 +254,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                         paddingVertical: 8,
                         paddingHorizontal: 12,
                         marginRight: 3,
-                    }} onPress={() => handleAddStudentTokenNavigate(item.value)} >
+                    }} onPress={() => handleAddStudentTokenNavigate(item.value, item.label)} >
                     <Text style={{
                         color: Colors.background,
                         fontSize: 14,

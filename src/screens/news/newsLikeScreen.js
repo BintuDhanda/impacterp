@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
-import { Get as httpGet, Delete as httpDelete } from '../../constants/httpService';
+import { Get as httpGet } from '../../constants/httpService';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 
 const NewsLikeScreen = ({ route }) => {
     const { newsId } = route.params;
@@ -19,7 +20,16 @@ const NewsLikeScreen = ({ route }) => {
                 console.log(result.data)
                 setNewsLikeList(result.data)
             })
-            .catch(err => console.log('Get News Like error :', err))
+            .catch((err) => {
+                console.log('Get News Like error :', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteNewsLikeIdConfirm = (newsLikeid) => {
@@ -27,14 +37,23 @@ const NewsLikeScreen = ({ route }) => {
     }
 
     const DeleteNewsLikeIdConfirmYes = () => {
-        httpDelete(`NewsLike/delete?Id=${newsLikeDeleteId}`)
+        httpGet(`NewsLike/delete?Id=${newsLikeDeleteId}`)
             .then((result) => {
                 console.log(result);
                 GetNewsLikeList();
                 setNewsLikeDeleteId(0);
                 setShowDelete(false);
             })
-            .catch(error => console.error('Delete NewsLike error', error))
+            .catch((error) => {
+                console.error('Delete NewsLike error', error);
+                Toast.show({
+                    type: 'error',
+                    text1: `${error}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     }
 
     const DeleteNewsLikeIdConfirmNo = () => {
@@ -133,6 +152,7 @@ const NewsLikeScreen = ({ route }) => {
                     renderItem={renderNewsLikeCard}
                     keyExtractor={(item) => item.newsLikeId.toString()}
                 />
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </View>
         </ScrollView>
     );

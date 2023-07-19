@@ -10,8 +10,8 @@ import { Post as httpPost } from '../constants/httpService';
 const StudentBatchFeesScreen = ({ navigation }) => {
     const { user, setUser } = useContext(UserContext);
     const [registrationNumber, setRegistrationNumber] = useState({ "RegistrationNumber": "" })
-    const [studentBatchFeesDeposit, setStudentBatchFeesDeposit] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true,  "CreatedBy": user.userId,  });
-    const [studentBatchFeesRefund, setStudentBatchFeesRefund] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true,  "CreatedBy": user.userId, });
+    const [studentBatchFeesDeposit, setStudentBatchFeesDeposit] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, "CreatedBy": user.userId, });
+    const [studentBatchFeesRefund, setStudentBatchFeesRefund] = useState({ "StudentBatchFeesId": 0, "RegistrationNumber": "", "Particulars": "", "Deposit": 0, "Refund": 0, "IsActive": true, "CreatedBy": user.userId, });
     const [studentBatchFeesList, setStudentBatchFeesList] = useState([]);
     const [depositModalVisible, setDepositModalVisible] = useState(false);
     const [refundModalVisible, setRefundModalVisible] = useState(false);
@@ -90,13 +90,29 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                 .catch((error) => {
                                     setLoading(false);
                                     console.error("Add Deposit Get Student Batch Fees By Registration Number error", error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
                 setDepositModalVisible(false);
             }
         })
-            .catch(err => console.error('Error in Registration IsExists', err))
+            .catch((err) => {
+                console.error('Error in Registration IsExists', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
     };
 
     const handleSaveStudentBatchFeesRefund = () => {
@@ -141,13 +157,29 @@ const StudentBatchFeesScreen = ({ navigation }) => {
                                 .catch((error) => {
                                     setLoading(false);
                                     console.error("Add Refund Get Student Batch Fees By Registration Number error", error);
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: `${error}`,
+                                        position: 'bottom',
+                                        visibilityTime: 2000,
+                                        autoHide: true,
+                                    });
                                 });
                         }
                     })
                 setRefundModalVisible(false);
             }
         })
-            .catch(err => console.error('Get Student Batch Fees Registration Exist', err))
+            .catch((err) => {
+                console.error('Get Student Batch Fees Registration Exist', err);
+                Toast.show({
+                    type: 'error',
+                    text1: `${err}`,
+                    position: 'bottom',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                });
+            })
 
     };
 

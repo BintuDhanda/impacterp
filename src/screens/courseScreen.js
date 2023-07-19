@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Colors from '../constants/Colors';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import { Get as httpGet, Post as httpPost } from '../constants/httpService';
 
 const CourseScreen = ({ route, navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const { courseCategoryId, courseCategoryName } = route.params;
-  const [course, setCourse] = useState({ "CourseId": 0, "CourseName": "", "Fees": "", "Duration": "", "IsActive": true, "CourseCategoryId": courseCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
+  const [course, setCourse] = useState({ "CourseId": 0, "CourseName": "", "IsActive": true, "CourseCategoryId": courseCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [courseDeleteId, setCourseDeleteId] = useState(0);
@@ -25,6 +26,13 @@ const CourseScreen = ({ route, navigation }) => {
       setCourseList(response.data);
     } catch (error) {
       console.log('Error fetching Courses:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -32,8 +40,6 @@ const CourseScreen = ({ route, navigation }) => {
     setCourse({
       CourseId: 0,
       CourseName: "",
-      Fees: "",
-      Duration: "",
       IsActive: true,
       CourseCategoryId: courseCategoryId,
       CreatedAt: null,
@@ -51,8 +57,6 @@ const CourseScreen = ({ route, navigation }) => {
           {
             CourseId: result.data.courseId,
             CourseName: result.data.courseName,
-            Fees: result.data.fees,
-            Duration: result.data.duration,
             CourseCategoryId: result.data.courseCategoryId,
             IsActive: result.data.isActive,
             CreatedAt: result.data.createdAt,
@@ -61,7 +65,16 @@ const CourseScreen = ({ route, navigation }) => {
           }
         );
       })
-      .catch(err => console.error("Get By Id Error", err));
+      .catch((err) => {
+        console.error("Get By Id Error", err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
     setModalVisible(true);
   };
 
@@ -70,14 +83,23 @@ const CourseScreen = ({ route, navigation }) => {
   }
 
   const DeleteCourseIdConfirmYes = () => {
-    httpDelete(`Course/delete?Id=${courseDeleteId}`)
+    httpGet(`Course/delete?Id=${courseDeleteId}`)
       .then((result) => {
         console.log(result);
         fetchCoursesByCourseCategoryId();
         setCourseDeleteId(0);
         setShowDelete(false);
       })
-      .catch(error => console.error('Delete Course error', error))
+      .catch((error) => {
+        console.error('Delete Course error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      })
   }
 
   const DeleteCourseIdConfirmNo = () => {
@@ -88,7 +110,7 @@ const CourseScreen = ({ route, navigation }) => {
   const handleSaveCourse = async () => {
     try {
       if (course.CourseId !== 0) {
-        await httpPut("Course/put", course)
+        await httpPost("Course/put", course)
           .then((response) => {
             if (response.status === 200) {
               fetchCoursesByCourseCategoryId();
@@ -96,8 +118,6 @@ const CourseScreen = ({ route, navigation }) => {
               setCourse({
                 "CourseId": 0,
                 "CourseName": "",
-                "Fees": "",
-                "Duration": "",
                 "CourseCategoryId": courseCategoryId,
                 "IsActive": true,
                 "CreatedAt": null,
@@ -106,7 +126,16 @@ const CourseScreen = ({ route, navigation }) => {
               });
             }
           })
-          .catch(err => console.error("Post error in Course", err));
+          .catch((err) => {
+            console.error("Put error in Course", err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          });
       } else {
         await httpPost("Course/post", course)
           .then((response) => {
@@ -116,8 +145,6 @@ const CourseScreen = ({ route, navigation }) => {
               setCourse({
                 "CourseId": 0,
                 "CourseName": "",
-                "Fees": "",
-                "Duration": "",
                 "CourseCategoryId": courseCategoryId,
                 "IsActive": true,
                 "CreatedAt": null,
@@ -130,6 +157,13 @@ const CourseScreen = ({ route, navigation }) => {
       setModalVisible(false);
     } catch (error) {
       console.error('Error saving Course:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -169,7 +203,7 @@ const CourseScreen = ({ route, navigation }) => {
             <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {DeleteCourseIdConfirm(item.courseId); setShowDelete(true);}}>
+          <TouchableOpacity onPress={() => { DeleteCourseIdConfirm(item.courseId); setShowDelete(true); }}>
             <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
           </TouchableOpacity>
         </View>
@@ -279,31 +313,6 @@ const CourseScreen = ({ route, navigation }) => {
                   value={course.CourseName}
                   onChangeText={(text) => setCourse({ ...course, CourseName: text })}
                 />
-                <TextInput
-                  style={{
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                    padding: 8,
-                    marginBottom: 20,
-                  }}
-                  placeholder="Fees"
-                  value={course.Fees.toString()}
-                  keyboardType='numeric'
-                  onChangeText={(text) => setCourse({ ...course, Fees: text })}
-                />
-                <TextInput
-                  style={{
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                    padding: 8,
-                    marginBottom: 20,
-                  }}
-                  placeholder="Duration"
-                  value={course.Duration}
-                  onChangeText={(text) => setCourse({ ...course, Duration: text })}
-                />
 
                 <View style={{
                   marginTop: 10,
@@ -340,6 +349,7 @@ const CourseScreen = ({ route, navigation }) => {
             </View>
           </Modal>
         )}
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );
