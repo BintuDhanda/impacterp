@@ -22,6 +22,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
     try {
       console.log(studentId, "studentId")
       const response = await httpGet(`StudentToken/getStudentTokenByStudentId?StudentId=${studentId}`)
+      console.log(response.data, "response")
       setTokenList(response.data);
     } catch (error) {
       console.error('Error fetching Student Token List:', error);
@@ -114,7 +115,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
       </View>)}
       {item.tokenFee === null ? null : (<View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Fee : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenFee}</Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenFee + ' ('+ 'Total Deposit :'+ item.totalDeposit+ ', Total Refund : '+item.totalRefund+' )'}</Text>
       </View>)}
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Status : </Text>

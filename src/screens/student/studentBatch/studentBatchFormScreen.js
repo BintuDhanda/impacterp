@@ -106,7 +106,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                     DateOfJoin: response.data.dateOfJoin,
                     BatchId: response.data.batchId,
                     RegistrationNumber: response.data.registrationNumber,
-                    TokenNumber: response.data.tokenNumber,
+                    TokenNumber: response.data.tokenNumber.toString(),
                     StudentId: response.data.studentId,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
