@@ -25,7 +25,7 @@ const LogInScreen = ({ navigation }) => {
                     visibilityTime: 2000,
                     autoHide: true,
                 });
-                setIsPress({ ...isPress, isPress: !isPress });
+                setIsPress({ ...isPress, IsPress: !isPress });
             }
             else {
                 //send otp 

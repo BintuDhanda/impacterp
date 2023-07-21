@@ -182,7 +182,6 @@ const CourseScreen = ({ route, navigation }) => {
       borderRadius: 10,
       padding: 10,
       marginBottom: 10,
-      marginTop: 10,
       shadowColor: Colors.shadow,
       shadowOffset: { width: 10, height: 2 },
       shadowOpacity: 4,
@@ -224,6 +223,7 @@ const CourseScreen = ({ route, navigation }) => {
           paddingVertical: 10,
           paddingHorizontal: 20,
           marginTop: 10,
+          marginBottom: 10
         }} onPress={handleAddCourse}>
           <Text style={{
             color: Colors.background,

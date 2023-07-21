@@ -237,7 +237,6 @@ const BatchScreen = ({ route }) => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 10,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,
@@ -291,6 +290,7 @@ const BatchScreen = ({ route }) => {
                     paddingVertical: 10,
                     paddingHorizontal: 20,
                     marginTop: 10,
+                    marginBottom: 10,
                 }} onPress={handleAddBatch}>
                     <Text style={{
                         color: Colors.background,

@@ -6,7 +6,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
-import { Post as httpPost, Get as httpGet } from '../../constants/httpService';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import { Post as httpPost, Get as httpGet, PostformData as PostForm } from '../../constants/httpService';
 import NewsCardComponent from '../../components/newsCardComponent';
 
 const NewsScreen = ({ navigation }) => {
@@ -31,9 +32,28 @@ const NewsScreen = ({ navigation }) => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
 
-    const [news, setNews] = useState({ "NewsId": 0, "NewsText": "", "NewsTitle": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
+    const [news, setNews] = useState({ "NewsId": 0, "NewsText": "", "NewsImage": "", "NewsTitle": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
     const [newsList, setNewsList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
+    const [image, setImage] = useState(null);
+    const [type, setType] = useState(null);
+    const [newsDeleteId, setNewsDeleteId] = useState(0);
+    const [showDelete, setShowDelete] = useState(false);
+
+    const takePhotoFromCamera = () => {
+        ImageCropPicker.openCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+        }).then(image => { setImage(image.path); setType(image.mime); })
+    }
+    const selectPhotoFromGallery = () => {
+        ImageCropPicker.openPicker({
+            width: 300,
+            height: 400,
+            cropping: true,
+        }).then(image => { setImage(image.path); setType(image.mime); })
+    }
 
     const handleFromDateChange = (event, date) => {
         if (date !== undefined) {
@@ -114,6 +134,7 @@ const NewsScreen = ({ navigation }) => {
             NewsId: 0,
             NewsTitle: "",
             NewsText: "",
+            NewsImage: "",
             IsActive: true,
             CreatedAt: null,
             CreatedBy: user.userId,
@@ -125,17 +146,42 @@ const NewsScreen = ({ navigation }) => {
     const handleSaveNews = () => {
         try {
             if (news.NewsId !== 0) {
-                httpPost("News/put", news)
+                // httpPost("News/put", news)
+                const formData = new FormData();
+                formData.append('NewsId', news.NewsId);
+                formData.append('NewsTitle', news.NewsTitle);
+                formData.append('NewsImage', "");
+                formData.append('NewsText', news.NewsText);
+                formData.append('IsActive', news.IsActive);
+                formData.append('CreatedAt', news.CreatedAt);
+                formData.append('CreatedBy', news.CreatedBy);
+                formData.append('LastUpdatedBy', news.LastUpdatedBy);
+                if (image) {
+                    const imageUriParts = image.split('/');
+                    const imageName = imageUriParts[imageUriParts.length - 1];
+                    console.log(imageName, "Get Image Name")
+                    const imageFile = {
+                        uri: image,
+                        type: type, // Adjust the type according to your image
+                        name: imageName, // Adjust the file name if needed
+                    };
+                    formData.append('Image', imageFile);
+                }
+                console.log(formData , "FormData")
+
+                PostForm('News/update', formData)
                     .then((response) => {
                         if (response.status === 200) {
                             setNewsList([]);
                             setSkip(0);
                             GetNewsList();
+                            setImage(null);
                             Alert.alert('Sucees', 'Update News Successfully')
                             setNews({
                                 "NewsId": 0,
                                 "NewsTitle": "",
                                 "NewsText": "",
+                                "NewsImage": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
@@ -155,17 +201,42 @@ const NewsScreen = ({ navigation }) => {
                     });
             }
             else {
-                httpPost("News/post", news)
+                // Create a new FormData object
+
+                const formData = new FormData();
+                formData.append('NewsId', news.NewsId);
+                formData.append('NewsTitle', news.NewsTitle);
+                formData.append('NewsImage', "");
+                formData.append('NewsText', news.NewsText);
+                formData.append('IsActive', news.IsActive);
+                formData.append('CreatedAt', news.CreatedAt);
+                formData.append('CreatedBy', news.CreatedBy);
+                formData.append('LastUpdatedBy', news.LastUpdatedBy);
+                if (image) {
+                    const imageUriParts = image.split('/');
+                    const imageName = imageUriParts[imageUriParts.length - 1];
+                    console.log(imageName, "Get Image Name")
+                    const imageFile = {
+                        uri: image,
+                        type: type, // Adjust the type according to your image
+                        name: imageName, // Adjust the file name if needed
+                    };
+                    formData.append('Image', imageFile);
+                }
+
+                PostForm('News/post', formData)
                     .then((response) => {
                         if (response.status === 200) {
                             setNewsList([]);
                             setSkip(0);
+                            setImage(null);
                             GetNewsList();
                             Alert.alert('Success', 'Add News Successfully')
                             setNews({
                                 "NewsId": 0,
                                 "NewsTitle": "",
                                 "NewsText": "",
+                                "NewsImage": "",
                                 "IsActive": true,
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
@@ -198,25 +269,34 @@ const NewsScreen = ({ navigation }) => {
         }
     }
 
-    const handleDeleteNews = (newsId) => {
-        httpGet(`News/delete?Id=${newsId}`)
+    const DeleteNewsIdConfirm = (newsid) => {
+        setNewsDeleteId(newsid);
+        console.log(newsid, "handle News")
+    }
+
+    const DeleteNewsIdConfirmYes = () => {
+        httpGet(`News/delete?Id=${newsDeleteId}`)
             .then((result) => {
-                console.log(result);
-                setNewsList([]);
-                setSkip(0);
                 GetNewsList();
+                setNewsDeleteId(0);
+                setShowDelete(false);
             })
-            .catch((err) => {
-                console.error("Delete Error", err);
+            .catch((error) => {
+                console.error('Delete News error', error);
                 Toast.show({
                     type: 'error',
-                    text1: `${err}`,
+                    text1: `${error}`,
                     position: 'bottom',
                     visibilityTime: 2000,
                     autoHide: true,
                 });
-            });
-    };
+            })
+    }
+
+    const DeleteNewsIdConfirmNo = () => {
+        setNewsDeleteId(0);
+        setShowDelete(false);
+    }
 
     const handleEditNews = (newsId) => {
         httpGet(`News/getById?Id=${newsId}`)
@@ -224,6 +304,7 @@ const NewsScreen = ({ navigation }) => {
                 setNews({
                     NewsId: response.data.newsId,
                     NewsTitle: response.data.newsTitle,
+                    NewsImage: response.data.newsImage,
                     NewsText: response.data.newsText,
                     IsActive: response.data.isActive,
                     CreatedAt: response.data.createdAt,
@@ -297,7 +378,7 @@ const NewsScreen = ({ navigation }) => {
                         paddingVertical: 10,
                         paddingHorizontal: 20,
                         marginBottom: 20,
-                    }} onPress={handleAddNews}>
+                    }} onPress={() => { handleAddNews(); setNewsList([]); setSkip(0); }}>
                         <Text style={{
                             color: Colors.background,
                             fontSize: 16,
@@ -432,11 +513,63 @@ const NewsScreen = ({ navigation }) => {
                         </Modal>
                     )}
 
+                    {showDelete && (
+                        <Modal transparent visible={showDelete}>
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                                <View style={{
+                                    backgroundColor: Colors.background,
+                                    borderRadius: 10,
+                                    padding: 28,
+                                    shadowColor: Colors.shadow,
+                                    width: '80%',
+                                }}>
+                                    <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                        <TouchableOpacity style={{
+                                            backgroundColor: Colors.primary,
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                            marginRight: 3,
+                                        }} onPress={() => {
+                                            DeleteNewsIdConfirmYes();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            backgroundColor: '#f25252',
+                                            borderRadius: 5,
+                                            paddingVertical: 8,
+                                            paddingHorizontal: 12,
+                                            marginTop: 10,
+                                        }} onPress={() => {
+                                            DeleteNewsIdConfirmNo();
+                                        }}>
+                                            <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    )}
+
                     <FlatList
                         data={newsList}
                         keyExtractor={(item) => item.newsId.toString()}
                         showsVerticalScrollIndicator={false}
-                        renderItem={(item) => <NewsCardComponent item={item} navigation={navigation} />}
+                        renderItem={(item) => <NewsCardComponent item={item} ondelete={DeleteNewsIdConfirm}
+                            onEdit={handleEditNews} showDelete={setShowDelete}
+                            showModelVisible={setModalVisible}
+                            recordSkip={setSkip} recordEmpty={setNewsList}
+                            navigation={navigation} />}
                         ListFooterComponent={renderFooter}
                         onEndReached={() => {
                             handleLoadMore();
@@ -459,6 +592,17 @@ const NewsScreen = ({ navigation }) => {
                                 padding: 20,
                                 width: '80%',
                             }}>
+                                <View style={{ flexDirection: 'row', marginBottom: 10, justifyContent: 'space-between' }}>
+                                    {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 10 }} />}
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <TouchableOpacity style={{ justifyContent: 'flex-end' }} onPress={takePhotoFromCamera}>
+                                            <Icon name="camera" size={30} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{ justifyContent: 'flex-end' }} onPress={selectPhotoFromGallery}>
+                                            <Icon name="image" size={30} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
                                 <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: Colors.primary, borderRadius: 8, marginBottom: 10 }}>
                                     <TextInput
                                         style={{
@@ -511,6 +655,7 @@ const NewsScreen = ({ navigation }) => {
                                 </View>
                             </View>
                         </View>
+                        <Toast ref={(ref) => Toast.setRef(ref)} />
                     </Modal>
                 </Animated.View>
             </View>

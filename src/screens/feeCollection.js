@@ -225,7 +225,6 @@ const StudentBatchFeesScreen = ({ navigation }) => {
             borderRadius: 10,
             padding: 10,
             marginBottom: 10,
-            marginTop: 20,
             shadowColor: Colors.shadow,
             shadowOffset: { width: 10, height: 2 },
             shadowOpacity: 4,

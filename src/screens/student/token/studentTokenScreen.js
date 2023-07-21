@@ -115,7 +115,7 @@ const StudentTokenScreen = ({ route, navigation }) => {
       </View>)}
       {item.tokenFee === null ? null : (<View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Fee : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenFee + ' ('+ 'Total Deposit :'+ item.totalDeposit+ ', Total Refund : '+item.totalRefund+' )'}</Text>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.tokenFee + ' ('+ 'Total Deposit : '+ item.totalDeposit+ ', Total Refund : '+item.totalRefund+' )'}</Text>
       </View>)}
       <View style={{ flexDirection: 'row' }}>
         <Text style={{ fontSize: 16 }}>Token Status : </Text>
@@ -130,9 +130,9 @@ const StudentTokenScreen = ({ route, navigation }) => {
         <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.isValidForAdmissionNonMapped}</Text>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.studentTokenId, item.batchName)}>
+        {/* <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentTokenNavigate(item.studentTokenId, item.batchName)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity onPress={() => { DeleteStudentTokenIdConfirm(item.studentTokenId); setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
