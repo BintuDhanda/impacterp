@@ -150,6 +150,7 @@ const NewsLikeScreen = ({ route }) => {
                 <FlatList
                     data={newsLikeList}
                     renderItem={renderNewsLikeCard}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item.newsLikeId.toString()}
                 />
                 <Toast ref={(ref) => Toast.setRef(ref)} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Image, ActivityIndicator, Animated, FlatList, Alert, ScrollView } from 'react-native';
+import { Dimensions, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
@@ -12,10 +12,6 @@ const NewsCardComponent = ({ item, ondelete, onEdit, recordSkip, recordEmpty, sh
     const { user, setUser } = useContext(UserContext);
     const [cardNews, SetCardNews] = useState(item.item);
     const { width, height } = Dimensions.get('window');
-    const absolutePath = cardNews.newsImage;
-
-// Replace backslashes with forward slashes and remove the part of the path before "/uploads/"
-const relativePath = absolutePath.replace("C:\\Users\\bintu\\OneDrive\\Documents\\ERP\\wwwroot\\uploads\\", "");
 
     const handleNewsLike = (newsId) => {
         httpPost("NewsLike/post", { NewsId: newsId, CreatedBy: user.userId, IsActive: true })
@@ -56,17 +52,17 @@ const relativePath = absolutePath.replace("C:\\Users\\bintu\\OneDrive\\Documents
                 padding: 10,
                 marginBottom: 10,
                 shadowColor: Colors.shadow,
-                shadowOffset: { width: 10, height: 2 },
-                shadowOpacity: 4,
-                shadowRadius: 10,
-                elevation: 10,
+                shadowOffset: { width: 5, height: 1 },
+                shadowOpacity: 1,
+                shadowRadius: 50,
+                elevation: 5,
                 borderWidth: 1,
                 borderColor: Colors.primary,
             }}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{cardNews.newsTitle}</Text>
                 </View>
-                {(cardNews.newsImage !== null && cardNews.newsImage !== "") && (<Image source={{ uri: News_URL + cardNews.newsImage }} style={{ width: width * 0.8, height: (width * 0.8 / 1.5), resizeMode: 'cover', borderRadius: 10, alignSelf: 'center', }} />)}
+                {(cardNews.newsImage !== null && cardNews.newsImage !== "") && (<Image source={{ uri: News_URL + cardNews.newsImage }} style={{ width: width * 0.8, height: (width * 0.8 / 1.5), resizeMode: 'cover', borderRadius: 10, alignSelf: 'center' }} />)}
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}> {cardNews.newsText} </Text>
                 </View>
@@ -75,11 +71,11 @@ const relativePath = absolutePath.replace("C:\\Users\\bintu\\OneDrive\\Documents
                         {cardNews.isLiked ? (<Icon name="heart" size={20} color="red" />) : (<Icon name="heart-o" size={20} color="red" />)}
                     </TouchableOpacity>
                     <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleNewsLikeNavigate(cardNews.newsId)}>
-                        <Text style={{ marginLeft: 5, }}>{cardNews.totalLikes}</Text>
+                        <Text style={{ marginLeft: 5, }}>{cardNews.totalLikes} Likes</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{ flexDirection: 'row', alignContent: 'center' }} onPress={() => handleNewsCommentNavigate(cardNews.newsId)} >
                         {cardNews.isCommented ? (<Icon name="comment" size={20} color="blue" />) : (<Icon name="comment-o" size={20} color="blue" />)}
-                        <Text style={{ marginLeft: 5, }}>{cardNews.totalComments}</Text>
+                        <Text style={{ marginLeft: 5, }}>{cardNews.totalComments} Comments</Text>
                     </TouchableOpacity>
                     <View style={{ flex: 1, flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
                         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { onEdit(cardNews.newsId); recordSkip(0); recordEmpty([]); showModelVisible(true);} } >

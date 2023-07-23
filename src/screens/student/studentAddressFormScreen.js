@@ -193,7 +193,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
                 "CreatedBy": user.userId,
                 "LastUpdatedBy": null,
               })
-              navigation.navigate('HomeScreen');
+              navigation.goBack();
             }
           })
           .catch((err) => {
@@ -226,7 +226,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
                 "CreatedBy": user.userId,
                 "LastUpdatedBy": null,
               })
-              navigation.navigate('HomeScreen');
+              navigation.goBack();
             }
           })
           .catch((err) => {

@@ -356,6 +356,7 @@ const NewsCommentScreen = ({ route }) => {
                 <FlatList
                     data={newsCommentList}
                     renderItem={renderNewsCommentCard}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item.newsCommentId.toString()}
                 />
                 <Toast ref={(ref) => Toast.setRef(ref)} />

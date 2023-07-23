@@ -130,8 +130,10 @@ const StudentFormScreen = ({ route, navigation }) => {
                 await httpPost("StudentDetails/post", formData)
                     .then((response) => {
                         if (response.status === 200) {
-                            Alert.alert('Success', 'Add Student Details Successfully')
-                            setUser({
+                            response.data.message == null || response.data.message == "" ?
+                                Alert.alert('Success', response.data.message) :
+                                Alert.alert('Exists', response.data.message);
+                            setFormData({
                                 "StudentId": 0,
                                 "FirstName": "",
                                 "LastName": "",

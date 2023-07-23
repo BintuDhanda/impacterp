@@ -168,7 +168,9 @@ const StudentTokenFormScreen = ({ route, navigation }) => {
                 await httpPost("StudentToken/post", studentToken)
                     .then((response) => {
                         if (response.status === 200) {
-                            Alert.alert('Success', 'Add Token Successfully')
+                            response.data.message == null || response.data.message == "" ?
+                                Alert.alert('Success', response.data.message) :
+                                Alert.alert('Exists', response.data.message);
                             setStudentToken({
                                 "StudentTokenId": 0,
                                 "ValidFrom": "",
