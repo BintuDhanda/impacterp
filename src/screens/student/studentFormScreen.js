@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import Colors from '../../constants/Colors';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import { Get as httpGet, Post as httpPost, PostformData as PostForm } from '../../constants/httpService';
 
 const StudentFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
     const { userId, studentId } = route.params;
+    const [image, setImage] = useState(null);
+    const [type, setType] = useState(null);
     console.log(studentId == undefined ? 0 : studentId, "studentId")
     const [formData, setFormData] = useState({
         "StudentId": studentId == undefined ? 0 : studentId,
+        "StudentImage": "",
         "FirstName": "",
         "LastName": "",
         "FatherName": "",
@@ -28,6 +33,22 @@ const StudentFormScreen = ({ route, navigation }) => {
     });
 
     console.log(formData, "Formdata")
+
+    const takePhotoFromCamera = () => {
+        ImageCropPicker.openCamera({
+            width: 300,
+            height: 400,
+            cropping: true,
+        }).then(image => { setImage(image.path); setType(image.mime); })
+    }
+    const selectPhotoFromGallery = () => {
+        ImageCropPicker.openPicker({
+            width: 300,
+            height: 400,
+            cropping: true,
+        }).then(image => { setImage(image.path); setType(image.mime); })
+    }
+
     useEffect(() => {
         if (formData.StudentId !== 0) {
             handleEditStudentDetails();
@@ -92,12 +113,40 @@ const StudentFormScreen = ({ route, navigation }) => {
         try {
             if (formData.StudentId !== 0) {
                 console.log(JSON.stringify(formData), "Form data request")
-                await httpPost("StudentDetails/put", formData)
+                const student = new FormData();
+                student.append('StudentId', formData.StudentId);
+                student.append('StudentImage', "");
+                student.append('FirstName', formData.FirstName);
+                student.append('LastName', formData.LastName);
+                student.append('FatherName', formData.FatherName);
+                student.append('MotherName', formData.MotherName);
+                student.append('Gender', formData.Gender);
+                student.append('StudentHeight', formData.StudentHeight);
+                student.append('StudentWeight', formData.StudentWeight);
+                student.append('BodyRemark', formData.BodyRemark);
+                student.append('UserId', formData.UserId);
+                student.append('IsActive', formData.IsActive);
+                student.append('CreatedAt', formData.CreatedAt);
+                student.append('CreatedBy', formData.CreatedBy);
+                student.append('LastUpdatedBy', formData.LastUpdatedBy);
+                if (image) {
+                    const imageUriParts = image.split('/');
+                    const imageName = imageUriParts[imageUriParts.length - 1];
+                    console.log(imageName, "Get Image Name")
+                    const imageFile = {
+                        uri: image,
+                        type: type, // Adjust the type according to your image
+                        name: imageName, // Adjust the file name if needed
+                    };
+                    student.append('Image', imageFile);
+                }
+                await PostForm("StudentDetails/put", student)
                     .then((response) => {
                         if (response.status === 200) {
                             Alert.alert('Success', 'Update Student Successfully')
                             setFormData({
                                 "StudentId": 0,
+                                "StudentImage": "",
                                 "FirstName": "",
                                 "LastName": "",
                                 "FatherName": "",
@@ -112,7 +161,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "CreatedBy": user.userId,
                                 "LastUpdatedBy": null,
                             })
-                            navigation.goBack();
+                            navigation.navigate('HomeScreen');
                         }
                     })
                     .catch((err) => {
@@ -127,7 +176,34 @@ const StudentFormScreen = ({ route, navigation }) => {
                     });
             }
             else {
-                await httpPost("StudentDetails/post", formData)
+                const student = new FormData();
+                student.append('StudentId', formData.StudentId);
+                student.append('StudentImage', "");
+                student.append('FirstName', formData.FirstName);
+                student.append('LastName', formData.LastName);
+                student.append('FatheName', formData.FatherName);
+                student.append('MotherName', formData.MotherName);
+                student.append('Gender', formData.Gender);
+                student.append('StudentHeight', formData.StudentHeight);
+                student.append('StudentWeight', formData.StudentWeight);
+                student.append('BodyRemark', formData.BodyRemark);
+                student.append('UserId', formData.UserId);
+                student.append('IsActive', formData.IsActive);
+                student.append('CreatedAt', formData.CreatedAt);
+                student.append('CreatedBy', formData.CreatedBy);
+                student.append('LastUpdatedBy', formData.LastUpdatedBy);
+                if (image) {
+                    const imageUriParts = image.split('/');
+                    const imageName = imageUriParts[imageUriParts.length - 1];
+                    console.log(imageName, "Get Image Name")
+                    const imageFile = {
+                        uri: image,
+                        type: type, // Adjust the type according to your image
+                        name: imageName, // Adjust the file name if needed
+                    };
+                    student.append('Image', imageFile);
+                }
+                await PostForm("StudentDetails/post", student)
                     .then((response) => {
                         if (response.status === 200) {
                             response.data.message == null || response.data.message == "" ?
@@ -135,6 +211,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 Alert.alert('Exists', response.data.message);
                             setFormData({
                                 "StudentId": 0,
+                                "StudentImage": "",
                                 "FirstName": "",
                                 "LastName": "",
                                 "FatherName": "",
@@ -149,7 +226,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "CreatedBy": user.userId,
                                 "LastUpdatedBy": null,
                             })
-                            navigation.navigate('StudentDetailsScreen')
+                            navigation.navigate('HomeScreen')
                         }
                     })
                     .catch((err) => {
@@ -177,7 +254,7 @@ const StudentFormScreen = ({ route, navigation }) => {
     }
 
     const handleCancel = () => {
-        navigation.goBack();
+        navigation.navigate('HomeScreen');
     }
     return (
         <View style={{ flex: 1 }}>
@@ -192,7 +269,17 @@ const StudentFormScreen = ({ route, navigation }) => {
                 elevation: 2,
             }}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, }}>Student Form</Text>
+                    <View style={{ flexDirection: 'row', marginBottom: 10, justifyContent: 'space-between' }}>
+                        {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 10 }} />}
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity style={{ justifyContent: 'flex-end' }} onPress={takePhotoFromCamera}>
+                                <Icon name="camera" size={30} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ justifyContent: 'flex-end' }} onPress={selectPhotoFromGallery}>
+                                <Icon name="image" size={30} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                     <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>First Name:</Text>
                     <TextInput
                         style={{

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
+import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, Image, ScrollView, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Colors from '../../constants/Colors';
 import { Post as httpPost } from '../../constants/httpService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { News_URL } from '../../constants/constant';
 
 const StudentDetailsScreen = ({ navigation }) => {
     const ToDate = new Date();
@@ -122,6 +123,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                 console.log(response.data, "StudentDetails list");
                 const studentDetailsArray = response.data.map((studentDetails) => ({
                     value: studentDetails.studentId,
+                    studentImage: studentDetails.studentImage,
                     label: studentDetails.firstName + " " + studentDetails.lastName,
                     father: studentDetails.fatherName,
                     mother: studentDetails.motherName,
@@ -196,6 +198,10 @@ const StudentDetailsScreen = ({ navigation }) => {
             borderWidth: 1.5,
             borderColor: Colors.primary,
         }}>
+            <Image
+                source={item.studentImage == null ? require('../../icons/user.png') : { uri: News_URL + item.studentImage }}
+                style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 10 }}
+            />
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Student Name : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.label}</Text>
@@ -279,7 +285,7 @@ const StudentDetailsScreen = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { handleNavigate(item.value); setStudentDetailsList([]); }} >
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { handleNavigate(item.value); setStudentDetailsList([]); setSkip(0); }} >
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { DeleteStudentIdConfirm(item.value); setShowDelete(true); setStudentDetailsList([]); setSkip(0); }}>
