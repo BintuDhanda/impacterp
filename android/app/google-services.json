@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "607361482260",
+    "project_id": "impacterp-37600",
+    "storage_bucket": "impacterp-37600.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607361482260:android:655383dc73767a8c967101",
+        "android_client_info": {
+          "package_name": "com.impacterp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "607361482260-7r31rc3icfmrht51b428s97lo7o233ue.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX28KiE7kyvBWxQ3b__ZL_ux41iJC6lOU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "607361482260-7r31rc3icfmrht51b428s97lo7o233ue.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

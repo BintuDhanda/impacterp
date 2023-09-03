@@ -85,6 +85,14 @@ const HomeScreen = () => {
             <Icon name="newspaper-o" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>News</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('SendNotificationScreen')}>
+            <Icon name="bell" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Notification</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('IdentityTypeScreen')}>
+            <Icon name="id-badge" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Identity Type</Text>
+          </TouchableOpacity>
         </View>
         <View style={{ justifyContent: "center", marginTop: 30, marginBottom: 20 }}>
           <TouchableOpacity onPress={handleLogOut}>

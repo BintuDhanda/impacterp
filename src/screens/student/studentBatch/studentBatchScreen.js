@@ -44,6 +44,10 @@ const StudentBatchScreen = ({ route, navigation }) => {
     navigation.navigate('StudentBatchFormScreen', { studentId: studentId, batchId: batchId })
   }
 
+  const handleStudentIdentitiesNavigate = (studentBatchid) => {
+    navigation.navigate('StudentIdentitiesScreen', { studentBatchid: studentBatchid })
+  }
+
   const DeleteStudentBatchIdConfirm = (studentBatchid) => {
     setStudentBatchDeleteId(studentBatchid);
   }
@@ -116,6 +120,9 @@ const StudentBatchScreen = ({ route, navigation }) => {
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
         <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditStudentBatchNavigate(item.studentBatchId)}>
           <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleStudentIdentitiesNavigate(item.studentBatchId)}>
+          <Icon name="file" size={20} color={'#006E33'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => { DeleteStudentBatchIdConfirm(item.studentBatchId), setShowDelete(true); }}>
           <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />

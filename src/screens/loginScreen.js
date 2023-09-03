@@ -16,7 +16,7 @@ const LogInScreen = ({ navigation }) => {
         //navigation.navigate('VerifyOTPScreen')
 
         //check if user exists or not
-        httpPost(`User/IsExists/`, { Mobile: phone }).then((res) => {
+        httpPost(`User/IsExists`, { Mobile: phone }).then((res) => {
             if (res.data == false) {
                 Toast.show({
                     type: 'error',

@@ -40,9 +40,17 @@ const VerifyOTPScreen = ({ route, navigation }) => {
     console.log(otp, verifyOtp)
     if (otp == verifyOtp) {
       // get user token api call
-      httpPost("User/login", { userMobile: mobile, userPassword: password }).then((response) => {
+      httpPost("User/ERPlogin", { userMobile: mobile, userPassword: password }).then((response) => {
         console.log(response.data, "Response")
-        if (response.status === 200) {
+        if (response.data === 0) {
+          Toast.show({
+            type: 'error',
+            text1: "Invalid Password or Phone No. Try Again!",
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        } else {
           AsyncStorage.setItem('user', JSON.stringify(response.data));
           setUser(response.data);
         }
@@ -55,6 +63,14 @@ const VerifyOTPScreen = ({ route, navigation }) => {
           autoHide: true,
         });
       })
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: "Invalid Otp!",
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
     // Navigate to the HomeScreen
   };
