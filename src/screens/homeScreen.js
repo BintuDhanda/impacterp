@@ -93,6 +93,10 @@ const HomeScreen = () => {
             <Icon name="id-badge" size={50} color={Colors.primary} style={styles.icon} />
             <Text style={styles.title}>Identity Type</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={() => handleIconPress('SliderScreen')}>
+            <Icon name="sliders" size={50} color={Colors.primary} style={styles.icon} />
+            <Text style={styles.title}>Slider</Text>
+          </TouchableOpacity>
         </View>
         <View style={{ justifyContent: "center", marginTop: 30, marginBottom: 20 }}>
           <TouchableOpacity onPress={handleLogOut}>

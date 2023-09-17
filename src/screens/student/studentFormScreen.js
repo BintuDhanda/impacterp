@@ -7,6 +7,7 @@ import { UserContext } from '../../../App';
 import { useContext } from 'react';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { Get as httpGet, Post as httpPost, PostformData as PostForm } from '../../constants/httpService';
+import { News_URL } from '../../constants/constant';
 
 const StudentFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -81,6 +82,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                 setFormData(
                     {
                         StudentId: result.data.studentId,
+                        StudentImage: result.data.studentImage,
                         FirstName: result.data.firstName,
                         LastName: result.data.lastName,
                         FatherName: result.data.fatherName,
@@ -280,6 +282,10 @@ const StudentFormScreen = ({ route, navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
+                    <Image
+                        source={formData.StudentImage == null || formData.StudentImage == "" ? require('../../icons/user.png') : { uri: News_URL + formData.StudentImage }}
+                        style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 10 }}
+                    />
                     <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>First Name:</Text>
                     <TextInput
                         style={{

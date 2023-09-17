@@ -50,7 +50,16 @@ const VerifyOTPScreen = ({ route, navigation }) => {
             visibilityTime: 2000,
             autoHide: true,
           });
-        } else {
+        } else if (response.data.userId === 0 && response.data.token == null && response.data.message == null) {
+          Toast.show({
+            type: 'error',
+            text1: "User not exist Please Contact for Admin",
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        }
+        else {
           AsyncStorage.setItem('user', JSON.stringify(response.data));
           setUser(response.data);
         }

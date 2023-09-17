@@ -59,6 +59,8 @@ import SendNotificationScreen from './src/screens/sendNotificationScreen';
 import { Post } from './src/constants/httpService';
 import StudentIdentitiesScreen from './src/screens/student/studentIdentities/studentIdentitiesScreen';
 import IdentityTypeScreen from './src/screens/identityTypeScreen';
+import SliderScreen from './src/screens/sliderScreen';
+import usePushNotification from './src/services/pushNotification';
 
 
 export const UserContext = React.createContext();
@@ -81,7 +83,7 @@ function App() {
       const user = await AsyncStorage.getItem('user');
       if (user !== null) {
         // We have data!!
-        console.log(user);
+        console.log(user, "User Id");
         setUser(JSON.parse(user))
       }
     } catch (error) {
@@ -90,52 +92,9 @@ function App() {
     }
   }
 
-  // useEffect(() => {
-  //   // Request permission for receiving push notifications
-  //   const requestUserPermission = async () => {
-  //     const authStatus = await messaging().requestPermission();
-  //     const enabled =
-  //       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-  //       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-  //     if (enabled) {
-  //       console.log('Authorization status:', authStatus);
-  //       getTokenAndStore();
-  //     }
-  //   };
-
-  //   requestUserPermission();
-
-  //   // Handle incoming notifications while the app is in the foreground
-  //   const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-  //     console.log('Notification received:', remoteMessage);
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
-
-  // const getTokenAndStore = async () => {
-  //   try {
-  //     const token = await messaging().getToken();
-  //     console.log('Device token:', token);
-  //     // Send the token to the server for storage
-  //     sendTokenToServer(token);
-  //   } catch (error) {
-  //     console.log('Error getting device token:', error);
-  //   }
-  // };
-
-  // const sendTokenToServer = async (token) => {
-  //   // Make an API call to your .NET Core Web API to store the token
-  //     if(user && user.userId>0)
-  //     {
-  //       (await Post("User/UserDeviceToken",{UserId: user.userId, DeviceType:"Android", UserToken: token })
-  //       .then((res)=>res))
-  //       .catch((err)=>{})
-  //     }
-  // };
+  const pushNotification = usePushNotification(user);
+  console.log(pushNotification)
+  pushNotification()
 
   return (
     <>
@@ -187,11 +146,12 @@ function App() {
                   <Stack.Screen name="AccountScreen" options={{ title: 'Account' }} component={AccountScreen} />
                   <Stack.Screen name="AccountDaybookScreen" options={{ title: 'Account Daybook' }} component={AccountDayBookScreen} />
                   <Stack.Screen name="DayBookScreen" options={{ title: 'DayBook' }} component={DayBookScreen} />
-                  <Stack.Screen name="CameraScreen" options={{title: 'Camera'}} component={CameraScreen} />
-                  <Stack.Screen name="NewsScreen" options={{title: 'News'}} component={NewsScreen} />
-                  <Stack.Screen name="NewsLikeScreen" options={{title: 'News Like'}} component={NewsLikeScreen} />
-                  <Stack.Screen name="NewsCommentScreen" options={{title: 'News Comment'}} component={NewsCommentScreen} />
-                  <Stack.Screen name="IdentityTypeScreen" options={{title: 'Identity Type'}} component={IdentityTypeScreen} />
+                  <Stack.Screen name="CameraScreen" options={{ title: 'Camera' }} component={CameraScreen} />
+                  <Stack.Screen name="NewsScreen" options={{ title: 'News' }} component={NewsScreen} />
+                  <Stack.Screen name="NewsLikeScreen" options={{ title: 'News Like' }} component={NewsLikeScreen} />
+                  <Stack.Screen name="NewsCommentScreen" options={{ title: 'News Comment' }} component={NewsCommentScreen} />
+                  <Stack.Screen name="IdentityTypeScreen" options={{ title: 'Identity Type' }} component={IdentityTypeScreen} />
+                  <Stack.Screen name="SliderScreen" options={{ title: 'Slider' }} component={SliderScreen} />
                   {/* <Stack.Screen name="SendNotificationScreen" options={{title: 'Send Notification'}} component={SendNotificationScreen} /> */}
                 </Stack.Navigator>
               </NavigationContainer>)
