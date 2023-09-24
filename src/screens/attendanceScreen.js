@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Post as httpPost } from '../constants/httpService';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 const AttendanceScreen = ({ navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -17,6 +18,7 @@ const AttendanceScreen = ({ navigation }) => {
     const [take, setTake] = useState(10);
     const [skip, setSkip] = useState(0);
     const [isEndReached, setIsEndReached] = useState(true);
+    const [ishowQrCode, setIshowQrCode] = useState(false);
 
     const handleHistory = () => {
         setAttendanceList([]);
@@ -194,6 +196,25 @@ const AttendanceScreen = ({ navigation }) => {
         const year = date.getFullYear();
         return `${year}-${month}-${day}`;
     }
+    const convertToIndianTimee = (datetimeString) => {
+        const utcDate = new Date(datetimeString);
+
+        // Convert to IST (Indian Standard Time)
+        // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
+
+        const istDate = new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true, // Use 12-hour format with AM/PM
+        }).format(utcDate);
+
+        return istDate;
+    }
 
     const handleLoadMore = async () => {
         console.log("Execute Handle More function")
@@ -215,6 +236,12 @@ const AttendanceScreen = ({ navigation }) => {
                 <ActivityIndicator animating size="large" />
             </View>
         );
+    };
+
+
+    const onSuccess = e => {
+        setAttendance({ ...attendance, RegistrationNumber: e.data })
+        setIshowQrCode(false);
     };
 
     const renderAttendanceCard = ({ item }) => (
@@ -241,7 +268,7 @@ const AttendanceScreen = ({ navigation }) => {
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Punch Time : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.punchTime)}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{convertToIndianTimee(item.punchTime)}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Registration Number : </Text>
@@ -262,8 +289,16 @@ const AttendanceScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={{ flex: 1 }}>
                 <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
+                    {ishowQrCode && (<QRCodeScanner
+                        onRead={onSuccess}
+                        reactivate={true}
+                        reactivateTimeout={500}
+                        showMarker={true}
+                        />)}
                     <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
-                        <Icon style={{ textAlignVertical: 'center' }} name="search" size={20} />
+                        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setIshowQrCode(true); }}>
+                            <Icon name="qrcode" size={20} />
+                        </TouchableOpacity>
                         <TextInput style={{ flex: 1, marginLeft: 10 }}
                             placeholder="Enter Registration Number"
                             value={attendance.RegistrationNumber}
@@ -274,6 +309,9 @@ const AttendanceScreen = ({ navigation }) => {
                                 setSkip(0);
                             }}
                         />
+                        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setAttendance({ ...attendance, RegistrationNumber: "" }); }}>
+                            <Icon name="trash" size={20} color="green"  />
+                        </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', marginBottom: 10 }}>
                         <TouchableOpacity style={{

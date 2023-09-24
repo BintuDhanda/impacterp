@@ -61,6 +61,7 @@ import StudentIdentitiesScreen from './src/screens/student/studentIdentities/stu
 import IdentityTypeScreen from './src/screens/identityTypeScreen';
 import SliderScreen from './src/screens/sliderScreen';
 import usePushNotification from './src/services/pushNotification';
+import QRCodeScannerScreen from './src/screens/qrCodeScannerScreen';
 
 
 export const UserContext = React.createContext();
@@ -152,6 +153,7 @@ function App() {
                   <Stack.Screen name="NewsCommentScreen" options={{ title: 'News Comment' }} component={NewsCommentScreen} />
                   <Stack.Screen name="IdentityTypeScreen" options={{ title: 'Identity Type' }} component={IdentityTypeScreen} />
                   <Stack.Screen name="SliderScreen" options={{ title: 'Slider' }} component={SliderScreen} />
+                  <Stack.Screen name="QRCodeScannerScreen" options={{ title: 'Qr Code Scanner' }} component={QRCodeScannerScreen} />
                   {/* <Stack.Screen name="SendNotificationScreen" options={{title: 'Send Notification'}} component={SendNotificationScreen} /> */}
                 </Stack.Navigator>
               </NavigationContainer>)

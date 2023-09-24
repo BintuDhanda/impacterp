@@ -100,6 +100,25 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
         const year = date.getFullYear();
         return `${year}-${month}-${day}`;
     }
+    const convertToIndianTimee = (datetimeString) => {
+        const utcDate = new Date(datetimeString);
+
+        // Convert to IST (Indian Standard Time)
+        // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
+
+        const istDate = new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true, // Use 12-hour format with AM/PM
+        }).format(utcDate);
+
+        return istDate;
+    }
     const renderFooter = () => {
         if (!loading) return null;
         return (
@@ -132,7 +151,7 @@ const AttendanceHistoryScreen = ({ route, navigation }) => {
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Punch Time : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{getFormattedDate(item.punchTime)}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{convertToIndianTimee(item.punchTime)}</Text>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={{ fontSize: 16 }}>Registration Number : </Text>

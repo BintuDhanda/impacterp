@@ -197,6 +197,26 @@ const StudentIdentitiesScreen = ({ route, navigation }) => {
         setShowDelete(false);
     }
 
+    const convertToIndianTimee = (datetimeString) => {
+        const utcDate = new Date(datetimeString);
+
+        // Convert to IST (Indian Standard Time)
+        // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
+
+        const istDate = new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true, // Use 12-hour format with AM/PM
+        }).format(utcDate);
+
+        return istDate;
+    }
+
     const renderIdentitiesCard = ({ item }) => (
         <View style={{
             justifyContent: 'space-between',
@@ -224,8 +244,12 @@ const StudentIdentitiesScreen = ({ route, navigation }) => {
                 <Text style={{ fontSize: 16 }}>Status : </Text>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.stringStatus}</Text>
             </View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ fontSize: 16 }}>Date & Time : </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{convertToIndianTimee(item.createdAt)}</Text>
+            </View>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => {GetStudentIdentitiesById(item.studentIdentitiesId); setShowModal(true);}}>
+                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => { GetStudentIdentitiesById(item.studentIdentitiesId); setShowModal(true); }}>
                     <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { DeleteStudentIdentitiesIdConfirm(item.studentIdentitiesId), setShowDelete(true); }}>
