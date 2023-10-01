@@ -22,7 +22,7 @@ const SendNotificationScreen = () => {
     const [isFocus, setIsFocus] = useState(false);
     const [title, SetTitle] = useState("");
     const [body, SetBody] = useState("");
-    const [SendToId, SetSendToId] = useState(0);
+    const [SendToId, SetSendToId] = useState("0");
 
     useEffect(() => {
         GetCourseCategoryList();
@@ -85,16 +85,16 @@ const SendNotificationScreen = () => {
     const handleCourseCategorySelect = (courseCategory) => {
         setCourseCategoryValue(courseCategory.courseCategoryId);
         fetchCourseByCourseCategoryId(courseCategory.courseCategoryId);
-        SetSendToId(courseCategory.courseCategoryId);
+        SetSendToId(String(courseCategory.courseCategoryId));
     };
     const handleCourseSelect = (course) => {
         setCourseValue(course.courseId);
         fetchBatchByCourseId(course.courseId);
-        SetSendToId(course.courseId);
+        SetSendToId(String(course.courseId));
     };
     const handleBatchSelect = (batch) => {
         setBatchValue(batch.batchId);
-        SetSendToId(batch.batchId);
+        SetSendToId(String(batch.batchId));
     };
 
     const handleSendAll = () => {
@@ -103,7 +103,7 @@ const SendNotificationScreen = () => {
                 setShowSendAll(false);
                 SetTitle("");
                 SetBody("");
-                SetSendToId(0);
+                SetSendToId("0");
             }
         })
             .catch((error) => {
@@ -121,10 +121,10 @@ const SendNotificationScreen = () => {
     const handleSendCourseCategory = () => {
         httpPost("User/UserNotification", { "Body": body, "Title": title, "SendToId": SendToId, "SendToType": "CourseCategory" }).then((response) => {
             if (response.status === 200) {
-                setShowSendAll(false);
+                setShowSendCourseCategory(false);
                 SetTitle("");
                 SetBody("");
-                SetSendToId(0);
+                SetSendToId("0");
             }
         })
             .catch((error) => {
@@ -142,10 +142,10 @@ const SendNotificationScreen = () => {
     const handleSendCourse = () => {
         httpPost("User/UserNotification", { "Body": body, "Title": title, "SendToId": SendToId, "SendToType": "Course" }).then((response) => {
             if (response.status === 200) {
-                setShowSendAll(false);
+                setShowSendCourse(false);
                 SetTitle("");
                 SetBody("");
-                SetSendToId(0);
+                SetSendToId("0");
             }
         })
             .catch((error) => {
@@ -162,10 +162,10 @@ const SendNotificationScreen = () => {
     const handleSendBatch = () => {
         httpPost("User/UserNotification", { "Body": body, "Title": title, "SendToId": SendToId, "SendToType": "Batch" }).then((response) => {
             if (response.status === 200) {
-                setShowSendAll(false);
+                setShowSendBatch(false);
                 SetTitle("");
                 SetBody("");
-                SetSendToId(0);
+                SetSendToId("0");
             }
         })
             .catch((error) => {
@@ -182,10 +182,10 @@ const SendNotificationScreen = () => {
     const handleSendMobile = () => {
         httpPost("User/UserNotification", {"Body": body, "Title": title, "SendToId": SendToId, "SendToType": "Mobile"}).then((response) => {
             if (response.status === 200) {
-                setShowSendAll(false);
+                setShowSendMobile(false);
                 SetTitle("");
                 SetBody("");
-                SetSendToId(0);
+                SetSendToId("0");
             }
         })
             .catch((error) => {
@@ -541,7 +541,7 @@ const SendNotificationScreen = () => {
                                         }}
                                         placeholder="Enter Body"
                                         value={body}
-                                        onChangeText={(text) => handleInputChange('Body', text)}
+                                        onChangeText={(text) => SetBody(text)}
                                     />
                                     <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Title :</Text>
                                     <TextInput
@@ -554,7 +554,7 @@ const SendNotificationScreen = () => {
                                         }}
                                         placeholder="Enter Title"
                                         value={title}
-                                        onChangeText={(text) => handleInputChange('Title', text)}
+                                        onChangeText={(text) => SetTitle(text)}
                                     />
                                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
 
@@ -723,7 +723,7 @@ const SendNotificationScreen = () => {
                                         value={SendToId}
                                         keyboardType='numeric'
                                         maxLength={10}
-                                        onChangeText={(text) => SetSendToId(text)}
+                                        onChangeText={(text) => SetSendToId(String(text))}
                                     />
                                     <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Body :</Text>
                                     <TextInput
