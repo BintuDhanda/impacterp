@@ -8,6 +8,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
+import ShowError from '../../../constants/ShowError';
 
 const StudentBatchFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -127,7 +128,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
     }
 
     const handleSaveStudentBatch = async () => {
-        try {
+        if(IsFormValid()){try {
             if (studentBatch.StudentBatchId !== 0) {
                 await httpPost("StudentBatch/put", studentBatch)
                     .then((response) => {
@@ -243,7 +244,7 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
                 visibilityTime: 2000,
                 autoHide: true,
             });
-        }
+        }}
     }
 
     const GetCourseCategoryList = () => {
@@ -337,6 +338,29 @@ const StudentBatchFormScreen = ({ route, navigation }) => {
         })
         navigation.goBack();
     }
+    const IsFormValid=()=>{
+        if(studentBatch.DateOfJoin.length==0)
+        {
+           ShowError("Select DateOfJoin");
+           return false;
+        }
+        if(studentBatch.BatchId.length==0){
+           ShowError("Select Batch");
+           return false;
+        }
+        if(studentBatch.RegistrationNumber.length==0)
+        {
+           ShowError("Enter Valid Registration Number")
+           return false;
+        }
+        if(studentBatch.TokenNumber.length==0)
+        {
+           ShowError("Enter Valid Token Number")
+           return false;
+        }
+    
+        return true;
+       }
     return (
         <View style={{ flex: 1, padding: 10, justifyContent: 'center' }}>
             <View style={{

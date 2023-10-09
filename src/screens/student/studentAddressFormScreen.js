@@ -6,6 +6,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
+import ShowError from '../../constants/ShowError';
 
 const StudentAddressFormScreen = ({ route, navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -173,7 +174,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
   };
 
   const handleSaveStudentAddress = async () => {
-    try {
+    if(IsFormValid()){try {
       if (studentAddress.StudentAddressId !== 0) {
         await httpPost('StudentAddress/put', studentAddress)
           .then((response) => {
@@ -250,7 +251,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
+    }}
   }
 
   const handleCancel = () => {
@@ -270,6 +271,40 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     })
     navigation.goBack();
   }
+  const IsFormValid=()=>{
+    if(studentAddress.AddressTypeId.length==0)
+    {
+       ShowError("Select Address Type");
+       return false;
+    }
+    if(studentAddress.Address.length==0){
+       ShowError("Enter Valid Address");
+       return false;
+    }
+    if(studentAddress.CountryId.length==0)
+    {
+       ShowError("Select Country")
+       return false;
+    }
+    if(studentAddress.StateId.length==0)
+    {
+       ShowError("Select State")
+       return false;
+    }
+    if(studentAddress.CityId.length==0)
+    {
+       ShowError("Select City")
+       return false;
+    }
+
+    if(studentAddress.Pincode.length==0)
+    {
+       ShowError("Enter a Valid Pincode")
+       return false;
+    }
+
+    return true;
+   }
   return (
     <View style={{ flex: 1, padding: 10, }}>
       <View style={{

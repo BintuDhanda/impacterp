@@ -6,6 +6,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { UserContext } from '../../../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
+import ShowError from '../../../constants/ShowError';
 
 const StudentQualificationFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -96,7 +97,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
     }
 
     const handleSaveStudentQualification = async () => {
-        try {
+        if(IsFormValid()){try {
             if (studentQualification.StudentQualificationId !== 0) {
                 await httpPost("StudentQualification/put", studentQualification)
                     .then((response) => {
@@ -174,7 +175,7 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
                 visibilityTime: 2000,
                 autoHide: true,
             });
-        }
+        }}
     }
 
     const handleCancel = () => {
@@ -194,6 +195,40 @@ const StudentQualificationFormScreen = ({ route, navigation }) => {
         })
         navigation.goBack();
     }
+    const IsFormValid=()=>{
+        if(studentQualification.QualificationId.length==0)
+        {
+           ShowError("Select Qualification");
+           return false;
+        }
+        if(studentQualification.Subject.length==0){
+           ShowError("Enter Valid Subject");
+           return false;
+        }
+        if(studentQualification.MaximumMark.length==0)
+        {
+           ShowError("Enter Valid Maximum Mark")
+           return false;
+        }
+        if(studentQualification.MarksObtain.length==0)
+        {
+           ShowError("Enter Valid Marks Obtain")
+           return false;
+        }
+        if(studentQualification.Percentage.length==0)
+        {
+           ShowError("Enter a Valid Percentage")
+           return false;
+        }
+    
+        if(studentQualification.Grade.length==0)
+        {
+           ShowError("Enter a Valid Grade")
+           return false;
+        }
+    
+        return true;
+       }
     return (
         <View style={{ flex: 1, padding: 10, justifyContent: 'center' }}>
             <View style={{

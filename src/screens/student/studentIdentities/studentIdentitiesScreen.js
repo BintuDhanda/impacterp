@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
 import { Get as httpGet, Post as httpPost } from '../../../constants/httpService';
+import ShowError from '../../../constants/ShowError';
 
 const StudentIdentitiesScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -86,7 +87,7 @@ const StudentIdentitiesScreen = ({ route, navigation }) => {
             })
     }
     const handleSaveStudentIdentities = async () => {
-        try {
+        if(IsFormValid()){try {
             if (studentIdentities.StudentIdentitiesId === 0) {
                 await httpPost("StudentIdentities/post", studentIdentities)
                     .then((response) => {
@@ -147,9 +148,21 @@ const StudentIdentitiesScreen = ({ route, navigation }) => {
                 visibilityTime: 2000,
                 autoHide: true,
             });
-        }
+        }}
     };
-
+    const IsFormValid=()=>{
+        if(studentIdentities.IdentityTypeId.length==0)
+        {
+           ShowError("Select Identity Type");
+           return false;
+        }
+        if(studentIdentities.StringStatus.length==0){
+           ShowError("Enter Valid Status");
+           return false;
+        }
+    
+        return true;
+       }
     const GetStudentIdentitiesByStudentId = () => {
         httpGet(`StudentIdentities/getStudentIdentitiesByStudentBatchId?Id=${studentBatchid}`)
             .then((response) => {

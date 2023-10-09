@@ -8,6 +8,7 @@ import { useContext } from 'react';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { Get as httpGet, Post as httpPost, PostformData as PostForm } from '../../constants/httpService';
 import { News_URL } from '../../constants/constant';
+import ShowError from '../../constants/ShowError';
 
 const StudentFormScreen = ({ route, navigation }) => {
     const { user, setUser } = useContext(UserContext);
@@ -112,6 +113,8 @@ const StudentFormScreen = ({ route, navigation }) => {
     };
 
     const handleSaveStudentDetails = async () => {
+        if(IsFormValid())
+       {
         try {
             if (formData.StudentId !== 0) {
                 console.log(JSON.stringify(formData), "Form data request")
@@ -253,11 +256,54 @@ const StudentFormScreen = ({ route, navigation }) => {
                 autoHide: true,
             });
         }
+       }
     }
 
     const handleCancel = () => {
         navigation.navigate('HomeScreen');
     }
+
+    const IsFormValid=()=>{
+     let studentForm = formData;
+     if(studentForm.FirstName.length==0)
+     {
+        ShowError("Enter a Valid Student Name");
+        return false;
+     }
+     if(studentForm.FatherName.length==0){
+        ShowError("Enter Valid Father Name");
+        return false;
+     }
+     if(studentForm.Gender.length==0)
+     {
+        ShowError("Select Gender")
+        return false;
+     }
+     if(studentForm.MotherName.length==0)
+     {
+        ShowError("Enter Valid Mother Name")
+        return false;
+     }
+     if(studentForm.StudentHeight.length==0)
+     {
+        ShowError("Enter a Valid Height")
+        return false;
+     }
+
+     if(studentForm.StudentWeight.length==0)
+     {
+        ShowError("Enter a Valid Weight")
+        return false;
+     }
+
+     if(studentForm.BodyRemark.length==0){
+        ShowError("Enter a Valid Body Remark")
+        return false;
+     }
+
+     return true;
+    }
+
     return (
         <View style={{ flex: 1 }}>
             <View style={{
