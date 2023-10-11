@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost, Put as httpPut, Delete as httpDelete } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const AccountScreen = ({ route, navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -113,7 +114,7 @@ const AccountScreen = ({ route, navigation }) => {
   }
 
   const handleSaveAccount = async () => {
-    try {
+    if(IsFormValid()){try {
       if (account.AccountId !== 0) {
         await httpPost("Account/put", account)
           .then((response) => {
@@ -169,9 +170,47 @@ const AccountScreen = ({ route, navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
     });
-    }
+    }}
   };
+  const IsFormValid=()=>{
+    if(account.AccountName.length==0)
+    {
+       ShowError("Enter a Valid Account Name");
+       return false;
+    }
+    if(account.AccCategoryId.length==0){
+       ShowError("Select Account Category");
+       return false;
+    }
+    if(account.Gender.length==0)
+    {
+       ShowError("Select Gender")
+       return false;
+    }
+    if(account.MotherName.length==0)
+    {
+       ShowError("Enter Valid Mother Name")
+       return false;
+    }
+    if(account.StudentHeight.length==0)
+    {
+       ShowError("Enter a Valid Height")
+       return false;
+    }
 
+    if(account.StudentWeight.length==0)
+    {
+       ShowError("Enter a Valid Weight")
+       return false;
+    }
+
+    if(account.BodyRemark.length==0){
+       ShowError("Enter a Valid Body Remark")
+       return false;
+    }
+
+    return true;
+   }
   const handleCloseModal = () => {
     setModalVisible(false);
   };

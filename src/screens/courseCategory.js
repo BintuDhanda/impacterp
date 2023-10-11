@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const CourseCategoryScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -49,7 +50,7 @@ const CourseCategoryScreen = ({ navigation }) => {
   };
 
   const handleSaveCourseCategory = () => {
-    try {
+    if(IsFormValid()){try {
       if (courseCategory.CourseCategoryId !== 0) {
         httpPost("CourseCategory/put", courseCategory)
           .then((response) => {
@@ -115,9 +116,17 @@ const CourseCategoryScreen = ({ navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
+    }}
   }
+  const IsFormValid=()=>{
+    if(courseCategory.CourseCategoryName.length==0)
+    {
+       ShowError("Enter a Valid Course Category Name");
+       return false;
+    }
 
+    return true;
+   }
   const DeleteCourseCategoryIdConfirm = (courseCategoryid) => {
     setCourseCategoryDeleteId(courseCategoryid);
   }
@@ -141,7 +150,7 @@ const CourseCategoryScreen = ({ navigation }) => {
         });
       })
   }
-
+  
   const DeleteCourseCategoryIdConfirmNo = () => {
     setCourseCategoryDeleteId(0);
     setShowDelete(false);

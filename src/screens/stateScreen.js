@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const StateScreen = ({ route, navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -113,7 +114,7 @@ const StateScreen = ({ route, navigation }) => {
   }
 
   const handleSaveState = async () => {
-    try {
+    if(IsFormValid()){try {
       if (state.StateId !== 0) {
         await httpPost("State/put", state)
           .then((response) => {
@@ -169,9 +170,17 @@ const StateScreen = ({ route, navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
+    }}
   };
+  const IsFormValid=()=>{
+    if(state.StateName.length==0)
+    {
+       ShowError("Enter a Valid State Name");
+       return false;
+    }
 
+    return true;
+   }
   const handleCloseModal = () => {
     setModalVisible(false);
   };

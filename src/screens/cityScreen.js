@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
+import ShowError from '../constants/ShowError';
 
 const CityScreen = ({ route }) => {
     const { user, setUser } = useContext(UserContext);
@@ -109,7 +110,7 @@ const CityScreen = ({ route }) => {
     }
 
     const handleSaveCity = async () => {
-        try {
+        if(IsFormValid()){try {
             if (city.CityId !== 0) {
                 await httpPost("City/put", city)
                     .then((response) => {
@@ -165,9 +166,17 @@ const CityScreen = ({ route }) => {
                 visibilityTime: 2000,
                 autoHide: true,
             });
-        }
+        }}
     };
-
+    const IsFormValid=()=>{
+        if(city.CityName.length==0)
+        {
+           ShowError("Enter a Valid City Name");
+           return false;
+        }
+    
+        return true;
+       }
     const handleCloseModal = () => {
         setModalVisible(false);
     };

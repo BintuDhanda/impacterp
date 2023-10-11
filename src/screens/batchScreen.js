@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const BatchScreen = ({ route }) => {
     const { user, setUser } = useContext(UserContext);
@@ -152,7 +153,7 @@ const BatchScreen = ({ route }) => {
     }
 
     const handleSaveBatch = async () => {
-        try {
+        if(IsFormValid()){try {
             if (batch.BatchId !== 0) {
                 await httpPost("Batch/put", batch)
                     .then((response) => {
@@ -214,9 +215,36 @@ const BatchScreen = ({ route }) => {
                 visibilityTime: 2000,
                 autoHide: true,
             });
-        }
+        }}
     };
-
+    const IsFormValid=()=>{
+        if(batch.BatchName.length==0)
+        {
+           ShowError("Enter a Valid Batch Name");
+           return false;
+        }
+        if(batch.Code.length==0){
+           ShowError("Enter Valid Code");
+           return false;
+        }
+        if(batch.StartDate.length==0)
+        {
+           ShowError("Select Start Date")
+           return false;
+        }
+        if(batch.EndDate.length==0)
+        {
+           ShowError("Select End Date")
+           return false;
+        }
+        if(batch.CourseId.length==0)
+        {
+           ShowError("Select Course")
+           return false;
+        }
+   
+        return true;
+       }
     const handleCloseModal = () => {
         setModalVisible(false);
     };

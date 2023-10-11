@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const AddressTypeScreen = () => {
   const { user, setUser } = useContext(UserContext);
@@ -48,7 +49,7 @@ const AddressTypeScreen = () => {
   };
 
   const handleSaveAddressType = () => {
-    try {
+    if(IsFormValid()){try {
       if (addressType.AddressTypeId !== 0) {
         httpPost("AddressType/put", addressType)
           .then((response) => {
@@ -114,9 +115,17 @@ const AddressTypeScreen = () => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
+    }}
   }
+  const IsFormValid=()=>{
+    if(addressType.AddressTypeName.length==0)
+    {
+       ShowError("Enter a Valid Address Type Name");
+       return false;
+    }
 
+    return true;
+   }
   const DeleteAddressTypeIdConfirm = (addressTypeid) => {
     setAddressTypeDeleteId(addressTypeid);
   }

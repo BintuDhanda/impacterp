@@ -6,6 +6,7 @@ import { UserContext } from '../../App';
 import { useContext } from 'react';
 import Toast from 'react-native-toast-message';
 import { Get as httpGet, Put as httpPut, Post as httpPost, Delete as httpDelete } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const AccountCategoryScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -48,7 +49,7 @@ const AccountCategoryScreen = ({ navigation }) => {
   };
 
   const handleSaveAccountCategory = () => {
-    try {
+    if(IsFormValid()){try {
       if (accountCategory.AccountCategoryId !== 0) {
         httpPost("AccountCategory/put", accountCategory)
           .then((response) => {
@@ -114,9 +115,17 @@ const AccountCategoryScreen = ({ navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
+    }}
   }
+  const IsFormValid=()=>{
+    if(accountCategory.AccCategoryName.length==0)
+    {
+       ShowError("Enter a Valid Account Category Name");
+       return false;
+    }
 
+    return true;
+   }
   const DeleteAccountCategoryIdConfirm = (accountCategoryid) => {
     setAccountCategoryDeleteId(accountCategoryid);
   }

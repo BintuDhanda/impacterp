@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { UserContext } from '../../App';
 import { useContext } from 'react';
 import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import ShowError from '../constants/ShowError';
 
 const CountryScreen = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
@@ -48,7 +49,7 @@ const CountryScreen = ({ navigation }) => {
   };
 
   const handleSaveCountry = () => {
-    try {
+    if(IsFormValid()){try {
       if (country.CountryId !== 0) {
         httpPost("Country/put", country)
           .then((response) => {
@@ -107,9 +108,17 @@ const CountryScreen = ({ navigation }) => {
     }
     catch (error) {
       console.log('Error saving Country:', error);
-    }
+    }}
   }
+  const IsFormValid=()=>{
+    if(country.CountryName.length==0)
+    {
+       ShowError("Enter a Valid Country Name");
+       return false;
+    }
 
+    return true;
+   }
   const DeleteCountryIdConfirm = (countryid) => {
     setCountryDeleteId(countryid);
   }
