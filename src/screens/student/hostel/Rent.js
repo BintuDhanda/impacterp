@@ -11,244 +11,52 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import Colors from '../../../constants/Colors';
+import Colors from '../../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {UserContext} from '../../../../App';
+import {UserContext} from '../../../App';
 import {useContext} from 'react';
-import {Get as httpGet, Post as httpPost} from '../../../constants/httpService';
-import ShowError from '../../../constants/ShowError';
+import {Get as httpGet, Post as httpPost} from '../../constants/httpService';
+import ShowError from '../../constants/ShowError';
 import {Picker} from '@react-native-picker/picker';
+import {months, paymentModes, paymentTypes} from './constants';
 
-const HostelRoomBadStudentScreen = ({navigation}) => {
+const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
+  const {hostelRoomBadStudentId} = route?.params;
+
   const {user, setUser} = useContext(UserContext);
-  const [hostelRoomBadStudent, setHostelRoomBadStudent] = useState({
-    HostelRoomBadStudentId: 0,
-    HostelId: 0,
-    HostelRoomId: 0,
-    HostelRoomBadId: 0,
-    StudentId: 0,
+  const [hostelRoomBadStudentRent, setHostelRoomBadStudentRent] = useState({
+    HostelRoomBadStudentRentId: 0,
+    HostelRoomBadStudentId: hostelRoomBadStudentId,
+    Month: '',
+    PaymentDate: '',
+    PaymentMode: '',
+    PaymentType: '',
+    ReceivedAmount: '',
+    RefundAmount: '',
+    Remarks: '',
     IsActive: true,
     CreatedAt: null,
     CreatedBy: user.userId,
     LastUpdatedBy: null,
   });
-  const [hostelRoomBadStudentList, setHostelRoomBadStudentList] = useState([]);
-  const [hostelList, setHostelList] = useState([]);
-  const [hostelRoomList, setHostelRoomList] = useState([]);
-  const [hostelRoomBadList, setHostelRoomBadList] = useState([]);
+  const [hostelRoomBadStudentRentList, setHostelRoomBadStudentRentList] =
+    useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [hostelDeleteId, setHostelRoomBadStudentDeleteId] = useState(0);
+  const [
+    hostelRoomBadStudentRentDeleteId,
+    setHostelRoomBadStudentRentDeleteId,
+  ] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
-  const [showQRScanner, setShowQRScanner] = useState(false);
 
   useEffect(() => {
-    GetHostelRoomBadStudentList();
+    GetHostelRoomBadStudentRentList();
   }, []);
-  const GetHostelRoomBadStudentList = () => {
-    httpGet('HostelRoomBadStudent/get')
-      .then(result => {
-        setHostelRoomBadStudentList(result.data);
-      })
-      .catch(err => {
-        console.log('Get HostelRoomBadStudent error :', err);
-        Toast.show({
-          type: 'error',
-          text1: `${err}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      });
-  };
-  const handleAddHostelRoomBadStudent = () => {
-    setHostelRoomBadStudent({
-      HostelRoomBadStudentId: 0,
-      HostelId: 0,
-      HostelRoomId: 0,
-      HostelRoomBadId: 0,
-      StudentId: 0,
-      IsActive: true,
-      CreatedAt: null,
-      CreatedBy: user.userId,
-      LastUpdatedBy: null,
-    });
-    setModalVisible(true);
-  };
-
-  const handleSaveHostelRoomBadStudent = () => {
-    if (IsFormValid()) {
-      try {
-        if (hostelRoomBadStudent.HostelRoomBadStudentId !== 0) {
-          httpPost('HostelRoomBadStudent/put', hostelRoomBadStudent)
-            .then(response => {
-              if (response.status === 200) {
-                GetHostelRoomBadStudentList();
-                Alert.alert(
-                  'Sucees',
-                  'Update HostelRoomBadStudent Successfully',
-                );
-                setHostelRoomBadStudent({
-                  HostelRoomBadStudentId: 0,
-                  HostelId: 0,
-                  HostelRoomId: 0,
-                  HostelRoomBadId: 0,
-                  StudentId: 0,
-                  IsActive: true,
-                  CreatedAt: null,
-                  CreatedBy: user.userId,
-                  LastUpdatedBy: null,
-                });
-              }
-            })
-            .catch(err => {
-              console.log('HostelRoomBadStudent update error : ', err);
-              Toast.show({
-                type: 'error',
-                text1: `${err}`,
-                position: 'bottom',
-                visibilityTime: 2000,
-                autoHide: true,
-              });
-            });
-        } else {
-          httpPost('HostelRoomBadStudent/post', hostelRoomBadStudent)
-            .then(response => {
-              if (response.status === 200) {
-                GetHostelRoomBadStudentList();
-                Alert.alert('Success', 'Add HostelRoomBadStudent Successfully');
-                setHostelRoomBadStudent({
-                  HostelRoomBadStudentId: 0,
-                  HostelId: 0,
-                  HostelRoomId: 0,
-                  HostelRoomBadId: 0,
-                  StudentId: 0,
-                  IsActive: true,
-                  CreatedAt: null,
-                  CreatedBy: user.userId,
-                  LastUpdatedBy: null,
-                });
-              }
-            })
-            .catch(err => {
-              console.log('HostelRoomBadStudent Add error :', err);
-              Toast.show({
-                type: 'error',
-                text1: `${err}`,
-                position: 'bottom',
-                visibilityTime: 2000,
-                autoHide: true,
-              });
-            });
-        }
-        setModalVisible(false);
-      } catch (error) {
-        console.log('Error saving HostelRoomBadStudent:', error);
-        Toast.show({
-          type: 'error',
-          text1: `${error}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      }
-    }
-  };
-  const IsFormValid = () => {
-    if (hostelRoomBadStudent.StudentId.length == 0) {
-      ShowError('Enter a Valid StudentId');
-      return false;
-    }
-
-    return true;
-  };
-  const DeleteHostelRoomBadStudentIdConfirm = hostelRoomBadStudentId => {
-    setHostelRoomBadStudentDeleteId(hostelRoomBadStudentId);
-  };
-
-  const DeleteHostelRoomBadStudentIdConfirmYes = () => {
-    httpGet(`HostelRoomBadStudent/delete?Id=${hostelDeleteId}`)
-      .then(result => {
-        console.log(result);
-        GetHostelRoomBadStudentList();
-        setHostelRoomBadStudentDeleteId(0);
-        setShowDelete(false);
-      })
-      .catch(error => {
-        console.error('Delete HostelRoomBadStudent error', error);
-        Toast.show({
-          type: 'error',
-          text1: `${error}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      });
-  };
-
-  const DeleteHostelRoomBadStudentIdConfirmNo = () => {
-    setHostelRoomBadStudentDeleteId(0);
-    setShowDelete(false);
-  };
-
-  const handleEditHostelRoomBadStudent = hostelRoomBadStudentId => {
-    httpGet(`HostelRoomBadStudent/getById?Id=${hostelRoomBadStudentId}`)
-      .then(response => {
-        setHostelRoomBadStudent({
-          HostelRoomBadStudentId: response.data.hostelRoomBadStudentId,
-          HostelId: response.data.hostelId,
-          HostelRoomId: response.data.hostelRoomId,
-          HostelRoomBadId: response.data.hostelRoomBadId,
-          StudentId: response?.data?.studentId,
-          IsActive: response.data.isActive,
-          CreatedAt: response.data.createdAt,
-          CreatedBy: response.data.createdBy,
-          LastUpdatedBy: user.userId,
-        });
-      })
-      .catch(error => {
-        console.error('HostelRoomBadStudent Get By Id :', error);
-        Toast.show({
-          type: 'error',
-          text1: `${err}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      });
-    setModalVisible(true);
-  };
-
-  const handleClose = () => {
-    setModalVisible(false);
-  };
-
-  const GetHostelList = () => {
-    httpGet('Hostel/get')
+  const GetHostelRoomBadStudentRentList = () => {
+    httpGet(`HostelRoomBadStudentRent/get?Id=${hostelRoomBadStudentId}`)
       .then(result => {
         console.log(result.data);
-        setHostelList(result.data);
-      })
-      .catch(err => {
-        console.log('Get Hostel error :', err);
-        Toast.show({
-          type: 'error',
-          text1: `${err}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
-      });
-  };
-  useEffect(() => {
-    GetHostelList();
-  }, []);
-
-  const GetHostelRoomList = () => {
-    httpGet(`HostelRoom/get?Id=${hostelRoomBadStudent?.HostelId}`)
-      .then(result => {
-        console.log(result.data);
-        setHostelRoomList(result.data);
+        setHostelRoomBadStudentRentList(result.data);
       })
       .catch(err => {
         console.log('Get Hostel Room error :', err);
@@ -261,18 +69,169 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
         });
       });
   };
-  useEffect(() => {
-    if (hostelRoomBadStudent?.HostelId) GetHostelRoomList();
-  }, [hostelRoomBadStudent?.HostelId]);
+  const handleAddHostelRoomBadStudentRent = () => {
+    setHostelRoomBadStudentRent({
+      HostelRoomBadStudentRentId: 0,
+      HostelRoomBadStudentId: hostelRoomBadStudentId,
+      Month: '',
+      PaymentDate: '',
+      PaymentMode: '',
+      PaymentType: '',
+      ReceivedAmount: '',
+      RefundAmount: '',
+      Remarks: '',
+      IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
+    });
+    setModalVisible(true);
+  };
 
-  const GetHostelRoomBadList = () => {
-    httpGet(`HostelRoomBad/get?Id=${hostelRoomBadStudent?.HostelRoomId}`)
+  const handleSaveHostelRoomBadStudentRent = () => {
+    if (IsFormValid()) {
+      try {
+        if (hostelRoomBadStudentRent.HostelRoomBadStudentRentId !== 0) {
+          httpPost('HostelRoomBadStudentRent/put', hostelRoomBadStudentRent)
+            .then(response => {
+              if (response.status === 200) {
+                GetHostelRoomBadStudentRentList();
+                Alert.alert('Sucees', 'Update Hostel Room Successfully');
+                setHostelRoomBadStudentRent({
+                  HostelRoomBadStudentRentId: 0,
+                  HostelRoomBadStudentId: hostelRoomBadStudentId,
+                  Month: '',
+                  PaymentDate: '',
+                  PaymentMode: '',
+                  PaymentType: '',
+                  ReceivedAmount: '',
+                  RefundAmount: '',
+                  Remarks: '',
+                  IsActive: true,
+                  CreatedAt: null,
+                  CreatedBy: user.userId,
+                  LastUpdatedBy: null,
+                });
+              }
+            })
+            .catch(err => {
+              console.log('Hostel Room update error : ', err);
+              Toast.show({
+                type: 'error',
+                text1: `${err}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+              });
+            });
+        } else {
+          httpPost('HostelRoomBadStudentRent/post', hostelRoomBadStudentRent)
+            .then(response => {
+              if (response.status === 200) {
+                GetHostelRoomBadStudentRentList();
+                Alert.alert('Success', 'Add Hostel Room Successfully');
+                setHostelRoomBadStudentRent({
+                  HostelRoomBadStudentRentId: 0,
+                  HostelRoomBadStudentId: hostelRoomBadStudentId,
+                  Month: '',
+                  PaymentDate: '',
+                  PaymentMode: '',
+                  PaymentType: '',
+                  ReceivedAmount: '',
+                  RefundAmount: '',
+                  Remarks: '',
+                  IsActive: true,
+                  CreatedAt: null,
+                  CreatedBy: user.userId,
+                  LastUpdatedBy: null,
+                });
+              }
+            })
+            .catch(err => {
+              console.log('Rent Add error :', err);
+              Toast.show({
+                type: 'error',
+                text1: `${err}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+              });
+            });
+        }
+        setModalVisible(false);
+      } catch (error) {
+        console.log('Error saving HostelRoomBadStudentRent:', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      }
+    }
+  };
+  const IsFormValid = () => {
+    if (hostelRoomBadStudentRent.HostelRoomBadStudentRentNo.length == 0) {
+      ShowError('Enter a Valid Hostel Room Name');
+      return false;
+    }
+
+    return true;
+  };
+  const DeleteHostelRoomBadStudentRentIdConfirm =
+    hostelRoomBadStudentRentid => {
+      setHostelRoomBadStudentRentDeleteId(hostelRoomBadStudentRentid);
+    };
+
+  const DeleteHostelRoomBadStudentRentIdConfirmYes = () => {
+    httpGet(
+      `HostelRoomBadStudentRent/delete?Id=${hostelRoomBadStudentRentDeleteId}`,
+    )
       .then(result => {
-        console.log(result.data);
-        setHostelRoomBadList(result.data);
+        console.log(result);
+        GetHostelRoomBadStudentRentList();
+        setHostelRoomBadStudentRentDeleteId(0);
+        setShowDelete(false);
       })
-      .catch(err => {
-        console.log('Get Hostel Room Bad error :', err);
+      .catch(error => {
+        console.error('Delete Hostel Room error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
+
+  const DeleteHostelRoomBadStudentRentIdConfirmNo = () => {
+    setHostelRoomBadStudentRentDeleteId(0);
+    setShowDelete(false);
+  };
+
+  const handleEditHostelRoomBadStudentRent = hostelRoomBadStudentRentId => {
+    httpGet(`HostelRoomBadStudentRent/getById?Id=${hostelRoomBadStudentRentId}`)
+      .then(response => {
+        setHostelRoomBadStudentRent({
+          HostelRoomBadStudentRentId: response.data.hostelRoomBadStudentRentId,
+          HostelRoomBadStudentId: response.data.hostelRoomBadStudentId,
+          PaymentMode: response.data.paymentMode,
+          PaymentType: response.data.paymentType,
+          PaymentDate: response.data.paymentDate,
+          ReceivedAmount: response.data.receivedAmount,
+          RefundAmount: response.data.refundAmount,
+          Month: response.data.month,
+          Remarks: response.data.remarks,
+          IsActive: response.data.isActive,
+          CreatedAt: response.data.createdAt,
+          CreatedBy: response.data.createdBy,
+          LastUpdatedBy: user.userId,
+        });
+      })
+      .catch(error => {
+        console.error('HostelRoomBadStudentRent Get By Id :', error);
         Toast.show({
           type: 'error',
           text1: `${err}`,
@@ -281,12 +240,24 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
           autoHide: true,
         });
       });
+    setModalVisible(true);
   };
-  useEffect(() => {
-    if (hostelRoomBadStudent?.HostelRoomId) GetHostelRoomBadList();
-  }, [hostelRoomBadStudent?.HostelRoomId]);
 
-  const renderHostelRoomBadStudentCard = ({item}) => {
+  const handleNavigate = (
+    hostelRoomBadStudentRentId,
+    hostelRoomBadStudentRentNo,
+  ) => {
+    navigation.navigate('HostelRoomBadStudentRentBads', {
+      hostelRoomBadStudentRentId: hostelRoomBadStudentRentId,
+      hostelRoomBadStudentRentNo: hostelRoomBadStudentRentNo,
+    });
+  };
+
+  const handleClose = () => {
+    setModalVisible(false);
+  };
+
+  const renderHostelRoomBadStudentRentCard = ({item}) => {
     return (
       <View
         style={{
@@ -305,28 +276,20 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
           borderWidth: 1.5,
           borderColor: Colors.primary,
         }}>
-        <View>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-            }}>
-            Student Id {item.studentId}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              maxWidth: '85%',
-            }}>
-            H/R/B {item.hostelRoomBad}
-          </Text>
-        </View>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: 'bold',
+          }}>
+          {item.hostelRoomBadStudentRentNo}
+        </Text>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             style={{marginRight: 10}}
             onPress={() =>
-              handleEditHostelRoomBadStudent(item.hostelRoomBadStudentId)
+              handleEditHostelRoomBadStudentRent(
+                item.hostelRoomBadStudentRentId,
+              )
             }>
             <Icon
               name="pencil"
@@ -337,8 +300,26 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
           </TouchableOpacity>
 
           <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() =>
+              handleNavigate(
+                item.hostelRoomBadStudentRentId,
+                item.hostelRoomBadStudentRentNo,
+              )
+            }>
+            <Icon
+              name="cogs"
+              size={20}
+              color={Colors.primary}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={() => {
-              DeleteHostelRoomBadStudentIdConfirm(item.hostelRoomBadStudentId);
+              DeleteHostelRoomBadStudentRentIdConfirm(
+                item.hostelRoomBadStudentRentId,
+              );
               setShowDelete(true);
             }}>
             <Icon
@@ -364,7 +345,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
             paddingHorizontal: 20,
             marginBottom: 20,
           }}
-          onPress={handleAddHostelRoomBadStudent}>
+          onPress={handleAddHostelRoomBadStudentRent}>
           <Text
             style={{
               color: Colors.background,
@@ -372,7 +353,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
               fontWeight: 'bold',
               textAlign: 'center',
             }}>
-            Allocate Hostel
+            Add Hostel Room
           </Text>
         </TouchableOpacity>
 
@@ -414,7 +395,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                       marginRight: 3,
                     }}
                     onPress={() => {
-                      DeleteHostelRoomBadStudentIdConfirmYes();
+                      DeleteHostelRoomBadStudentRentIdConfirmYes();
                     }}>
                     <Text style={{fontSize: 16, color: Colors.background}}>
                       Yes
@@ -429,7 +410,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                       marginTop: 10,
                     }}
                     onPress={() => {
-                      DeleteHostelRoomBadStudentIdConfirmNo();
+                      DeleteHostelRoomBadStudentRentIdConfirmNo();
                     }}>
                     <Text style={{fontSize: 16, color: Colors.background}}>
                       No
@@ -457,77 +438,52 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 width: '80%',
                 marginBottom: 20,
               }}>
-              <Text>Hostel</Text>
+              <Text>Payment Type</Text>
               <Picker
-                selectedValue={hostelRoomBadStudent?.HostelId}
-                onValueChange={(itemValue, itemIndex) => {
-                  setHostelRoomBadStudent({
-                    ...hostelRoomBadStudent,
-                    HostelId: itemValue,
-                    HostelRoomId: 0,
-                    HostelRoomBadId: 0,
-                  });
-                }}>
-                <Picker.Item label={'--Select hostel--'} value={0} />
-                {hostelList?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.hostelName}
-                    value={item?.hostelId}
-                  />
-                ))}
-              </Picker>
-              <Text>Room</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudent?.HostelRoomId}
-                onValueChange={(itemValue, itemIndex) => {
-                  setHostelRoomBadStudent({
-                    ...hostelRoomBadStudent,
-                    HostelRoomId: itemValue,
-                    HostelRoomBadId: 0,
-                  });
-                }}>
-                <Picker.Item label={'--Select room--'} value={0} />
-                {hostelRoomList?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.hostelRoomNo}
-                    value={item?.hostelRoomId}
-                  />
-                ))}
-              </Picker>
-              <Text>Bad</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudent?.HostelRoomBadId}
+                selectedValue={hostelRoomBadStudentRent?.PaymentType}
                 onValueChange={(itemValue, itemIndex) =>
-                  setHostelRoomBadStudent({
-                    ...hostelRoomBadStudent,
-                    HostelRoomBadId: itemValue,
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    PaymentType: itemValue,
                   })
                 }>
-                <Picker.Item label={'--Select bad--'} value={0} />
-                {hostelRoomBadList?.map((item, index) => (
+                <Picker.Item label={'--Select type--'} value={''} />
+                {paymentTypes?.map((item, index) => (
+                  <Picker.Item key={index} label={item} value={item} />
+                ))}
+              </Picker>
+              <Text>Payment Mode</Text>
+              <Picker
+                selectedValue={hostelRoomBadStudentRent?.PaymentMode}
+                onValueChange={(itemValue, itemIndex) =>
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    PaymentMode: itemValue,
+                  })
+                }>
+                <Picker.Item label={'--Select mode--'} value={''} />
+                {paymentModes?.map((item, index) => (
+                  <Picker.Item key={index} label={item} value={item} />
+                ))}
+              </Picker>
+              <Text>Payment Month</Text>
+              <Picker
+                selectedValue={hostelRoomBadStudentRent?.Month}
+                onValueChange={(itemValue, itemIndex) =>
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    Month: itemValue,
+                  })
+                }>
+                <Picker.Item label={'--Select month--'} value={0 || ''} />
+                {months?.map((item, index) => (
                   <Picker.Item
                     key={index}
-                    label={item?.hostelRoomBadNo}
-                    value={item?.hostelRoomBadId}
+                    label={item?.label}
+                    value={item?.value}
                   />
                 ))}
               </Picker>
-              <Text style={{marginVertical: 10}}>
-                Security/Rent:-{' '}
-                {hostelRoomBadList?.find(
-                  ele =>
-                    ele?.hostelRoomBadId ==
-                    hostelRoomBadStudent?.HostelRoomBadId,
-                )?.hostelRoomBadSecurity || 0}
-                /
-                {hostelRoomBadList?.find(
-                  ele =>
-                    ele?.hostelRoomBadId ==
-                    hostelRoomBadStudent?.HostelRoomBadId,
-                )?.hostelRoomBadAmount || 0}
-              </Text>
               <TextInput
                 style={{
                   width: '100%',
@@ -537,12 +493,32 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                   marginBottom: 10,
                   paddingHorizontal: 10,
                 }}
-                placeholder="Student Registration No."
-                value={hostelRoomBadStudent?.StudentId?.toString()}
+                keyboardType="number-pad"
+                placeholder="Received Amount"
+                value={hostelRoomBadStudentRent.ReceivedAmount}
                 onChangeText={text =>
-                  setHostelRoomBadStudent({
-                    ...hostelRoomBadStudent,
-                    StudentId: text,
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    ReceivedAmount: text,
+                  })
+                }
+              />
+              <TextInput
+                style={{
+                  width: '100%',
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: Colors.primary,
+                  marginBottom: 10,
+                  paddingHorizontal: 10,
+                }}
+                keyboardType="number-pad"
+                placeholder="Refund Amount"
+                value={hostelRoomBadStudentRent.RefundAmount}
+                onChangeText={text =>
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    RefundAmount: text,
                   })
                 }
               />
@@ -555,7 +531,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                   paddingHorizontal: 20,
                   marginBottom: 10,
                 }}
-                onPress={handleSaveHostelRoomBadStudent}>
+                onPress={handleSaveHostelRoomBadStudentRent}>
                 <Text
                   style={{
                     color: Colors.background,
@@ -563,7 +539,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                     fontWeight: 'bold',
                     textAlign: 'center',
                   }}>
-                  {hostelRoomBadStudent.HostelRoomBadStudentId !== 0
+                  {hostelRoomBadStudentRent.HostelRoomBadStudentRentId !== 0
                     ? 'Save'
                     : 'Add'}
                 </Text>
@@ -591,16 +567,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
         </Modal>
 
         <FlatList
-          data={hostelRoomBadStudentList}
-          renderItem={renderHostelRoomBadStudentCard}
-          keyExtractor={item => item.hostelRoomBadStudentId.toString()}
+          data={hostelRoomBadStudentRentList}
+          renderItem={renderHostelRoomBadStudentRentCard}
+          keyExtractor={item => item.hostelRoomBadStudentRentId.toString()}
         />
         <Toast ref={ref => Toast.setRef(ref)} />
       </View>
-      <Modal
-        transparent
-        visible={showQRScanner}
-        onRequestClose={() => setShowQRScanner(false)}></Modal>
     </ScrollView>
   );
 };
@@ -669,10 +641,10 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
 //     fontWeight: 'bold',
 //     textAlign: 'center',
 //   },
-//   hostelRoomBadStudentList: {
+//   hostelRoomBadStudentRentList: {
 //     flexGrow: 1,
 //   },
-//   hostelCard: {
+//   hostelRoomBadStudentRentCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -686,7 +658,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   hostelName: {
+//   hostelRoomBadStudentRentNo: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },
@@ -713,4 +685,4 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
 //   },
 // });
 
-export default HostelRoomBadStudentScreen;
+export default HostelRoomBadStudentRentScreen;
