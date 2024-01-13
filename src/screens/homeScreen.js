@@ -230,6 +230,17 @@ const HomeScreen = () => {
               color={Colors.primary}
               style={styles.icon}
             />
+            <Icon
+              name="user"
+              size={30}
+              color={'white'}
+              style={{
+                ...styles.icon,
+                position: 'absolute',
+                right: 72,
+                bottom: 55,
+              }}
+            />
             <Text style={styles.title}>Student Hostels</Text>
           </TouchableOpacity>
         </View>

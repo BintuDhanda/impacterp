@@ -24,8 +24,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
   const [hostelRoomBadStudent, setHostelRoomBadStudent] = useState({
     HostelRoomBadStudentId: 0,
+    HostelId: 0,
+    HostelRoomId: 0,
     HostelRoomBadId: 0,
     StudentId: 0,
+    MonthlyRent: 0,
+    IsRent: true,
     IsActive: true,
     CreatedAt: null,
     CreatedBy: user.userId,
@@ -35,11 +39,10 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
   const [hostelList, setHostelList] = useState([]);
   const [hostelRoomList, setHostelRoomList] = useState([]);
   const [hostelRoomBadList, setHostelRoomBadList] = useState([]);
-  const [hostelId, setHostelId] = useState(0);
-  const [hostelRoomId, setHostelRoomId] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [hostelDeleteId, setHostelRoomBadStudentDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   useEffect(() => {
     GetHostelRoomBadStudentList();
@@ -63,8 +66,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
   const handleAddHostelRoomBadStudent = () => {
     setHostelRoomBadStudent({
       HostelRoomBadStudentId: 0,
+      HostelId: 0,
+      HostelRoomId: 0,
       HostelRoomBadId: 0,
       StudentId: 0,
+      MonthlyRent: 0,
+      IsRent: true,
       IsActive: true,
       CreatedAt: null,
       CreatedBy: user.userId,
@@ -87,8 +94,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 );
                 setHostelRoomBadStudent({
                   HostelRoomBadStudentId: 0,
+                  HostelId: 0,
+                  HostelRoomId: 0,
                   HostelRoomBadId: 0,
                   StudentId: 0,
+                  MonthlyRent: 0,
+                  IsRent: true,
                   IsActive: true,
                   CreatedAt: null,
                   CreatedBy: user.userId,
@@ -114,8 +125,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 Alert.alert('Success', 'Add HostelRoomBadStudent Successfully');
                 setHostelRoomBadStudent({
                   HostelRoomBadStudentId: 0,
+                  HostelId: 0,
+                  HostelRoomId: 0,
                   HostelRoomBadId: 0,
                   StudentId: 0,
+                  MonthlyRent: 0,
+                  IsRent: true,
                   IsActive: true,
                   CreatedAt: null,
                   CreatedBy: user.userId,
@@ -148,15 +163,15 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
     }
   };
   const IsFormValid = () => {
-    if (hostelRoomBadStudent.HostelRoomBadStudentName.length == 0) {
-      ShowError('Enter a Valid HostelRoomBadStudent Name');
+    if (hostelRoomBadStudent.StudentId.length == 0) {
+      ShowError('Enter a Valid StudentId');
       return false;
     }
 
     return true;
   };
-  const DeleteHostelRoomBadStudentIdConfirm = hostelid => {
-    setHostelRoomBadStudentDeleteId(hostelid);
+  const DeleteHostelRoomBadStudentIdConfirm = hostelRoomBadStudentId => {
+    setHostelRoomBadStudentDeleteId(hostelRoomBadStudentId);
   };
 
   const DeleteHostelRoomBadStudentIdConfirmYes = () => {
@@ -189,8 +204,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
       .then(response => {
         setHostelRoomBadStudent({
           HostelRoomBadStudentId: response.data.hostelRoomBadStudentId,
+          HostelId: response.data.hostelId,
+          HostelRoomId: response.data.hostelRoomId,
           HostelRoomBadId: response.data.hostelRoomBadId,
           StudentId: response?.data?.studentId,
+          MonthlyRent: response?.data?.monthlyRent,
+          IsRent: response?.data?.isRent,
           IsActive: response.data.isActive,
           CreatedAt: response.data.createdAt,
           CreatedBy: response.data.createdBy,
@@ -236,7 +255,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
   }, []);
 
   const GetHostelRoomList = () => {
-    httpGet(`HostelRoom/get?Id=${hostelId}`)
+    httpGet(`HostelRoom/get?Id=${hostelRoomBadStudent?.HostelId}`)
       .then(result => {
         console.log(result.data);
         setHostelRoomList(result.data);
@@ -253,11 +272,11 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
       });
   };
   useEffect(() => {
-    if (hostelId) GetHostelRoomList();
-  }, [hostelId]);
+    if (hostelRoomBadStudent?.HostelId) GetHostelRoomList();
+  }, [hostelRoomBadStudent?.HostelId]);
 
   const GetHostelRoomBadList = () => {
-    httpGet(`HostelRoomBad/get?Id=${hostelRoomId}`)
+    httpGet(`HostelRoomBad/get?Id=${hostelRoomBadStudent?.HostelRoomId}`)
       .then(result => {
         console.log(result.data);
         setHostelRoomBadList(result.data);
@@ -274,8 +293,8 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
       });
   };
   useEffect(() => {
-    if (hostelRoomId) GetHostelRoomBadList();
-  }, [hostelRoomId]);
+    if (hostelRoomBadStudent?.HostelRoomId) GetHostelRoomBadList();
+  }, [hostelRoomBadStudent?.HostelRoomId]);
 
   const renderHostelRoomBadStudentCard = ({item}) => {
     return (
@@ -296,13 +315,23 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
           borderWidth: 1.5,
           borderColor: Colors.primary,
         }}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-          }}>
-          {item.hostelName}
-        </Text>
+        <View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+            }}>
+            Student Id {item.studentId}
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+              maxWidth: '85%',
+            }}>
+            H/R/B {item.hostelRoomBad}
+          </Text>
+        </View>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             style={{marginRight: 10}}
@@ -440,10 +469,15 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
               }}>
               <Text>Hostel</Text>
               <Picker
-                selectedValue={hostelId}
-                onValueChange={(itemValue, itemIndex) =>
-                  setHostelId(itemValue)
-                }>
+                selectedValue={hostelRoomBadStudent?.HostelId}
+                onValueChange={(itemValue, itemIndex) => {
+                  setHostelRoomBadStudent({
+                    ...hostelRoomBadStudent,
+                    HostelId: itemValue,
+                    HostelRoomId: 0,
+                    HostelRoomBadId: 0,
+                  });
+                }}>
                 <Picker.Item label={'--Select hostel--'} value={0} />
                 {hostelList?.map((item, index) => (
                   <Picker.Item
@@ -455,10 +489,14 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
               </Picker>
               <Text>Room</Text>
               <Picker
-                selectedValue={hostelRoomId}
-                onValueChange={(itemValue, itemIndex) =>
-                  setHostelRoomId(itemValue)
-                }>
+                selectedValue={hostelRoomBadStudent?.HostelRoomId}
+                onValueChange={(itemValue, itemIndex) => {
+                  setHostelRoomBadStudent({
+                    ...hostelRoomBadStudent,
+                    HostelRoomId: itemValue,
+                    HostelRoomBadId: 0,
+                  });
+                }}>
                 <Picker.Item label={'--Select room--'} value={0} />
                 {hostelRoomList?.map((item, index) => (
                   <Picker.Item
@@ -486,6 +524,60 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                   />
                 ))}
               </Picker>
+              <Text style={{marginVertical: 10}}>
+                Security/Rent:-{' '}
+                {hostelRoomBadList?.find(
+                  ele =>
+                    ele?.hostelRoomBadId ==
+                    hostelRoomBadStudent?.HostelRoomBadId,
+                )?.hostelRoomBadSecurity || 0}
+                /
+                {hostelRoomBadList?.find(
+                  ele =>
+                    ele?.hostelRoomBadId ==
+                    hostelRoomBadStudent?.HostelRoomBadId,
+                )?.hostelRoomBadAmount || 0}
+              </Text>
+              <Text>Payment Type</Text>
+              <Picker
+                selectedValue={hostelRoomBadStudent?.IsRent}
+                onValueChange={(itemValue, itemIndex) =>
+                  setHostelRoomBadStudent({
+                    ...hostelRoomBadStudent,
+                    IsRent: itemValue,
+                  })
+                }>
+                <Picker.Item label={'--Select type--'} value={0} />
+                {[
+                  {label: 'Security', value: false},
+                  {label: 'Monthly Rent', value: true},
+                ]?.map((item, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={item?.label}
+                    value={item?.value}
+                  />
+                ))}
+              </Picker>
+              <TextInput
+                style={{
+                  width: '100%',
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: Colors.primary,
+                  marginBottom: 10,
+                  paddingHorizontal: 10,
+                }}
+                keyboardType="number-pad"
+                placeholder="Paid amount"
+                value={hostelRoomBadStudent?.MonthlyRent?.toString()}
+                onChangeText={text =>
+                  setHostelRoomBadStudent({
+                    ...hostelRoomBadStudent,
+                    MonthlyRent: text,
+                  })
+                }
+              />
               <TextInput
                 style={{
                   width: '100%',
@@ -496,7 +588,7 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                   paddingHorizontal: 10,
                 }}
                 placeholder="Student Registration No."
-                value={hostelRoomBadStudent.StudentId}
+                value={hostelRoomBadStudent?.StudentId?.toString()}
                 onChangeText={text =>
                   setHostelRoomBadStudent({
                     ...hostelRoomBadStudent,
@@ -555,6 +647,10 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
         />
         <Toast ref={ref => Toast.setRef(ref)} />
       </View>
+      <Modal
+        transparent
+        visible={showQRScanner}
+        onRequestClose={() => setShowQRScanner(false)}></Modal>
     </ScrollView>
   );
 };
