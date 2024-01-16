@@ -11,15 +11,17 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import Colors from '../../constants/Colors';
+import Colors from '../../../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {UserContext} from '../../../App';
+import {UserContext} from '../../../../App';
 import {useContext} from 'react';
-import {Get as httpGet, Post as httpPost} from '../../constants/httpService';
-import ShowError from '../../constants/ShowError';
+import {Get as httpGet, Post as httpPost} from '../../../constants/httpService';
+import ShowError from '../../../constants/ShowError';
 import {Picker} from '@react-native-picker/picker';
 import {months, paymentModes, paymentTypes} from './constants';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {getFormattedDate} from '../../../helpers';
 
 const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
   const {hostelRoomBadStudentId} = route?.params;
@@ -29,11 +31,11 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
     HostelRoomBadStudentRentId: 0,
     HostelRoomBadStudentId: hostelRoomBadStudentId,
     Month: '',
-    PaymentDate: '',
+    PaymentDate: new Date(),
     PaymentMode: '',
     PaymentType: '',
-    ReceivedAmount: '',
-    RefundAmount: '',
+    ReceivedAmount: 0,
+    RefundAmount: 0,
     Remarks: '',
     IsActive: true,
     CreatedAt: null,
@@ -59,7 +61,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
         setHostelRoomBadStudentRentList(result.data);
       })
       .catch(err => {
-        console.log('Get Hostel Room error :', err);
+        console.log('Get Hostel Rent error :', err);
         Toast.show({
           type: 'error',
           text1: `${err}`,
@@ -74,11 +76,11 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
       HostelRoomBadStudentRentId: 0,
       HostelRoomBadStudentId: hostelRoomBadStudentId,
       Month: '',
-      PaymentDate: '',
+      PaymentDate: new Date(),
       PaymentMode: '',
       PaymentType: '',
-      ReceivedAmount: '',
-      RefundAmount: '',
+      ReceivedAmount: 0,
+      RefundAmount: 0,
       Remarks: '',
       IsActive: true,
       CreatedAt: null,
@@ -96,16 +98,16 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
             .then(response => {
               if (response.status === 200) {
                 GetHostelRoomBadStudentRentList();
-                Alert.alert('Sucees', 'Update Hostel Room Successfully');
+                Alert.alert('Sucees', 'Update Hostel Rent Successfully');
                 setHostelRoomBadStudentRent({
                   HostelRoomBadStudentRentId: 0,
                   HostelRoomBadStudentId: hostelRoomBadStudentId,
                   Month: '',
-                  PaymentDate: '',
+                  PaymentDate: new Date(),
                   PaymentMode: '',
                   PaymentType: '',
-                  ReceivedAmount: '',
-                  RefundAmount: '',
+                  ReceivedAmount: 0,
+                  RefundAmount: 0,
                   Remarks: '',
                   IsActive: true,
                   CreatedAt: null,
@@ -115,7 +117,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
               }
             })
             .catch(err => {
-              console.log('Hostel Room update error : ', err);
+              console.log('Hostel Rent update error : ', err);
               Toast.show({
                 type: 'error',
                 text1: `${err}`,
@@ -129,16 +131,16 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
             .then(response => {
               if (response.status === 200) {
                 GetHostelRoomBadStudentRentList();
-                Alert.alert('Success', 'Add Hostel Room Successfully');
+                Alert.alert('Success', 'Add Hostel Rent Successfully');
                 setHostelRoomBadStudentRent({
                   HostelRoomBadStudentRentId: 0,
                   HostelRoomBadStudentId: hostelRoomBadStudentId,
                   Month: '',
-                  PaymentDate: '',
+                  PaymentDate: new Date(),
                   PaymentMode: '',
                   PaymentType: '',
-                  ReceivedAmount: '',
-                  RefundAmount: '',
+                  ReceivedAmount: 0,
+                  RefundAmount: 0,
                   Remarks: '',
                   IsActive: true,
                   CreatedAt: null,
@@ -172,8 +174,13 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
     }
   };
   const IsFormValid = () => {
-    if (hostelRoomBadStudentRent.HostelRoomBadStudentRentNo.length == 0) {
-      ShowError('Enter a Valid Hostel Room Name');
+    if (
+      hostelRoomBadStudentRent.ReceivedAmount.length == 0 ||
+      !hostelRoomBadStudentRent?.PaymentDate ||
+      !hostelRoomBadStudentRent?.PaymentMode ||
+      !hostelRoomBadStudentRent?.PaymentType
+    ) {
+      ShowError('Enter all required fields');
       return false;
     }
 
@@ -195,7 +202,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
         setShowDelete(false);
       })
       .catch(error => {
-        console.error('Delete Hostel Room error', error);
+        console.error('Delete Hostel Rent error', error);
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -243,18 +250,22 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
     setModalVisible(true);
   };
 
-  const handleNavigate = (
-    hostelRoomBadStudentRentId,
-    hostelRoomBadStudentRentNo,
-  ) => {
-    navigation.navigate('HostelRoomBadStudentRentBads', {
-      hostelRoomBadStudentRentId: hostelRoomBadStudentRentId,
-      hostelRoomBadStudentRentNo: hostelRoomBadStudentRentNo,
-    });
-  };
-
   const handleClose = () => {
     setModalVisible(false);
+  };
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (event, date) => {
+    if (date !== undefined) {
+      setSelectToDate(date);
+      setToDate(getFormattedDate(date));
+    }
+    setShowDatePicker(false);
+  };
+
+  const handleConfirmDatePicker = () => {
+    setShowDatePicker(false);
   };
 
   const renderHostelRoomBadStudentRentCard = ({item}) => {
@@ -276,13 +287,31 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
           borderWidth: 1.5,
           borderColor: Colors.primary,
         }}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-          }}>
-          {item.hostelRoomBadStudentRentNo}
-        </Text>
+        <View>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+            }}>
+            {months?.find(ele => ele?.value == item.month)?.label}
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+            }}>
+            {item?.paymentType}: {item?.receivedAmount}
+          </Text>
+          {item?.refundAmount ? (
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: 'bold',
+              }}>
+              Refunded: {item?.refundAmount}
+            </Text>
+          ) : null}
+        </View>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             style={{marginRight: 10}}
@@ -296,22 +325,6 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
               size={20}
               color={'#5a67f2'}
               style={{marginLeft: 8, textAlignVertical: 'center'}}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{marginRight: 10}}
-            onPress={() =>
-              handleNavigate(
-                item.hostelRoomBadStudentRentId,
-                item.hostelRoomBadStudentRentNo,
-              )
-            }>
-            <Icon
-              name="cogs"
-              size={20}
-              color={Colors.primary}
-              style={{marginRight: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
 
@@ -353,7 +366,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
               fontWeight: 'bold',
               textAlign: 'center',
             }}>
-            Add Hostel Room
+            Add Hostel Rent
           </Text>
         </TouchableOpacity>
 
@@ -438,7 +451,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 width: '80%',
                 marginBottom: 20,
               }}>
-              <Text>Payment Type</Text>
+              <Text>Payment Type*</Text>
               <Picker
                 selectedValue={hostelRoomBadStudentRent?.PaymentType}
                 onValueChange={(itemValue, itemIndex) =>
@@ -452,7 +465,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                   <Picker.Item key={index} label={item} value={item} />
                 ))}
               </Picker>
-              <Text>Payment Mode</Text>
+              <Text>Payment Mode*</Text>
               <Picker
                 selectedValue={hostelRoomBadStudentRent?.PaymentMode}
                 onValueChange={(itemValue, itemIndex) =>
@@ -466,7 +479,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                   <Picker.Item key={index} label={item} value={item} />
                 ))}
               </Picker>
-              <Text>Payment Month</Text>
+              <Text>Payment Month*</Text>
               <Picker
                 selectedValue={hostelRoomBadStudentRent?.Month}
                 onValueChange={(itemValue, itemIndex) =>
@@ -484,6 +497,43 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                   />
                 ))}
               </Picker>
+              <Text style={{fontSize: 16, marginBottom: 5}}>Payment Date*</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 10,
+                  paddingHorizontal: 10,
+                  borderWidth: 1,
+                  borderColor: Colors.primary,
+                  borderRadius: 8,
+                }}>
+                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                  <Icon name={'calendar'} size={25} />
+                </TouchableOpacity>
+                <TextInput
+                  style={{
+                    marginLeft: 10,
+                    fontSize: 16,
+                    color: Colors.secondary,
+                  }}
+                  value={getFormattedDate(
+                    hostelRoomBadStudentRent?.PaymentDate,
+                  )}
+                  placeholder="Select payment date"
+                  editable={false}
+                />
+              </View>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={hostelRoomBadStudentRent?.PaymentDate}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  onConfirm={handleConfirmDatePicker}
+                  onCancel={handleConfirmDatePicker}
+                />
+              )}
               <TextInput
                 style={{
                   width: '100%',
@@ -494,8 +544,12 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                   paddingHorizontal: 10,
                 }}
                 keyboardType="number-pad"
-                placeholder="Received Amount"
-                value={hostelRoomBadStudentRent.ReceivedAmount}
+                placeholder="Received Amount*"
+                value={
+                  !hostelRoomBadStudentRent?.ReceivedAmount
+                    ? ''
+                    : hostelRoomBadStudentRent?.ReceivedAmount?.toString()
+                }
                 onChangeText={text =>
                   setHostelRoomBadStudentRent({
                     ...hostelRoomBadStudentRent,
@@ -514,11 +568,33 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 }}
                 keyboardType="number-pad"
                 placeholder="Refund Amount"
-                value={hostelRoomBadStudentRent.RefundAmount}
+                value={
+                  !hostelRoomBadStudentRent.RefundAmount
+                    ? ''
+                    : hostelRoomBadStudentRent.RefundAmount?.toString()
+                }
                 onChangeText={text =>
                   setHostelRoomBadStudentRent({
                     ...hostelRoomBadStudentRent,
                     RefundAmount: text,
+                  })
+                }
+              />
+              <TextInput
+                style={{
+                  width: '100%',
+                  height: 40,
+                  borderWidth: 1,
+                  borderColor: Colors.primary,
+                  marginBottom: 10,
+                  paddingHorizontal: 10,
+                }}
+                placeholder="Remarks"
+                value={hostelRoomBadStudentRent.Remarks}
+                onChangeText={text =>
+                  setHostelRoomBadStudentRent({
+                    ...hostelRoomBadStudentRent,
+                    Remarks: text,
                   })
                 }
               />

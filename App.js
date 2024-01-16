@@ -66,6 +66,7 @@ import Hostels from './src/screens/hostel';
 import HostelRooms from './src/screens/hostel/Room';
 import HostelRoomBads from './src/screens/hostel/Bad';
 import StundetHostelRoomBad from './src/screens/student/hostel';
+import StundetHostelRoomBadRent from './src/screens/student/hostel/Rent';
 
 export const UserContext = React.createContext();
 const Stack = createStackNavigator();
@@ -365,9 +366,14 @@ function App() {
                     component={HostelRoomBads}
                   />
                   <Stack.Screen
-                    name="StudentHostelRoomBad"
+                    name="StudentHostelRoomBads"
                     options={{title: 'Student Hostel Room Bads'}}
                     component={StundetHostelRoomBad}
+                  />
+                  <Stack.Screen
+                    name="StudentHostelRoomBadRents"
+                    options={{title: 'Student Hostel Room Bads'}}
+                    component={StundetHostelRoomBadRent}
                   />
                 </Stack.Navigator>
               </NavigationContainer>

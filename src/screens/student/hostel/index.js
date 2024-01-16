@@ -18,7 +18,7 @@ import {UserContext} from '../../../../App';
 import {useContext} from 'react';
 import {Get as httpGet, Post as httpPost} from '../../../constants/httpService';
 import ShowError from '../../../constants/ShowError';
-import {Picker} from '@react-native-picker/picker';
+import {Dropdown} from 'react-native-element-dropdown';
 
 const HostelRoomBadStudentScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
@@ -286,6 +286,12 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
     if (hostelRoomBadStudent?.HostelRoomId) GetHostelRoomBadList();
   }, [hostelRoomBadStudent?.HostelRoomId]);
 
+  const handleNavigate = referenceId => {
+    navigation.navigate('StudentHostelRoomBadRents', {
+      hostelRoomBadStudentId: referenceId,
+    });
+  };
+
   const renderHostelRoomBadStudentCard = ({item}) => {
     return (
       <View
@@ -333,6 +339,17 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
               size={20}
               color={'#5a67f2'}
               style={{marginLeft: 8, textAlignVertical: 'center'}}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => handleNavigate(item.hostelRoomBadStudentId)}>
+            <Icon
+              name="cogs"
+              size={20}
+              color={Colors.primary}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
 
@@ -457,63 +474,125 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 width: '80%',
                 marginBottom: 20,
               }}>
-              <Text>Hostel</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudent?.HostelId}
-                onValueChange={(itemValue, itemIndex) => {
+              <Dropdown
+                style={[
+                  {
+                    height: 50,
+                    borderColor: Colors.primary,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    paddingHorizontal: 8,
+                  },
+                ]}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
+                inputSearchStyle={{
+                  height: 40,
+                  fontSize: 16,
+                }}
+                iconStyle={{
+                  width: 20,
+                  height: 20,
+                }}
+                data={hostelList}
+                search
+                maxHeight={300}
+                labelField="hostelName"
+                valueField="hostelId"
+                placeholder={'Select hostel'}
+                searchPlaceholder="Search..."
+                value={hostelList?.find(
+                  ele => ele?.hostelId === hostelRoomBadStudent?.HostelId,
+                )}
+                onChange={text => {
                   setHostelRoomBadStudent({
                     ...hostelRoomBadStudent,
-                    HostelId: itemValue,
+                    HostelId: text.hostelId,
                     HostelRoomId: 0,
                     HostelRoomBadId: 0,
                   });
-                }}>
-                <Picker.Item label={'--Select hostel--'} value={0} />
-                {hostelList?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.hostelName}
-                    value={item?.hostelId}
-                  />
-                ))}
-              </Picker>
-              <Text>Room</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudent?.HostelRoomId}
-                onValueChange={(itemValue, itemIndex) => {
+                }}
+              />
+              <Dropdown
+                style={[
+                  {
+                    marginTop: 10,
+                    height: 50,
+                    borderColor: Colors.primary,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    paddingHorizontal: 8,
+                  },
+                ]}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
+                inputSearchStyle={{
+                  height: 40,
+                  fontSize: 16,
+                }}
+                iconStyle={{
+                  width: 20,
+                  height: 20,
+                }}
+                data={hostelRoomList}
+                search
+                maxHeight={300}
+                labelField="hostelRoomNo"
+                valueField="hostelRoomId"
+                placeholder={'Select room'}
+                searchPlaceholder="Search..."
+                value={hostelRoomList?.find(
+                  ele =>
+                    ele?.hostelRoomId === hostelRoomBadStudent?.HostelRoomId,
+                )}
+                onChange={text => {
                   setHostelRoomBadStudent({
                     ...hostelRoomBadStudent,
-                    HostelRoomId: itemValue,
+                    HostelRoomId: text.hostelRoomId,
                     HostelRoomBadId: 0,
                   });
-                }}>
-                <Picker.Item label={'--Select room--'} value={0} />
-                {hostelRoomList?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.hostelRoomNo}
-                    value={item?.hostelRoomId}
-                  />
-                ))}
-              </Picker>
-              <Text>Bad</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudent?.HostelRoomBadId}
-                onValueChange={(itemValue, itemIndex) =>
+                }}
+              />
+              <Dropdown
+                style={[
+                  {
+                    marginTop: 10,
+                    height: 50,
+                    borderColor: Colors.primary,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    paddingHorizontal: 8,
+                  },
+                ]}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
+                inputSearchStyle={{
+                  height: 40,
+                  fontSize: 16,
+                }}
+                iconStyle={{
+                  width: 20,
+                  height: 20,
+                }}
+                data={hostelRoomBadList}
+                search
+                maxHeight={300}
+                labelField="hostelRoomBadNo"
+                valueField="hostelRoomBadId"
+                placeholder={'Select bad'}
+                searchPlaceholder="Search..."
+                value={hostelRoomBadList?.find(
+                  ele =>
+                    ele?.hostelRoomBadId ===
+                    hostelRoomBadStudent?.HostelRoomBadId,
+                )}
+                onChange={text => {
                   setHostelRoomBadStudent({
                     ...hostelRoomBadStudent,
-                    HostelRoomBadId: itemValue,
-                  })
-                }>
-                <Picker.Item label={'--Select bad--'} value={0} />
-                {hostelRoomBadList?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.hostelRoomBadNo}
-                    value={item?.hostelRoomBadId}
-                  />
-                ))}
-              </Picker>
+                    HostelRoomBadId: text?.hostelRoomBadId,
+                  });
+                }}
+              />
               <Text style={{marginVertical: 10}}>
                 Security/Rent:-{' '}
                 {hostelRoomBadList?.find(
