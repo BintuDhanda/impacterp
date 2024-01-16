@@ -68,7 +68,10 @@ const HomeScreen = () => {
         <View style={styles.cardContainer}>
           {menus?.map((item, index) => {
             if (
-              !userRoleList?.map(item => item?.roleName)?.includes(item?.path)
+              !userRoleList
+                ?.map(item => item?.roleName)
+                ?.includes(item?.path) &&
+              !userRoleList?.map(item => item?.roleName)?.includes('Admin')
             ) {
               return null;
             }
