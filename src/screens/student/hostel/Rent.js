@@ -30,7 +30,8 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
   const [hostelRoomBadStudentRent, setHostelRoomBadStudentRent] = useState({
     HostelRoomBadStudentRentId: 0,
     HostelRoomBadStudentId: hostelRoomBadStudentId,
-    Month: '',
+    Month: 0,
+    Year: new Date().getFullYear(),
     PaymentDate: new Date(),
     PaymentMode: '',
     PaymentType: '',
@@ -75,7 +76,8 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
     setHostelRoomBadStudentRent({
       HostelRoomBadStudentRentId: 0,
       HostelRoomBadStudentId: hostelRoomBadStudentId,
-      Month: '',
+      Month: 0,
+      Year: new Date().getFullYear(),
       PaymentDate: new Date(),
       PaymentMode: '',
       PaymentType: '',
@@ -102,7 +104,8 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 setHostelRoomBadStudentRent({
                   HostelRoomBadStudentRentId: 0,
                   HostelRoomBadStudentId: hostelRoomBadStudentId,
-                  Month: '',
+                  Month: 0,
+                  Year: new Date().getFullYear(),
                   PaymentDate: new Date(),
                   PaymentMode: '',
                   PaymentType: '',
@@ -135,7 +138,8 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 setHostelRoomBadStudentRent({
                   HostelRoomBadStudentRentId: 0,
                   HostelRoomBadStudentId: hostelRoomBadStudentId,
-                  Month: '',
+                  Month: 0,
+                  Year: new Date().getFullYear(),
                   PaymentDate: new Date(),
                   PaymentMode: '',
                   PaymentType: '',
@@ -221,6 +225,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
   const handleEditHostelRoomBadStudentRent = hostelRoomBadStudentRentId => {
     httpGet(`HostelRoomBadStudentRent/getById?Id=${hostelRoomBadStudentRentId}`)
       .then(response => {
+        console.log(response.data);
         setHostelRoomBadStudentRent({
           HostelRoomBadStudentRentId: response.data.hostelRoomBadStudentRentId,
           HostelRoomBadStudentId: response.data.hostelRoomBadStudentId,
@@ -230,6 +235,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
           ReceivedAmount: response.data.receivedAmount,
           RefundAmount: response.data.refundAmount,
           Month: response.data.month,
+          Year: response.data.year,
           Remarks: response.data.remarks,
           IsActive: response.data.isActive,
           CreatedAt: response.data.createdAt,
@@ -238,7 +244,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
         });
       })
       .catch(error => {
-        console.error('HostelRoomBadStudentRent Get By Id :', error);
+        console.error('Hostel Room Bad Studen tRent Get By Id :', error);
         Toast.show({
           type: 'error',
           text1: `${err}`,
@@ -293,6 +299,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
               fontSize: 16,
               fontWeight: 'bold',
             }}>
+            {item?.paymentType}:{' '}
             {months?.find(ele => ele?.value == item.month)?.label}
           </Text>
           <Text
@@ -300,7 +307,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
               fontSize: 16,
               fontWeight: 'bold',
             }}>
-            {item?.paymentType}: {item?.receivedAmount}
+            Received Amount: {item?.receivedAmount}
           </Text>
           {item?.refundAmount ? (
             <Text
@@ -479,24 +486,28 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                   <Picker.Item key={index} label={item} value={item} />
                 ))}
               </Picker>
-              <Text>Payment Month*</Text>
-              <Picker
-                selectedValue={hostelRoomBadStudentRent?.Month}
-                onValueChange={(itemValue, itemIndex) =>
-                  setHostelRoomBadStudentRent({
-                    ...hostelRoomBadStudentRent,
-                    Month: itemValue,
-                  })
-                }>
-                <Picker.Item label={'--Select month--'} value={0 || ''} />
-                {months?.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.label}
-                    value={item?.value}
-                  />
-                ))}
-              </Picker>
+              {hostelRoomBadStudentRent.PaymentType !== 'Security' && (
+                <>
+                  <Text>Payment Month*</Text>
+                  <Picker
+                    selectedValue={hostelRoomBadStudentRent?.Month}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setHostelRoomBadStudentRent({
+                        ...hostelRoomBadStudentRent,
+                        Month: itemValue,
+                      })
+                    }>
+                    <Picker.Item label={'--Select month--'} value={0} />
+                    {months?.map((item, index) => (
+                      <Picker.Item
+                        key={index}
+                        label={item?.label}
+                        value={item?.value}
+                      />
+                    ))}
+                  </Picker>
+                </>
+              )}
               <Text style={{fontSize: 16, marginBottom: 5}}>Payment Date*</Text>
               <View
                 style={{
@@ -553,7 +564,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 onChangeText={text =>
                   setHostelRoomBadStudentRent({
                     ...hostelRoomBadStudentRent,
-                    ReceivedAmount: text,
+                    ReceivedAmount: parseFloat(text),
                   })
                 }
               />
@@ -576,7 +587,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
                 onChangeText={text =>
                   setHostelRoomBadStudentRent({
                     ...hostelRoomBadStudentRent,
-                    RefundAmount: text,
+                    RefundAmount: parseFloat(text),
                   })
                 }
               />
