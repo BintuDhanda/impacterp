@@ -43,6 +43,7 @@ const RoleScreen = () => {
   const GetRoleList = () => {
     httpGet('Role/roleGet')
       .then(result => {
+        console.log("all roles result",result.data)
         setRoleList(result.data);
       })
       .catch(err => {
@@ -196,9 +197,9 @@ const RoleScreen = () => {
   };
 
   const renderRoleCard = ({item}) => {
-    if (item?.isStatic) {
-      return null;
-    }
+    // if (item?.isStatic) {
+    //   return null;
+    // }
     return (
       <View
         style={{
@@ -227,7 +228,8 @@ const RoleScreen = () => {
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             style={{marginRight: 10}}
-            onPress={() => handleEditRole(item.rolesId)}>
+            //onPress={() => handleEditRole(item.rolesId)}>
+            onPress={()=>Alert.alert("You are not Authorised for this action")}>
             <Icon
               name="pencil"
               size={20}
@@ -236,10 +238,11 @@ const RoleScreen = () => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => {
-              DeleteRoleIdConfirm(item.rolesId);
-              setShowDelete(true);
-            }}>
+            // onPress={() => {
+            //   DeleteRoleIdConfirm(item.rolesId);
+            //   setShowDelete(true);
+            // }}>
+          onPress={()=>Alert.alert("You are not Authorised for this action")}>
             <Icon
               name="trash"
               size={20}
@@ -263,7 +266,8 @@ const RoleScreen = () => {
             paddingHorizontal: 20,
             marginBottom: 20,
           }}
-          onPress={handleAddRole}>
+          //onPress={handleAddRole}>  
+          onPress={()=>Alert.alert("You are not Authorised for this action")}>
           <Text
             style={{
               color: Colors.background,

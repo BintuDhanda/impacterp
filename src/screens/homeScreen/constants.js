@@ -95,4 +95,9 @@ export const menus = [
     icon: 'building',
     icon2: 'user',
   },
+  {
+    title: 'Hostels Rent',
+    path: 'RentCollectionQrScreen',
+    icon: 'bed',
+  },
 ];

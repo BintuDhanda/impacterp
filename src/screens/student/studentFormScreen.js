@@ -31,7 +31,7 @@ const StudentFormScreen = ({ route, navigation }) => {
         "IsActive": true,
         "CreatedAt": null,
         "CreatedBy": user.userId,
-        "LastUpdatedBy": null,
+        "LastUpdatedBy": user.userId,
     });
 
     console.log(formData, "Formdata")
@@ -83,7 +83,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                 setFormData(
                     {
                         StudentId: result.data.studentId,
-                        StudentImage: result.data.studentImage,
+                        Image: result.data.image,
                         FirstName: result.data.firstName,
                         LastName: result.data.lastName,
                         FatherName: result.data.fatherName,
@@ -116,8 +116,74 @@ const StudentFormScreen = ({ route, navigation }) => {
         if(IsFormValid())
        {
         try {
+            console.log("student form studentid", formData.studentId);
             if (formData.StudentId !== 0) {
                 console.log(JSON.stringify(formData), "Form data request")
+                const student = new FormData();
+                student.append('StudentId', formData.StudentId);              
+                student.append('FirstName', formData.FirstName);
+                student.append('LastName', formData.LastName);
+                student.append('FatherName', formData.FatherName);
+                student.append('MotherName', formData.MotherName);
+                student.append('Gender', formData.Gender);
+                student.append('StudentHeight', formData.StudentHeight);
+                student.append('StudentWeight', formData.StudentWeight);
+                student.append('BodyRemark', formData.BodyRemark);
+                student.append('UserId', formData.UserId);
+                student.append('IsActive', formData.IsActive);
+                student.append('CreatedAt', formData.CreatedAt);
+                student.append('CreatedBy', formData.CreatedBy);
+                student.append('LastUpdatedBy', formData.LastUpdatedBy);
+                if (image) {
+                    const imageUriParts = image.split('/');
+                    const imageName = imageUriParts[imageUriParts.length - 1];
+                    console.log(imageName, "Get Image Name")
+                    const imageFile = {
+                        uri: image,
+                        type: type, // Adjust the type according to your image
+                        name: imageName, // Adjust the file name if needed
+                    };
+                    student.append('StudentImage', imageFile);
+                }
+                else{
+                    student.append('StudentImage', "");
+                }
+                await PostForm("StudentDetails/put", student)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            Alert.alert('Success', 'Update Student Successfully')
+                            setFormData({
+                                "StudentId": 0,
+                                "StudentImage": "",
+                                "FirstName": "",
+                                "LastName": "",
+                                "FatherName": "",
+                                "MotherName": "",
+                                "Gender": "",
+                                "StudentHeight": "",
+                                "StudentWeight": "",
+                                "BodyRemark": "",
+                                "UserId": userId,
+                                "IsActive": true,
+                                "CreatedAt": null,
+                                "CreatedBy": user.userId,
+                                "LastUpdatedBy": user.userId,
+                            })
+                            navigation.navigate('HomeScreen');
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Student Details update error : ", err);
+                        Toast.show({
+                            type: 'error',
+                            text1: `${err}`,
+                            position: 'bottom',
+                            visibilityTime: 2000,
+                            autoHide: true,
+                        });
+                    });
+            }
+            else {
                 const student = new FormData();
                 student.append('StudentId', formData.StudentId);
                 student.append('StudentImage', "");
@@ -143,70 +209,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                         type: type, // Adjust the type according to your image
                         name: imageName, // Adjust the file name if needed
                     };
-                    student.append('Image', imageFile);
-                }
-                await PostForm("StudentDetails/put", student)
-                    .then((response) => {
-                        if (response.status === 200) {
-                            Alert.alert('Success', 'Update Student Successfully')
-                            setFormData({
-                                "StudentId": 0,
-                                "StudentImage": "",
-                                "FirstName": "",
-                                "LastName": "",
-                                "FatherName": "",
-                                "MotherName": "",
-                                "Gender": "",
-                                "StudentHeight": "",
-                                "StudentWeight": "",
-                                "BodyRemark": "",
-                                "UserId": userId,
-                                "IsActive": true,
-                                "CreatedAt": null,
-                                "CreatedBy": user.userId,
-                                "LastUpdatedBy": null,
-                            })
-                            navigation.navigate('HomeScreen');
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Student Details update error : ", err);
-                        Toast.show({
-                            type: 'error',
-                            text1: `${err}`,
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        });
-                    });
-            }
-            else {
-                const student = new FormData();
-                student.append('StudentId', formData.StudentId);
-                student.append('StudentImage', "");
-                student.append('FirstName', formData.FirstName);
-                student.append('LastName', formData.LastName);
-                student.append('FatheName', formData.FatherName);
-                student.append('MotherName', formData.MotherName);
-                student.append('Gender', formData.Gender);
-                student.append('StudentHeight', formData.StudentHeight);
-                student.append('StudentWeight', formData.StudentWeight);
-                student.append('BodyRemark', formData.BodyRemark);
-                student.append('UserId', formData.UserId);
-                student.append('IsActive', formData.IsActive);
-                student.append('CreatedAt', formData.CreatedAt);
-                student.append('CreatedBy', formData.CreatedBy);
-                student.append('LastUpdatedBy', formData.LastUpdatedBy);
-                if (image) {
-                    const imageUriParts = image.split('/');
-                    const imageName = imageUriParts[imageUriParts.length - 1];
-                    console.log(imageName, "Get Image Name")
-                    const imageFile = {
-                        uri: image,
-                        type: type, // Adjust the type according to your image
-                        name: imageName, // Adjust the file name if needed
-                    };
-                    student.append('Image', imageFile);
+                    student.append('StudentImage', imageFile);
                 }
                 await PostForm("StudentDetails/post", student)
                     .then((response) => {
@@ -229,7 +232,7 @@ const StudentFormScreen = ({ route, navigation }) => {
                                 "IsActive": true,
                                 "CreatedAt": null,
                                 "CreatedBy": user.userId,
-                                "LastUpdatedBy": null,
+                                "LastUpdatedBy": user.userId,
                             })
                             navigation.navigate('HomeScreen')
                         }
@@ -265,41 +268,41 @@ const StudentFormScreen = ({ route, navigation }) => {
 
     const IsFormValid=()=>{
      let studentForm = formData;
-     if(studentForm.FirstName.length==0)
-     {
+     
+     if (!studentForm.FirstName || studentForm.FirstName.length === 0) {
         ShowError("Enter a Valid Student Name");
         return false;
-     }
-     if(studentForm.FatherName.length==0){
+      }
+    
+      if (!studentForm.FatherName || studentForm.FatherName.length === 0) {
         ShowError("Enter Valid Father Name");
         return false;
-     }
-     if(studentForm.Gender.length==0)
-     {
-        ShowError("Select Gender")
+      }
+    
+      if (!studentForm.Gender || studentForm.Gender.length === 0) {
+        ShowError("Select Gender");
         return false;
-     }
-     if(studentForm.MotherName.length==0)
-     {
-        ShowError("Enter Valid Mother Name")
+      }
+    
+      if (!studentForm.MotherName || studentForm.MotherName.length === 0) {
+        ShowError("Enter Valid Mother Name");
         return false;
-     }
-     if(studentForm.StudentHeight.length==0)
-     {
-        ShowError("Enter a Valid Height")
+      }
+    
+      if (!studentForm.StudentHeight || studentForm.StudentHeight.length === 0) {
+        ShowError("Enter a Valid Height");
         return false;
-     }
-
-     if(studentForm.StudentWeight.length==0)
-     {
-        ShowError("Enter a Valid Weight")
+      }
+    
+      if (!studentForm.StudentWeight || studentForm.StudentWeight.length === 0) {
+        ShowError("Enter a Valid Weight");
         return false;
-     }
-
-     if(studentForm.BodyRemark.length==0){
-        ShowError("Enter a Valid Body Remark")
+      }
+    
+      if (!studentForm.BodyRemark || studentForm.BodyRemark.length === 0) {
+        ShowError("Enter a Valid Body Remark");
         return false;
-     }
+      }
 
      return true;
     }
