@@ -22,14 +22,16 @@ import { Picker } from '@react-native-picker/picker';
 import { months, paymentModes, paymentTypes } from './constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getFormattedDate } from '../../../helpers';
+import { Dropdown } from 'react-native-element-dropdown';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
-const RentCollectionQrScreen = ({ navigation, route }) => {
-    const { hostelRoomBadStudentId } = route?.params;
+const RentCollectionQrScreen = () => {
 
     const { user, setUser } = useContext(UserContext);
+    const [hostelRoomBadStudentId, setHostelRoomBadStudentId] = useState(0);
     const [hostelRoomBadStudentRent, setHostelRoomBadStudentRent] = useState({
         HostelRoomBadStudentRentId: 0,
-        HostelRoomBadStudentId: 0,
+        HostelRoomBadStudentId: hostelRoomBadStudentId,
         Month: 0,
         Year: new Date().getFullYear(),
         PaymentDate: new Date(),
@@ -45,22 +47,26 @@ const RentCollectionQrScreen = ({ navigation, route }) => {
     });
     const [hostelRoomBadStudentRentList, setHostelRoomBadStudentRentList] =
         useState([]);
+    const [hostelRoomBadStudentList, setHostelRoomBadStudentList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [
         hostelRoomBadStudentRentDeleteId,
         setHostelRoomBadStudentRentDeleteId,
     ] = useState(0);
+    const [showModal, setShowModal] = useState(true);
     const [showDelete, setShowDelete] = useState(false);
-    const [registrationNumber, setRegistrationNumber] = useState({ "RegistrationNumber": "" })
+    const [registrationNumber, setRegistrationNumber] = useState({ "RegistrationNumber": "" });
+    const [ishowQrCode, setIshowQrCode] = useState(false);
 
     useEffect(() => {
-        GetHostelRoomBadStudentRentList();
+        // GetHostelRoomBadStudentRentList();
     }, []);
     const GetHostelRoomBadStudentRentList = () => {
         httpGet(`HostelRoomBadStudentRent/get?Id=${hostelRoomBadStudentId}`)
             .then(result => {
                 console.log(result.data);
                 setHostelRoomBadStudentRentList(result.data);
+                setShowModal(false);
             })
             .catch(err => {
                 console.log('Get Hostel Rent error :', err);
@@ -280,11 +286,21 @@ const RentCollectionQrScreen = ({ navigation, route }) => {
         httpGetById(`StudentDetails/getStudentIdByRegistrationNumber?RegistrationNumber=${e.data}`)
             .then(result => {
                 if (result.data.studentId > 0) {
-                    setHostelRoomBadStudentRent({ ...hostelRoomBadStudentRent, HostelRoomBadStudentId: result.data.studentId });
-                    if (hostelRoomBadStudentRent.HostelRoomBadStudentId.length == 0) {
-                        ShowError('Enter a Valid StudentId');
-                        setIshowQrCode(false);
-                    }
+                    httpGet(`HostelRoomBadStudent/get?Id=${result.data.studentId}`)
+                        .then(result => {
+                            setHostelRoomBadStudentList(result.data);
+                            setIshowQrCode(false);
+                        })
+                        .catch(err => {
+                            console.log('Get HostelRoomBadStudent error :', err);
+                            Toast.show({
+                                type: 'error',
+                                text1: `${err}`,
+                                position: 'bottom',
+                                visibilityTime: 2000,
+                                autoHide: true,
+                            });
+                        });
                 } else {
                     ShowError('Enter a Valid RegistrationNumber');
                 }
@@ -300,6 +316,15 @@ const RentCollectionQrScreen = ({ navigation, route }) => {
                 });
             });
         setIshowQrCode(false);
+    };
+
+    const handleSave = () => {
+        if (registrationNumber.RegistrationNumber == "" && hostelRoomBadStudentRent.HostelRoomBadStudentId == 0) {
+            ShowError('Please Fill RegistrationNumber and HostelRoomBad')
+        }
+        else {
+            GetHostelRoomBadStudentRentList();
+        }
     };
 
     const renderHostelRoomBadStudentRentCard = ({ item }) => {
@@ -391,22 +416,6 @@ const RentCollectionQrScreen = ({ navigation, route }) => {
                 showMarker={true}
             />)}
             <View style={{ flex: 1, padding: 20 }}>
-                <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
-                    <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setIshowQrCode(true); }}>
-                        <Icon name="qrcode" size={20} />
-                    </TouchableOpacity>
-                    <TextInput style={{ flex: 1, marginLeft: 10 }}
-                        placeholder="Enter Registration Number"
-                        value={registrationNumber.RegistrationNumber}
-                        keyboardType='numeric'
-                        onChangeText={(text) => {
-                            setRegistrationNumber({ ...registrationNumber, RegistrationNumber: text })
-                        }}
-                    />
-                    <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setRegistrationNumber({ ...registrationNumber, RegistrationNumber: "" }); }}>
-                        <Icon name="trash" size={20} color="green" />
-                    </TouchableOpacity>
-                </View>
                 <TouchableOpacity
                     style={{
                         backgroundColor: Colors.primary,
@@ -426,7 +435,92 @@ const RentCollectionQrScreen = ({ navigation, route }) => {
                         Add Hostel Rent
                     </Text>
                 </TouchableOpacity>
+                {showModal && (
+                    <Modal transparent visible={showModal}>
+                        <View style={{
+                            flex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <View style={{
+                                backgroundColor: Colors.background,
+                                borderRadius: 10,
+                                padding: 10,
+                                marginBottom: 10,
+                                shadowColor: Colors.shadow,
+                                width: '80%',
+                            }}>
 
+                                <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1, fontSize: 16, paddingHorizontal: 20, marginBottom: 10 }}>
+                                    <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setIshowQrCode(true); }}>
+                                        <Icon name="qrcode" size={20} />
+                                    </TouchableOpacity>
+                                    <TextInput style={{ flex: 1, marginLeft: 10 }}
+                                        placeholder="Enter Registration Number"
+                                        value={registrationNumber.RegistrationNumber}
+                                        keyboardType='numeric'
+                                        onChangeText={(text) => {
+                                            setRegistrationNumber({ ...registrationNumber, RegistrationNumber: text })
+                                        }}
+                                    />
+                                    <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setRegistrationNumber({ ...registrationNumber, RegistrationNumber: "" }); }}>
+                                        <Icon name="trash" size={20} color="green" />
+                                    </TouchableOpacity>
+                                </View>
+                                <Dropdown
+                                    style={[
+                                        {
+                                            height: 50,
+                                            borderColor: Colors.primary,
+                                            borderWidth: 1.5,
+                                            borderRadius: 10,
+                                            paddingHorizontal: 8,
+                                        },
+                                    ]}
+                                    placeholderStyle={{ fontSize: 16 }}
+                                    selectedTextStyle={{ fontSize: 16 }}
+                                    inputSearchStyle={{
+                                        height: 40,
+                                        fontSize: 16,
+                                    }}
+                                    iconStyle={{
+                                        width: 20,
+                                        height: 20,
+                                    }}
+                                    data={hostelRoomBadStudentList}
+                                    search
+                                    maxHeight={300}
+                                    labelField="hostelRoomBad"
+                                    valueField="hostelRoomBadStudentId"
+                                    placeholder={'Select HostelRoomBad'}
+                                    searchPlaceholder="Search..."
+                                    value={hostelRoomBadStudentList?.find(
+                                        ele => ele?.hostelRoomBadStudentId === hostelRoomBadStudentRent?.HostelRoomBadStudentId,
+                                    )}
+                                    onChange={text => {
+                                        setHostelRoomBadStudentId(text.hostelRoomBadStudentId);
+                                    }}
+                                />
+                                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+                                    <TouchableOpacity style={{
+                                        backgroundColor: Colors.primary,
+                                        borderRadius: 5,
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        marginTop: 10,
+                                        marginRight: 3,
+                                    }} onPress={() => {
+                                        handleSave();
+                                    }}>
+                                        <Text style={{ fontSize: 16, color: Colors.background }}>Save</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                )}
                 {showDelete && (
                     <Modal transparent visible={showDelete}>
                         <View

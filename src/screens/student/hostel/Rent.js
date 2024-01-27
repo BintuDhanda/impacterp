@@ -244,7 +244,7 @@ const HostelRoomBadStudentRentScreen = ({navigation, route}) => {
         });
       })
       .catch(error => {
-        console.error('Hostel Room Bad Studen tRent Get By Id :', error);
+        console.error('Hostel Room Bad Student Rent Get By Id :', error);
         Toast.show({
           type: 'error',
           text1: `${err}`,
