@@ -43,7 +43,7 @@ const RoleScreen = () => {
   const GetRoleList = () => {
     httpGet('Role/roleGet')
       .then(result => {
-        console.log("all roles result",result.data)
+        console.log('all roles result', result.data);
         setRoleList(result.data);
       })
       .catch(err => {
@@ -229,7 +229,9 @@ const RoleScreen = () => {
           <TouchableOpacity
             style={{marginRight: 10}}
             //onPress={() => handleEditRole(item.rolesId)}>
-            onPress={()=>Alert.alert("You are not Authorised for this action")}>
+            onPress={() =>
+              Alert.alert('You are not Authorised for this action')
+            }>
             <Icon
               name="pencil"
               size={20}
@@ -242,7 +244,9 @@ const RoleScreen = () => {
             //   DeleteRoleIdConfirm(item.rolesId);
             //   setShowDelete(true);
             // }}>
-          onPress={()=>Alert.alert("You are not Authorised for this action")}>
+            onPress={() =>
+              Alert.alert('You are not Authorised for this action')
+            }>
             <Icon
               name="trash"
               size={20}
@@ -266,8 +270,8 @@ const RoleScreen = () => {
             paddingHorizontal: 20,
             marginBottom: 20,
           }}
-          //onPress={handleAddRole}>  
-          onPress={()=>Alert.alert("You are not Authorised for this action")}>
+          //onPress={handleAddRole}>
+          onPress={() => Alert.alert('You are not Authorised for this action')}>
           <Text
             style={{
               color: Colors.background,
