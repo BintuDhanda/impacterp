@@ -1,137 +1,179 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native'
+import {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Post as httpPost } from '../constants/httpService';
+import {Post as httpPost} from '../constants/httpService';
 import Toast from 'react-native-toast-message';
-import { sendOTP } from '../constants/smsService';
+import {sendOTP} from '../constants/smsService';
 import Colors from '../constants/Colors';
 
-const LogInScreen = ({ navigation }) => {
+const LogInScreen = ({navigation}) => {
+  const [phone, setPhone] = useState('');
+  const [isPress, setIsPress] = useState({IsPress: false});
 
-    const [phone, setPhone] = useState('');
-    const [isPress, setIsPress] = useState({ "IsPress": false });
+  const handleLogin = () => {
+    // Handle login logic
+    //navigation.navigate('VerifyOTPScreen')
 
-    const handleLogin = () => {
-        // Handle login logic
-        //navigation.navigate('VerifyOTPScreen')
-
-        //check if user exists or not
-        httpPost(`User/IsExists`, { Mobile: phone }).then((res) => {
-            if (res.data == false) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'User dose not exist',
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
+    //check if user exists or not
+    httpPost(`User/IsExists`, {Mobile: phone})
+      .then(res => {
+        if (res.data == false) {
+          Toast.show({
+            type: 'error',
+            text1: 'User dose not exist',
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+          setIsPress({...isPress, IsPress: !isPress});
+        } else {
+          //send otp
+          //navigatin with otp
+          // let otp = Math.floor(1000 + Math.random() * 9000);
+          let otp = 1234;
+          console.log(otp, 'Otp');
+          let msg =
+            'Dear Student, Your Registration OTP is 1234 Mobile No. 9050546000 Impact Academy, Hisar';
+          sendOTP(otp, phone)
+            .then(res => {
+              console.log(res.data, 'Response otp');
+              if (res.status == 200) {
+                navigation.navigate('VerifyOTPScreen', {
+                  mobile: phone,
+                  verifyOtp: otp,
                 });
-                setIsPress({ ...isPress, IsPress: !isPress });
-            }
-            else {
-                //send otp 
-                //navigatin with otp
-                let otp = Math.floor(1000 + Math.random() * 9000);
-                console.log(otp, "Otp")
-                let msg = 'Dear Student, Your Registration OTP is 1234 Mobile No. 9050546000 Impact Academy, Hisar'
-                sendOTP(otp, phone).then((res) => {
-                    console.log(res.data, "Response otp")
-                    if (res.status == 200) {
-                        navigation.navigate("VerifyOTPScreen", { mobile: phone, verifyOtp: otp })
-                    }
-                    else {
-                        Toast.show({
-                            type: 'error',
-                            text1: 'OTP Send is Fail Please Send Again',
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        });
-                        setIsPress({ ...isPress, isPress: !isPress });
-                    }
-                }
-                ).catch((err) => {
-                    console.error("Send Otp Error : ", err)
-                    Toast.show({
-                        type: 'error',
-                        text1: `${err}`,
-                        position: 'bottom',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                    });
-                })
-
-            }
-        }).catch((err) => {
-            console.error("IsExist Error : ", err)
-            Toast.show({
+              } else {
+                Toast.show({
+                  type: 'error',
+                  text1: 'OTP Send is Fail Please Send Again',
+                  position: 'bottom',
+                  visibilityTime: 2000,
+                  autoHide: true,
+                });
+                setIsPress({...isPress, isPress: !isPress});
+              }
+            })
+            .catch(err => {
+              console.error('Send Otp Error : ', err);
+              Toast.show({
                 type: 'error',
                 text1: `${err}`,
                 position: 'bottom',
                 visibilityTime: 2000,
                 autoHide: true,
+              });
             });
-        })
-    };
+        }
+      })
+      .catch(err => {
+        console.error('IsExist Error : ', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
 
+  // const sendOTP = () =>{
+  //     let otp = 1234;
+  //     let user = 'impactcampus';
+  //     let password = 'K9F2HDNY';
+  //     let mobile ='9416669174';
+  //     let sid ='IMPHSR';
+  //     let msg =`Dear Student, Your Registration OTP is ${otp} Mobile No. 9050546000 Impact Academy, Hisar`;
+  //     axios.get(`http://www.getwaysms.com/vendorsms/pushsms.aspx?user=${user}&password=${password}&msisdn=${mobile}&sid=${sid}&msg=${msg}&fl=0&gwid=2)`)
+  //     .then((res)=>{
+  //         if(res.status==200)
+  //         {
+  //             navigation.navigate('VerifyOTPScreen', {verifyotp: otp})
+  //         }
+  //     })
+  // }
 
-    // const sendOTP = () =>{
-    //     let otp = 1234;
-    //     let user = 'impactcampus';
-    //     let password = 'K9F2HDNY';
-    //     let mobile ='9416669174';
-    //     let sid ='IMPHSR';
-    //     let msg =`Dear Student, Your Registration OTP is ${otp} Mobile No. 9050546000 Impact Academy, Hisar`;
-    //     axios.get(`http://www.getwaysms.com/vendorsms/pushsms.aspx?user=${user}&password=${password}&msisdn=${mobile}&sid=${sid}&msg=${msg}&fl=0&gwid=2)`)
-    //     .then((res)=>{
-    //         if(res.status==200)
-    //         {
-    //             navigation.navigate('VerifyOTPScreen', {verifyotp: otp})
-    //         }
-    //     })
-    // }
-
-    return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: Colors.background }}>
-                <View style={{ paddingHorizontal: 25 }}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Image source={require('../assets/impact.png')} style={{ borderRadius: 200 }} />
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Text style={{
-                            fontSize: 24,
-                            fontWeight: 'bold',
-                            marginBottom: 30,
-                            alignItems: 'center'
-                        }}>Welcome Back!</Text>
-                    </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        borderBottomColor: Colors.primary,
-                        borderBottomWidth: 1,
-                        paddingBottom: 8,
-                        marginBottom: 25
-                    }}>
-                        <Icon name="mobile" style={{ marginRight: 5 }} size={20} color="#666" />
-                        <TextInput
-                            placeholder="Phone No."
-                            style={{ flex: 1, paddingVertical: 0 }}
-                            value={phone}
-                            keyboardType="numeric"
-                            maxLength={10}
-                            onChangeText={(text) => setPhone(text)}
-                        />
-                    </View>
-                    <TouchableOpacity style={{ flex: 1, backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} disabled={isPress.IsPress === true ? true : false} onPress={() => { handleLogin(); setIsPress(true); }}>
-                        <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Login</Text>
-                    </TouchableOpacity>
-                </View>
-                <Toast ref={(ref) => Toast.setRef(ref)} />
-            </SafeAreaView>
-        </ScrollView>
-    );
-}
-
+  return (
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          backgroundColor: Colors.background,
+        }}>
+        <View style={{paddingHorizontal: 25}}>
+          <View style={{alignItems: 'center'}}>
+            <Image
+              source={require('../assets/impact.png')}
+              style={{borderRadius: 200}}
+            />
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: 'bold',
+                marginBottom: 30,
+                alignItems: 'center',
+              }}>
+              Welcome Back!
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              borderBottomColor: Colors.primary,
+              borderBottomWidth: 1,
+              paddingBottom: 8,
+              marginBottom: 25,
+            }}>
+            <Icon
+              name="mobile"
+              style={{marginRight: 5}}
+              size={20}
+              color="#666"
+            />
+            <TextInput
+              placeholder="Phone No."
+              style={{flex: 1, paddingVertical: 0}}
+              value={phone}
+              keyboardType="numeric"
+              maxLength={10}
+              onChangeText={text => setPhone(text)}
+            />
+          </View>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: Colors.primary,
+              padding: 15,
+              borderRadius: 10,
+              marginBottom: 30,
+            }}
+            disabled={isPress.IsPress === true ? true : false}
+            onPress={() => {
+              handleLogin();
+              setIsPress(true);
+            }}>
+            <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
+              Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Toast ref={ref => Toast.setRef(ref)} />
+      </SafeAreaView>
+    </ScrollView>
+  );
+};
 
 // const styles = StyleSheet.create({
 
@@ -182,6 +224,5 @@ const LogInScreen = ({ navigation }) => {
 //         fontSize: 22
 //     },
 // });
-
 
 export default LogInScreen;
