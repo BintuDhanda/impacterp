@@ -2,9 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import {FlatList} from 'react-native';
 import AcademyItem from './AcademyItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  Get as httpGet,
-} from '../../constants/httpService';
+import {Get as httpGet} from '../../constants/httpService';
 import Toast from 'react-native-toast-message';
 import {UserContext} from '../../../App';
 

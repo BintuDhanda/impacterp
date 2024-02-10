@@ -69,7 +69,7 @@ import HostelRoomBads from './src/screens/hostel/Bad';
 import StundetHostelRoomBad from './src/screens/student/hostel';
 import StundetHostelRoomBadRent from './src/screens/student/hostel/Rent';
 import RentCollectionQrScreen from './src/screens/student/hostel/rentCollectionQrScreen';
-import Academies from './src/screens/Academies';
+import Academies from './src/screens/academies';
 const {width} = Dimensions.get('window');
 export const UserContext = React.createContext();
 const Stack = createStackNavigator();
