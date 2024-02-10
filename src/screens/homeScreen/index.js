@@ -59,7 +59,17 @@ const HomeScreen = () => {
       }
     }, [user?.userId]),
   );
-
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleLogOut}>
+          <Text style={{color: '#1c8adb', fontSize: 16, marginRight: 10}}>
+            Logout
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  });
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -103,16 +113,6 @@ const HomeScreen = () => {
               </TouchableOpacity>
             );
           })}
-        </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            marginTop: 'auto',
-            marginBottom: 20,
-          }}>
-          <TouchableOpacity onPress={handleLogOut}>
-            <Text style={{color: '#1c8adb', fontSize: 16}}>LogOut</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>

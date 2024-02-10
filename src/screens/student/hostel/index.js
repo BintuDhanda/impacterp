@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,15 +14,19 @@ import {
 import Colors from '../../../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { UserContext } from '../../../../App';
-import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost, GetById as httpGetById } from '../../../constants/httpService';
+import {UserContext} from '../../../../App';
+import {useContext} from 'react';
+import {
+  Get as httpGet,
+  Post as httpPost,
+  GetById as httpGetById,
+} from '../../../constants/httpService';
 import ShowError from '../../../constants/ShowError';
-import { Dropdown } from 'react-native-element-dropdown';
+import {Dropdown} from 'react-native-element-dropdown';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-const HostelRoomBadStudentScreen = ({ navigation }) => {
-  const { user, setUser } = useContext(UserContext);
+const HostelRoomBadStudentScreen = ({navigation}) => {
+  const {user, setUser} = useContext(UserContext);
   const [hostelRoomBadStudent, setHostelRoomBadStudent] = useState({
     HostelRoomBadStudentId: 0,
     HostelId: 0,
@@ -34,7 +38,9 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
     CreatedBy: user.userId,
     LastUpdatedBy: null,
   });
-  const [registrationNumber, setRegistrationNumber] = useState({"RegistrationNumber": ""});
+  const [registrationNumber, setRegistrationNumber] = useState({
+    RegistrationNumber: '',
+  });
   const [hostelRoomBadStudentList, setHostelRoomBadStudentList] = useState([]);
   const [hostelList, setHostelList] = useState([]);
   const [hostelRoomList, setHostelRoomList] = useState([]);
@@ -80,88 +86,88 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
   };
 
   const handleSaveHostelRoomBadStudent = () => {
-    if (IsFormValid()) {
-      try {
-        if (hostelRoomBadStudent.HostelRoomBadStudentId !== 0) {
-          httpPost('HostelRoomBadStudent/put', hostelRoomBadStudent)
-            .then(response => {
-              if (response.status === 200) {
-                GetHostelRoomBadStudentList();
-                Alert.alert(
-                  'Sucees',
-                  'Update HostelRoomBadStudent Successfully',
-                );
-                setHostelRoomBadStudent({
-                  HostelRoomBadStudentId: 0,
-                  HostelId: 0,
-                  HostelRoomId: 0,
-                  HostelRoomBadId: 0,
-                  StudentId: 0,
-                  IsActive: true,
-                  CreatedAt: null,
-                  CreatedBy: user.userId,
-                  LastUpdatedBy: null,
-                });
-              }
-            })
-            .catch(err => {
-              console.log('HostelRoomBadStudent update error : ', err);
-              Toast.show({
-                type: 'error',
-                text1: `${err}`,
-                position: 'bottom',
-                visibilityTime: 2000,
-                autoHide: true,
+    try {
+      if (hostelRoomBadStudent.HostelRoomBadStudentId !== 0) {
+        httpPost('HostelRoomBadStudent/put', hostelRoomBadStudent)
+          .then(response => {
+            if (response.status === 200) {
+              GetHostelRoomBadStudentList();
+              Alert.alert('Success', 'Bad Allocated Successfully');
+              setHostelRoomBadStudent({
+                HostelRoomBadStudentId: 0,
+                HostelId: 0,
+                HostelRoomId: 0,
+                HostelRoomBadId: 0,
+                StudentId: 0,
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
               });
+            }
+          })
+          .catch(err => {
+            console.log('HostelRoomBadStudent update error : ', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
             });
-        } else {
-          httpPost('HostelRoomBadStudent/post', hostelRoomBadStudent)
-            .then(response => {
-              if (response.status === 200) {
-                GetHostelRoomBadStudentList();
-                Alert.alert('Success', 'Add HostelRoomBadStudent Successfully');
-                setHostelRoomBadStudent({
-                  HostelRoomBadStudentId: 0,
-                  HostelId: 0,
-                  HostelRoomId: 0,
-                  HostelRoomBadId: 0,
-                  StudentId: 0,
-                  IsActive: true,
-                  CreatedAt: null,
-                  CreatedBy: user.userId,
-                  LastUpdatedBy: null,
-                });
-              }
-            })
-            .catch(err => {
-              console.log('HostelRoomBadStudent Add error :', err);
-              Toast.show({
-                type: 'error',
-                text1: `${err}`,
-                position: 'bottom',
-                visibilityTime: 2000,
-                autoHide: true,
+          });
+      } else {
+        httpPost('HostelRoomBadStudent/post', hostelRoomBadStudent)
+          .then(response => {
+            if (response.status === 200) {
+              GetHostelRoomBadStudentList();
+              Alert.alert('Success', 'Bad Allocated Successfully');
+              setHostelRoomBadStudent({
+                HostelRoomBadStudentId: 0,
+                HostelId: 0,
+                HostelRoomId: 0,
+                HostelRoomBadId: 0,
+                StudentId: 0,
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
               });
+            }
+          })
+          .catch(err => {
+            console.log('HostelRoomBadStudent Add error :', err);
+            Toast.show({
+              type: 'error',
+              text1: `${err}`,
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
             });
-        }
-        setModalVisible(false);
-      } catch (error) {
-        console.log('Error saving HostelRoomBadStudent:', error);
-        Toast.show({
-          type: 'error',
-          text1: `${error}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
-        });
+          });
       }
+      setModalVisible(false);
+    } catch (error) {
+      console.log('Error saving HostelRoomBadStudent:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
-  const IsFormValid = () => {
-    httpGetById(`StudentDetails/getStudentIdByRegistrationNumber?RegistrationNumber=${registrationNumber.RegistrationNumber}`)
+  const getStudentIdByRegistrationNumber = () => {
+    httpGetById(
+      `StudentDetails/getStudentIdByRegistrationNumber?RegistrationNumber=${registrationNumber.RegistrationNumber}`,
+    )
       .then(result => {
         if (result.data.studentId) {
-          setHostelRoomBadStudent({ ...hostelRoomBadStudent, StudentId: result.data.studentId });
+          setHostelRoomBadStudent({
+            ...hostelRoomBadStudent,
+            StudentId: result.data.studentId,
+          });
           if (hostelRoomBadStudent.StudentId.length == 0) {
             ShowError('Enter a Valid StudentId');
             return false;
@@ -184,6 +190,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
 
     return true;
   };
+
   const DeleteHostelRoomBadStudentIdConfirm = hostelRoomBadStudentId => {
     setHostelRoomBadStudentDeleteId(hostelRoomBadStudentId);
   };
@@ -315,11 +322,11 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
   };
 
   const onSuccess = e => {
-    setRegistrationNumber({RegistrationNumber: e.data })
+    setRegistrationNumber({RegistrationNumber: e.data});
     setIshowQrCode(false);
-};
+  };
 
-  const renderHostelRoomBadStudentCard = ({ item }) => {
+  const renderHostelRoomBadStudentCard = ({item}) => {
     return (
       <View
         style={{
@@ -331,7 +338,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
           padding: 10,
           marginBottom: 10,
           shadowColor: Colors.shadow,
-          shadowOffset: { width: 10, height: 2 },
+          shadowOffset: {width: 10, height: 2},
           shadowOpacity: 4,
           shadowRadius: 10,
           elevation: 10,
@@ -355,9 +362,9 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
             H/R/B {item.hostelRoomBad}
           </Text>
         </View>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
-            style={{ marginRight: 10 }}
+            style={{marginRight: 10}}
             onPress={() =>
               handleEditHostelRoomBadStudent(item.hostelRoomBadStudentId)
             }>
@@ -365,18 +372,18 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
               name="pencil"
               size={20}
               color={'#5a67f2'}
-              style={{ marginLeft: 8, textAlignVertical: 'center' }}
+              style={{marginLeft: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{ marginRight: 10 }}
+            style={{marginRight: 10}}
             onPress={() => handleNavigate(item.hostelRoomBadStudentId)}>
             <Icon
               name="cogs"
               size={20}
               color={Colors.primary}
-              style={{ marginRight: 8, textAlignVertical: 'center' }}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
 
@@ -389,7 +396,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
               name="trash"
               size={20}
               color={'#f25252'}
-              style={{ marginRight: 8, textAlignVertical: 'center' }}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
         </View>
@@ -398,14 +405,16 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1, padding: 20 }}>
-        {ishowQrCode && (<QRCodeScanner
-          onRead={onSuccess}
-          reactivate={true}
-          reactivateTimeout={500}
-          showMarker={true}
-        />)}
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={{flex: 1, padding: 20}}>
+        {ishowQrCode && (
+          <QRCodeScanner
+            onRead={onSuccess}
+            reactivate={true}
+            reactivateTimeout={500}
+            showMarker={true}
+          />
+        )}
         <TouchableOpacity
           style={{
             backgroundColor: Colors.primary,
@@ -453,7 +462,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                   Are You Sure You Want To Delete
                 </Text>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                   <TouchableOpacity
                     style={{
                       backgroundColor: Colors.primary,
@@ -466,7 +475,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     onPress={() => {
                       DeleteHostelRoomBadStudentIdConfirmYes();
                     }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
                       Yes
                     </Text>
                   </TouchableOpacity>
@@ -481,7 +490,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     onPress={() => {
                       DeleteHostelRoomBadStudentIdConfirmNo();
                     }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
                       No
                     </Text>
                   </TouchableOpacity>
@@ -517,8 +526,8 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     paddingHorizontal: 8,
                   },
                 ]}
-                placeholderStyle={{ fontSize: 16 }}
-                selectedTextStyle={{ fontSize: 16 }}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
                 inputSearchStyle={{
                   height: 40,
                   fontSize: 16,
@@ -557,8 +566,8 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     paddingHorizontal: 8,
                   },
                 ]}
-                placeholderStyle={{ fontSize: 16 }}
-                selectedTextStyle={{ fontSize: 16 }}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
                 inputSearchStyle={{
                   height: 40,
                   fontSize: 16,
@@ -597,8 +606,8 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     paddingHorizontal: 8,
                   },
                 ]}
-                placeholderStyle={{ fontSize: 16 }}
-                selectedTextStyle={{ fontSize: 16 }}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
                 inputSearchStyle={{
                   height: 40,
                   fontSize: 16,
@@ -626,7 +635,7 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                   });
                 }}
               />
-              <Text style={{ marginVertical: 10 }}>
+              <Text style={{marginVertical: 10}}>
                 Security/Rent:-{' '}
                 {hostelRoomBadList?.find(
                   ele =>
@@ -640,8 +649,20 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     hostelRoomBadStudent?.HostelRoomBadId,
                 )?.hostelRoomBadAmount || 0}
               </Text>
-              <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1, fontSize: 16, paddingHorizontal: 20 }}>
-                <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setIshowQrCode(true); }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  borderRadius: 10,
+                  borderColor: Colors.primary,
+                  borderWidth: 1,
+                  fontSize: 16,
+                  paddingHorizontal: 20,
+                }}>
+                <TouchableOpacity
+                  style={{justifyContent: 'center'}}
+                  onPress={() => {
+                    setIshowQrCode(true);
+                  }}>
                   <Icon name="qrcode" size={20} />
                 </TouchableOpacity>
                 <TextInput
@@ -652,15 +673,27 @@ const HostelRoomBadStudentScreen = ({ navigation }) => {
                     // borderColor: Colors.primary,
                     // marginBottom: 10,
                     // paddingHorizontal: 10,
-                    flex: 1, marginLeft: 10
+                    flex: 1,
+                    marginLeft: 10,
                   }}
                   placeholder="Student Registration No."
                   value={registrationNumber.RegistrationNumber}
+                  onBlur={() => getStudentIdByRegistrationNumber()}
                   onChangeText={text =>
-                    setRegistrationNumber({ ...registrationNumber, RegistrationNumber: text })
+                    setRegistrationNumber({
+                      ...registrationNumber,
+                      RegistrationNumber: text,
+                    })
                   }
                 />
-                <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setRegistrationNumber({ ...registrationNumber, RegistrationNumber: "" }); }}>
+                <TouchableOpacity
+                  style={{justifyContent: 'center'}}
+                  onPress={() => {
+                    setRegistrationNumber({
+                      ...registrationNumber,
+                      RegistrationNumber: '',
+                    });
+                  }}>
                   <Icon name="trash" size={20} color="green" />
                 </TouchableOpacity>
               </View>

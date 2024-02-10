@@ -28,6 +28,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {getFormattedDate} from '../../../helpers';
 import {Dropdown} from 'react-native-element-dropdown';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import {useNavigation} from '@react-navigation/native';
 
 const RentCollectionQrScreen = () => {
   const {user, setUser} = useContext(UserContext);
@@ -286,10 +287,9 @@ const RentCollectionQrScreen = () => {
     setShowDatePicker(false);
   };
 
-  const onSuccess = e => {
-    setRegistrationNumber({RegistrationNumber: e.data});
+  const onSuccess = () => {
     httpGetById(
-      `StudentDetails/getStudentIdByRegistrationNumber?RegistrationNumber=${e.data}`,
+      `StudentDetails/getStudentIdByRegistrationNumber?RegistrationNumber=${registrationNumber?.RegistrationNumber}`,
     )
       .then(result => {
         if (result.data.studentId > 0) {
@@ -335,6 +335,20 @@ const RentCollectionQrScreen = () => {
       GetHostelRoomBadStudentRentList();
     }
   };
+  const navigation = useNavigation();
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: showModal
+        ? undefined
+        : () => (
+            <TouchableOpacity
+              style={{marginRight: 10}}
+              onPress={() => setShowModal(true)}>
+              <Icon name="search" size={20} />
+            </TouchableOpacity>
+          ),
+    });
+  }, [showModal]);
 
   const renderHostelRoomBadStudentRentCard = ({item}) => {
     return (
@@ -423,7 +437,7 @@ const RentCollectionQrScreen = () => {
         transparent
         onRequestClose={() => setIshowQrCode(false)}>
         <QRCodeScanner
-          onRead={onSuccess}
+          onRead={e => setRegistrationNumber({RegistrationNumber: e?.data})}
           reactivate={true}
           reactivateTimeout={500}
           showMarker={true}
@@ -450,120 +464,125 @@ const RentCollectionQrScreen = () => {
           </Text>
         </TouchableOpacity>
         {showModal && (
-          <Modal transparent visible={showModal}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              zIndex: 999,
+            }}>
             <View
               style={{
-                flex: 1,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                justifyContent: 'center',
-                alignItems: 'center',
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 10,
+                marginBottom: 10,
+                shadowColor: Colors.shadow,
+                width: '80%',
               }}>
               <View
                 style={{
-                  backgroundColor: Colors.background,
+                  flexDirection: 'row',
                   borderRadius: 10,
-                  padding: 10,
+                  borderColor: Colors.primary,
+                  borderWidth: 1,
+                  fontSize: 16,
+                  paddingHorizontal: 20,
                   marginBottom: 10,
-                  shadowColor: Colors.shadow,
-                  width: '80%',
                 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    borderRadius: 10,
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    fontSize: 16,
-                    paddingHorizontal: 20,
-                    marginBottom: 10,
+                <TouchableOpacity
+                  style={{justifyContent: 'center'}}
+                  onPress={() => {
+                    setIshowQrCode(true);
                   }}>
-                  <TouchableOpacity
-                    style={{justifyContent: 'center'}}
-                    onPress={() => {
-                      setIshowQrCode(true);
-                    }}>
-                    <Icon name="qrcode" size={20} />
-                  </TouchableOpacity>
-                  <TextInput
-                    style={{flex: 1, marginLeft: 10}}
-                    placeholder="Enter Registration Number"
-                    value={registrationNumber.RegistrationNumber}
-                    keyboardType="numeric"
-                    onChangeText={text => {
-                      setRegistrationNumber({
-                        ...registrationNumber,
-                        RegistrationNumber: text,
-                      });
-                    }}
-                  />
-                  <TouchableOpacity
-                    style={{justifyContent: 'center'}}
-                    onPress={() => {
-                      setRegistrationNumber({
-                        ...registrationNumber,
-                        RegistrationNumber: '',
-                      });
-                    }}>
-                    <Icon name="trash" size={20} color="green" />
-                  </TouchableOpacity>
-                </View>
-                <Dropdown
-                  style={[
-                    {
-                      height: 50,
-                      borderColor: Colors.primary,
-                      borderWidth: 1.5,
-                      borderRadius: 10,
-                      paddingHorizontal: 8,
-                    },
-                  ]}
-                  placeholderStyle={{fontSize: 16}}
-                  selectedTextStyle={{fontSize: 16}}
-                  inputSearchStyle={{
-                    height: 40,
-                    fontSize: 16,
-                  }}
-                  iconStyle={{
-                    width: 20,
-                    height: 20,
-                  }}
-                  data={hostelRoomBadStudentList}
-                  search
-                  maxHeight={300}
-                  labelField="hostelRoomBad"
-                  valueField="hostelRoomBadStudentId"
-                  placeholder={'Select HostelRoomBad'}
-                  searchPlaceholder="Search..."
-                  value={hostelRoomBadStudentList?.find(
-                    ele =>
-                      ele?.hostelRoomBadStudentId ===
-                      hostelRoomBadStudentRent?.HostelRoomBadStudentId,
-                  )}
-                  onChange={text => {
-                    setHostelRoomBadStudentId(text.hostelRoomBadStudentId);
+                  <Icon name="qrcode" size={20} />
+                </TouchableOpacity>
+                <TextInput
+                  style={{flex: 1, marginLeft: 10}}
+                  placeholder="Enter Registration Number"
+                  value={registrationNumber.RegistrationNumber}
+                  keyboardType="numeric"
+                  onBlur={e => onSuccess()}
+                  onChangeText={text => {
+                    setRegistrationNumber({
+                      ...registrationNumber,
+                      RegistrationNumber: text,
+                    });
                   }}
                 />
-                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: Colors.primary,
-                      borderRadius: 5,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      marginTop: 10,
-                      marginRight: 3,
-                    }}
-                    onPress={() => {
-                      handleSave();
-                    }}>
-                    <Text style={{fontSize: 16, color: Colors.background}}>
-                      Save
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={{justifyContent: 'center'}}
+                  onPress={() => {
+                    setRegistrationNumber({
+                      ...registrationNumber,
+                      RegistrationNumber: '',
+                    });
+                  }}>
+                  <Icon name="trash" size={20} color="green" />
+                </TouchableOpacity>
+              </View>
+              <Dropdown
+                style={[
+                  {
+                    height: 50,
+                    borderColor: Colors.primary,
+                    borderWidth: 1.5,
+                    borderRadius: 10,
+                    paddingHorizontal: 8,
+                  },
+                ]}
+                placeholderStyle={{fontSize: 16}}
+                selectedTextStyle={{fontSize: 16}}
+                inputSearchStyle={{
+                  height: 40,
+                  fontSize: 16,
+                }}
+                iconStyle={{
+                  width: 20,
+                  height: 20,
+                }}
+                data={hostelRoomBadStudentList}
+                search
+                maxHeight={300}
+                labelField="hostelRoomBad"
+                valueField="hostelRoomBadStudentId"
+                placeholder={'Select HostelRoomBad'}
+                searchPlaceholder="Search..."
+                value={hostelRoomBadStudentList?.find(
+                  ele =>
+                    ele?.hostelRoomBadStudentId ===
+                    hostelRoomBadStudentRent?.HostelRoomBadStudentId,
+                )}
+                onChange={text => {
+                  setHostelRoomBadStudentId(text.hostelRoomBadStudentId);
+                }}
+              />
+              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 5,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    marginTop: 10,
+                    marginRight: 3,
+                  }}
+                  onPress={() => {
+                    handleSave();
+                  }}>
+                  <Text style={{fontSize: 16, color: Colors.background}}>
+                    Search
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </Modal>
+          </View>
         )}
         {showDelete && (
           <Modal transparent visible={showDelete}>
