@@ -63,7 +63,12 @@ const HomeScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={handleLogOut}>
-          <Text style={{color: '#1c8adb', fontSize: 16, marginRight: 10}}>
+          <Text
+            style={{
+              color: '#1c8adb',
+              fontSize: 16,
+              marginRight: 10,
+            }}>
             Logout
           </Text>
         </TouchableOpacity>

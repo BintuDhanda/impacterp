@@ -46,14 +46,14 @@ const usePushNotification = user => {
 
   const sendTokenToServer = async token => {
     // Make an API call to your .NET Core Web API to store the token
-    if (user && user.userId > 0) {
-      (
-        await httpPost('User/UserDeviceToken', {
-          UserId: user.userId,
-          DeviceType: 'Android',
-          UserToken: token,
-        }).then(res => res)
-      ).catch(err => {});
+    if (user && user?.userId > 0) {
+      await httpPost('User/UserDeviceToken', {
+        UserId: user?.userId,
+        DeviceType: 'Android',
+        UserToken: token,
+      })
+        .then(res => res)
+        .catch(err => {});
     }
   };
   return pushNotification;

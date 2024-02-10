@@ -197,9 +197,9 @@ const RoleScreen = () => {
   };
 
   const renderRoleCard = ({item}) => {
-    // if (item?.isStatic) {
-    //   return null;
-    // }
+    if (item?.isStatic) {
+      return null;
+    }
     return (
       <View
         style={{
