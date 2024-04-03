@@ -5,11 +5,11 @@ import {
   View,
   Modal,
   TextInput,
-  FlatList,
   TouchableOpacity,
   Alert,
   ScrollView,
 } from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../constants/Colors';
 import {Dropdown} from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';

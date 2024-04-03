@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  FlatList,
   Alert,
   ScrollView,
 } from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../../../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';

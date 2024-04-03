@@ -1,31 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../../../constants/Colors';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Get as httpGet } from '../../../constants/httpService';
+import {Get as httpGet} from '../../../constants/httpService';
 
-const StudentQualificationScreen = ({ route, navigation }) => {
-  const { studentId } = route.params;
+const StudentQualificationScreen = ({route, navigation}) => {
+  const {studentId} = route.params;
   const [qualificationList, setQualificationList] = useState([]);
-  const [studentQualificationDeleteId, setStudentQualificationDeleteId] = useState(0);
+  const [studentQualificationDeleteId, setStudentQualificationDeleteId] =
+    useState(0);
   const [showDelete, setShowDelete] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       GetStudentQualificationByStudentId();
-    }, [])
+    }, []),
   );
 
   const GetStudentQualificationByStudentId = () => {
-    httpGet(`StudentQualification/getStudentQualificationByStudentId?Id=${studentId}`)
-      .then((response) => {
+    httpGet(
+      `StudentQualification/getStudentQualificationByStudentId?Id=${studentId}`,
+    )
+      .then(response => {
         console.log(response.data);
         setQualificationList(response.data);
       })
-      .catch((error) => {
-        console.error(error, "Get Student Qualification By Student Id Error");
+      .catch(error => {
+        console.error(error, 'Get Student Qualification By Student Id Error');
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -34,21 +45,21 @@ const StudentQualificationScreen = ({ route, navigation }) => {
           autoHide: true,
         });
       });
-  }
+  };
 
-  const DeleteStudentQualificationIdConfirm = (studentQualificationid) => {
+  const DeleteStudentQualificationIdConfirm = studentQualificationid => {
     setStudentQualificationDeleteId(studentQualificationid);
-  }
+  };
 
   const DeleteStudentQualificationIdConfirmYes = () => {
     httpGet(`StudentQualification/delete?Id=${studentQualificationDeleteId}`)
-      .then((result) => {
+      .then(result => {
         console.log(result);
         GetStudentQualificationByStudentId();
         setStudentQualificationDeleteId(0);
         setShowDelete(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Delete Student Qualification error', error);
         Toast.show({
           type: 'error',
@@ -57,134 +68,193 @@ const StudentQualificationScreen = ({ route, navigation }) => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
 
   const DeleteStudentQualificationIdConfirmNo = () => {
     setStudentQualificationDeleteId(0);
     setShowDelete(false);
-  }
+  };
 
   const handleAddQualificationNavigate = () => {
-    navigation.navigate('StudentQualificationFormScreen', { studentId: studentId })
-  }
+    navigation.navigate('StudentQualificationFormScreen', {
+      studentId: studentId,
+    });
+  };
 
-  const handleEditQualificationNavigate = (qualificationId) => {
-    navigation.navigate('StudentQualificationFormScreen', { studentId: studentId, qualificationId: qualificationId })
-  }
+  const handleEditQualificationNavigate = qualificationId => {
+    navigation.navigate('StudentQualificationFormScreen', {
+      studentId: studentId,
+      qualificationId: qualificationId,
+    });
+  };
 
-  const renderQualificationCard = ({ item }) => (
-    <View style={{
-      justifyContent: 'space-between',
-      backgroundColor: Colors.background,
-      borderRadius: 10,
-      padding: 10,
-      marginBottom: 10,
-      shadowColor: Colors.shadow,
-      shadowOffset: { width: 10, height: 2 },
-      shadowOpacity: 4,
-      shadowRadius: 10,
-      elevation: 10,
-      borderWidth: 1.5,
-      borderColor: Colors.primary,
-    }}>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Qualification Name : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.qualificationName}</Text>
+  const renderQualificationCard = ({item}) => (
+    <View
+      style={{
+        justifyContent: 'space-between',
+        backgroundColor: Colors.background,
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 10,
+        shadowColor: Colors.shadow,
+        shadowOffset: {width: 10, height: 2},
+        shadowOpacity: 4,
+        shadowRadius: 10,
+        elevation: 10,
+        borderWidth: 1.5,
+        borderColor: Colors.primary,
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Qualification Name : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.qualificationName}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Subject : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.subject}</Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Subject : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.subject}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Maximum Marks : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.maximumMark}</Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Maximum Marks : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.maximumMark}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Marks Obtain : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.marksObtain}</Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Marks Obtain : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.marksObtain}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Percentage : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.percentage}</Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Percentage : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.percentage}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Grade : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.grade}</Text>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Grade : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.grade}
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditQualificationNavigate(item.studentQualificationId)}>
-          <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+      <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+        <TouchableOpacity
+          style={{marginRight: 10}}
+          onPress={() =>
+            handleEditQualificationNavigate(item.studentQualificationId)
+          }>
+          <Icon
+            name="pencil"
+            size={20}
+            color={'#5a67f2'}
+            style={{marginLeft: 8, textAlignVertical: 'center'}}
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { DeleteStudentQualificationIdConfirm(item.studentQualificationId); setShowDelete(true); }}>
-          <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+        <TouchableOpacity
+          onPress={() => {
+            DeleteStudentQualificationIdConfirm(item.studentQualificationId);
+            setShowDelete(true);
+          }}>
+          <Icon
+            name="trash"
+            size={20}
+            color={'#f25252'}
+            style={{marginRight: 8, textAlignVertical: 'center'}}
+          />
         </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{
-        padding: 16,
-        justifyContent: 'center'
-      }}>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          marginBottom: 20,
-        }} onPress={handleAddQualificationNavigate}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 14,
-            fontWeight: 'bold',
-            textAlign: 'center'
-          }}>Add Qualification</Text>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View
+        style={{
+          padding: 16,
+          justifyContent: 'center',
+        }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }}
+          onPress={handleAddQualificationNavigate}>
+          <Text
+            style={{
+              color: Colors.background,
+              fontSize: 14,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            Add Qualification
+          </Text>
         </TouchableOpacity>
 
         {showDelete && (
           <Modal transparent visible={showDelete}>
-            <View style={{
-              flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <View style={{
-                backgroundColor: Colors.background,
-                borderRadius: 10,
-                padding: 28,
-                shadowColor: Colors.shadow,
-                width: '80%',
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                  <TouchableOpacity style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                    marginRight: 3,
-                  }} onPress={() => {
-                    DeleteStudentQualificationIdConfirmYes();
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    fontWeight: 'bold',
                   }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  Are You Sure You Want To Delete
+                </Text>
+
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }}
+                    onPress={() => {
+                      DeleteStudentQualificationIdConfirmYes();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      Yes
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                  }} onPress={() => {
-                    DeleteStudentQualificationIdConfirmNo();
-                  }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }}
+                    onPress={() => {
+                      DeleteStudentQualificationIdConfirmNo();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      No
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -194,10 +264,10 @@ const StudentQualificationScreen = ({ route, navigation }) => {
 
         <FlatList
           data={qualificationList}
-          keyExtractor={(item) => item.studentQualificationId.toString()}
+          keyExtractor={item => item.studentQualificationId.toString()}
           renderItem={renderQualificationCard}
         />
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast ref={ref => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

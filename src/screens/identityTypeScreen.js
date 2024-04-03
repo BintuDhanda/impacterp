@@ -1,15 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { UserContext } from '../../App';
-import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import {UserContext} from '../../App';
+import {useContext} from 'react';
+import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 
 const IdentityTypeScreen = () => {
-  const { user, setUser } = useContext(UserContext);
-  const [identityType, setIdentityType] = useState({ "IdentityTypeId": 0, "Name": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
+  const {user, setUser} = useContext(UserContext);
+  const [identityType, setIdentityType] = useState({
+    IdentityTypeId: 0,
+    Name: '',
+    IsActive: true,
+    CreatedAt: null,
+    CreatedBy: user.userId,
+    LastUpdatedBy: null,
+  });
   const [identityTypeList, setIdentityTypeList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [identityTypeDeleteId, setIdentityTypeDeleteId] = useState(0);
@@ -19,12 +36,12 @@ const IdentityTypeScreen = () => {
     GetIdentityTypeList();
   }, []);
   const GetIdentityTypeList = () => {
-    httpGet("IdentityType/get")
-      .then((result) => {
-        console.log(result.data)
-        setIdentityTypeList(result.data)
+    httpGet('IdentityType/get')
+      .then(result => {
+        console.log(result.data);
+        setIdentityTypeList(result.data);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('Get IdentityType error :', err);
         Toast.show({
           type: 'error',
@@ -33,12 +50,12 @@ const IdentityTypeScreen = () => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
   const handleAddIdentityType = () => {
     setIdentityType({
       IdentityTypeId: 0,
-      Name: "",
+      Name: '',
       IsActive: true,
       CreatedAt: null,
       CreatedBy: user.userId,
@@ -50,23 +67,23 @@ const IdentityTypeScreen = () => {
   const handleSaveIdentityType = () => {
     try {
       if (identityType.IdentityTypeId !== 0) {
-        httpPost("IdentityType/put", identityType)
-          .then((response) => {
+        httpPost('IdentityType/put', identityType)
+          .then(response => {
             if (response.status === 200) {
               GetIdentityTypeList();
-              Alert.alert('Sucees', 'Update IdentityType Successfully')
+              Alert.alert('Sucees', 'Update IdentityType Successfully');
               setIdentityType({
-                "IdentityTypeId": 0,
-                "Name": "",
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
-              })
+                IdentityTypeId: 0,
+                Name: '',
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
+              });
             }
           })
-          .catch((err) => {
-            console.log("IdentityType update error : ", err);
+          .catch(err => {
+            console.log('IdentityType update error : ', err);
             Toast.show({
               type: 'error',
               text1: `${err}`,
@@ -75,24 +92,23 @@ const IdentityTypeScreen = () => {
               autoHide: true,
             });
           });
-      }
-      else {
-        httpPost("IdentityType/post", identityType)
-          .then((response) => {
+      } else {
+        httpPost('IdentityType/post', identityType)
+          .then(response => {
             if (response.status === 200) {
               GetIdentityTypeList();
-              Alert.alert('Success', 'Add IdentityType Successfully')
+              Alert.alert('Success', 'Add IdentityType Successfully');
               setIdentityType({
-                "IdentityTypeId": 0,
-                "Name": "",
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
-              })
+                IdentityTypeId: 0,
+                Name: '',
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
+              });
             }
           })
-          .catch((err) => {
+          .catch(err => {
             console.log('IdentityType Add error :', err);
             Toast.show({
               type: 'error',
@@ -104,8 +120,7 @@ const IdentityTypeScreen = () => {
           });
       }
       setModalVisible(false);
-    }
-    catch (error) {
+    } catch (error) {
       console.log('Error saving IdentityType:', error);
       Toast.show({
         type: 'error',
@@ -115,21 +130,21 @@ const IdentityTypeScreen = () => {
         autoHide: true,
       });
     }
-  }
+  };
 
-  const DeleteIdentityTypeIdConfirm = (identityTypeid) => {
+  const DeleteIdentityTypeIdConfirm = identityTypeid => {
     setIdentityTypeDeleteId(identityTypeid);
-  }
+  };
 
   const DeleteIdentityTypeIdConfirmYes = () => {
     httpGet(`IdentityType/delete?Id=${identityTypeDeleteId}`)
-      .then((result) => {
+      .then(result => {
         console.log(result);
         GetIdentityTypeList();
         setIdentityTypeDeleteId(0);
         setShowDelete(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Delete Identity Type error', error);
         Toast.show({
           type: 'error',
@@ -138,17 +153,17 @@ const IdentityTypeScreen = () => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
 
   const DeleteIdentityTypeIdConfirmNo = () => {
     setIdentityTypeDeleteId(0);
     setShowDelete(false);
-  }
+  };
 
-  const handleEditIdentityType = (identityTypeId) => {
+  const handleEditIdentityType = identityTypeId => {
     httpGet(`IdentityType/getById?Id=${identityTypeId}`)
-      .then((response) => {
+      .then(response => {
         setIdentityType({
           IdentityTypeId: response.data.identityTypeId,
           Name: response.data.name,
@@ -156,9 +171,9 @@ const IdentityTypeScreen = () => {
           CreatedAt: response.data.createdAt,
           CreatedBy: response.data.createdBy,
           LastUpdatedBy: user.userId,
-        })
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('IdentityType Get By Id :', error);
         Toast.show({
           type: 'error',
@@ -167,107 +182,149 @@ const IdentityTypeScreen = () => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
+      });
     setModalVisible(true);
   };
 
   const handleClose = () => {
     setModalVisible(false);
-  }
+  };
 
-  const renderIdentityTypeCard = ({ item }) => {
+  const renderIdentityTypeCard = ({item}) => {
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: Colors.background,
-        borderRadius: 10,
-        padding: 10,
-        marginBottom: 10,
-        shadowColor: Colors.shadow,
-        shadowOffset: { width: 10, height: 2 },
-        shadowOpacity: 4,
-        shadowRadius: 10,
-        elevation: 10,
-        borderColor: Colors.primary,
-        borderWidth: 1.5,
-      }}>
-        <Text style={{
-          fontSize: 16,
-          fontWeight: 'bold',
-        }}>{item.name}</Text>
-        <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditIdentityType(item.identityTypeId)} >
-            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: Colors.background,
+          borderRadius: 10,
+          padding: 10,
+          marginBottom: 10,
+          shadowColor: Colors.shadow,
+          shadowOffset: {width: 10, height: 2},
+          shadowOpacity: 4,
+          shadowRadius: 10,
+          elevation: 10,
+          borderColor: Colors.primary,
+          borderWidth: 1.5,
+        }}>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: 'bold',
+          }}>
+          {item.name}
+        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => handleEditIdentityType(item.identityTypeId)}>
+            <Icon
+              name="pencil"
+              size={20}
+              color={'#5a67f2'}
+              style={{marginLeft: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { DeleteIdentityTypeIdConfirm(item.identityTypeId); setShowDelete(true); }}>
-            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          <TouchableOpacity
+            onPress={() => {
+              DeleteIdentityTypeIdConfirm(item.identityTypeId);
+              setShowDelete(true);
+            }}>
+            <Icon
+              name="trash"
+              size={20}
+              color={'#f25252'}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
         </View>
-      </View >
+      </View>
     );
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1, padding: 20, }}>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          marginBottom: 20,
-        }} onPress={handleAddIdentityType}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 16,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>Add Identity Type</Text>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={{flex: 1, padding: 20}}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }}
+          onPress={handleAddIdentityType}>
+          <Text
+            style={{
+              color: Colors.background,
+              fontSize: 16,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            Add Identity Type
+          </Text>
         </TouchableOpacity>
 
         {showDelete && (
           <Modal transparent visible={showDelete}>
-            <View style={{
-              flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <View style={{
-                backgroundColor: Colors.background,
-                borderRadius: 10,
-                padding: 28,
-                shadowColor: Colors.shadow,
-                width: '80%',
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                  <TouchableOpacity style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                    marginRight: 3,
-                  }} onPress={() => {
-                    DeleteIdentityTypeIdConfirmYes();
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    fontWeight: 'bold',
                   }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  Are You Sure You Want To Delete
+                </Text>
+
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }}
+                    onPress={() => {
+                      DeleteIdentityTypeIdConfirmYes();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      Yes
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                  }} onPress={() => {
-                    DeleteIdentityTypeIdConfirmNo();
-                  }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }}
+                    onPress={() => {
+                      DeleteIdentityTypeIdConfirmNo();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      No
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -276,19 +333,21 @@ const IdentityTypeScreen = () => {
         )}
 
         <Modal visible={modalVisible} animationType="slide" transparent>
-          <View style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}>
-            <View style={{
-              backgroundColor: Colors.background,
-              borderRadius: 10,
-              padding: 20,
-              width: '80%',
-              marginBottom: 20,
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}>
+            <View
+              style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 20,
+                width: '80%',
+                marginBottom: 20,
+              }}>
               <TextInput
                 style={{
                   width: '100%',
@@ -300,22 +359,29 @@ const IdentityTypeScreen = () => {
                 }}
                 placeholder="Identity Type Name"
                 value={identityType.Name}
-                onChangeText={(text) => setIdentityType({ ...identityType, Name: text })}
+                onChangeText={text =>
+                  setIdentityType({...identityType, Name: text})
+                }
               />
 
-              <TouchableOpacity style={{
-                backgroundColor: Colors.primary,
-                borderRadius: 5,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-                marginBottom: 10,
-              }} onPress={handleSaveIdentityType}>
-                <Text style={{
-                  color: Colors.background,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>{identityType.IdentityTypeId !== 0 ? 'Save' : 'Add'}</Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: Colors.primary,
+                  borderRadius: 5,
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }}
+                onPress={handleSaveIdentityType}>
+                <Text
+                  style={{
+                    color: Colors.background,
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}>
+                  {identityType.IdentityTypeId !== 0 ? 'Save' : 'Add'}
+                </Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -325,14 +391,16 @@ const IdentityTypeScreen = () => {
                 paddingVertical: 10,
                 paddingHorizontal: 20,
               }}
-              onPress={handleClose}
-            >
-              <Text style={{
-                color: Colors.background,
-                fontSize: 16,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>Close</Text>
+              onPress={handleClose}>
+              <Text
+                style={{
+                  color: Colors.background,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                Close
+              </Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -340,10 +408,10 @@ const IdentityTypeScreen = () => {
         <FlatList
           data={identityTypeList}
           renderItem={renderIdentityTypeCard}
-          keyExtractor={(item) => item.identityTypeId.toString()}
-          contentContainerStyle={{ flexGrow: 1, }}
+          keyExtractor={item => item.identityTypeId.toString()}
+          contentContainerStyle={{flexGrow: 1}}
         />
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast ref={ref => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

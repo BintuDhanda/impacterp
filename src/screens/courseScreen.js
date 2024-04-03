@@ -1,16 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { UserContext } from '../../App';
-import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import {UserContext} from '../../App';
+import {useContext} from 'react';
+import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 
-const CourseScreen = ({ route, navigation }) => {
-  const { user, setUser } = useContext(UserContext);
-  const { courseCategoryId, courseCategoryName } = route.params;
-  const [course, setCourse] = useState({ "CourseId": 0, "CourseName": "", "IsActive": true, "CourseCategoryId": courseCategoryId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
+const CourseScreen = ({route, navigation}) => {
+  const {user, setUser} = useContext(UserContext);
+  const {courseCategoryId, courseCategoryName} = route.params;
+  const [course, setCourse] = useState({
+    CourseId: 0,
+    CourseName: '',
+    IsActive: true,
+    CourseCategoryId: courseCategoryId,
+    CreatedAt: null,
+    CreatedBy: user.userId,
+    LastUpdatedBy: null,
+  });
   const [courseList, setCourseList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [courseDeleteId, setCourseDeleteId] = useState(0);
@@ -22,7 +40,9 @@ const CourseScreen = ({ route, navigation }) => {
 
   const fetchCoursesByCourseCategoryId = async () => {
     try {
-      const response = await httpGet(`Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`)
+      const response = await httpGet(
+        `Course/getCourseByCourseCategoryId?Id=${courseCategoryId}`,
+      );
       setCourseList(response.data);
     } catch (error) {
       console.log('Error fetching Courses:', error);
@@ -39,7 +59,7 @@ const CourseScreen = ({ route, navigation }) => {
   const handleAddCourse = () => {
     setCourse({
       CourseId: 0,
-      CourseName: "",
+      CourseName: '',
       IsActive: true,
       CourseCategoryId: courseCategoryId,
       CreatedAt: null,
@@ -49,24 +69,22 @@ const CourseScreen = ({ route, navigation }) => {
     setModalVisible(true);
   };
 
-  const handleEditCourse = (id) => {
+  const handleEditCourse = id => {
     httpGet(`Course/getById?Id=${id}`)
-      .then((result) => {
+      .then(result => {
         console.log(result);
-        setCourse(
-          {
-            CourseId: result.data.courseId,
-            CourseName: result.data.courseName,
-            CourseCategoryId: result.data.courseCategoryId,
-            IsActive: result.data.isActive,
-            CreatedAt: result.data.createdAt,
-            CreatedBy: result.data.CreatedBy,
-            LastUpdatedBy: user.userId
-          }
-        );
+        setCourse({
+          CourseId: result.data.courseId,
+          CourseName: result.data.courseName,
+          CourseCategoryId: result.data.courseCategoryId,
+          IsActive: result.data.isActive,
+          CreatedAt: result.data.createdAt,
+          CreatedBy: result.data.CreatedBy,
+          LastUpdatedBy: user.userId,
+        });
       })
-      .catch((err) => {
-        console.error("Get By Id Error", err);
+      .catch(err => {
+        console.error('Get By Id Error', err);
         Toast.show({
           type: 'error',
           text1: `${err}`,
@@ -78,19 +96,19 @@ const CourseScreen = ({ route, navigation }) => {
     setModalVisible(true);
   };
 
-  const DeleteCourseIdConfirm = (courseid) => {
+  const DeleteCourseIdConfirm = courseid => {
     setCourseDeleteId(courseid);
-  }
+  };
 
   const DeleteCourseIdConfirmYes = () => {
     httpGet(`Course/delete?Id=${courseDeleteId}`)
-      .then((result) => {
+      .then(result => {
         console.log(result);
         fetchCoursesByCourseCategoryId();
         setCourseDeleteId(0);
         setShowDelete(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Delete Course error', error);
         Toast.show({
           type: 'error',
@@ -99,35 +117,35 @@ const CourseScreen = ({ route, navigation }) => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
 
   const DeleteCourseIdConfirmNo = () => {
     setCourseDeleteId(0);
     setShowDelete(false);
-  }
+  };
 
   const handleSaveCourse = async () => {
     try {
       if (course.CourseId !== 0) {
-        await httpPost("Course/put", course)
-          .then((response) => {
+        await httpPost('Course/put', course)
+          .then(response => {
             if (response.status === 200) {
               fetchCoursesByCourseCategoryId();
               Alert.alert('Sucess', 'Data fetched successfully');
               setCourse({
-                "CourseId": 0,
-                "CourseName": "",
-                "CourseCategoryId": courseCategoryId,
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
+                CourseId: 0,
+                CourseName: '',
+                CourseCategoryId: courseCategoryId,
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
               });
             }
           })
-          .catch((err) => {
-            console.error("Put error in Course", err);
+          .catch(err => {
+            console.error('Put error in Course', err);
             Toast.show({
               type: 'error',
               text1: `${err}`,
@@ -137,22 +155,21 @@ const CourseScreen = ({ route, navigation }) => {
             });
           });
       } else {
-        await httpPost("Course/post", course)
-          .then((response) => {
-            if (response.status === 200) {
-              fetchCoursesByCourseCategoryId();
-              Alert.alert('Sucess', 'Course is Added Successfully')
-              setCourse({
-                "CourseId": 0,
-                "CourseName": "",
-                "CourseCategoryId": courseCategoryId,
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
-              });
-            }
-          })
+        await httpPost('Course/post', course).then(response => {
+          if (response.status === 200) {
+            fetchCoursesByCourseCategoryId();
+            Alert.alert('Sucess', 'Course is Added Successfully');
+            setCourse({
+              CourseId: 0,
+              CourseName: '',
+              CourseCategoryId: courseCategoryId,
+              IsActive: true,
+              CreatedAt: null,
+              CreatedBy: user.userId,
+              LastUpdatedBy: null,
+            });
+          }
+        });
       }
       setModalVisible(false);
     } catch (error) {
@@ -168,42 +185,71 @@ const CourseScreen = ({ route, navigation }) => {
   };
 
   const handleNavigate = (courseId, courseName) => {
-    navigation.navigate('BatchScreen', { courseId: courseId, courseName: courseName })
-  }
+    navigation.navigate('BatchScreen', {
+      courseId: courseId,
+      courseName: courseName,
+    });
+  };
 
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
-
-  const renderCourseCard = ({ item }) => (
-    <View style={{
-      backgroundColor: Colors.background,
-      borderRadius: 10,
-      padding: 10,
-      marginBottom: 10,
-      shadowColor: Colors.shadow,
-      shadowOffset: { width: 10, height: 2 },
-      shadowOpacity: 4,
-      shadowRadius: 10,
-      elevation: 10,
-      borderWidth: 1.5,
-      borderColor: Colors.primary
-    }}>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={{ fontSize: 16 }}>Course Name : </Text>
-        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.courseName}</Text>
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditCourse(item.courseId)}>
-            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+  const renderCourseCard = ({item}) => (
+    <View
+      style={{
+        backgroundColor: Colors.background,
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 10,
+        shadowColor: Colors.shadow,
+        shadowOffset: {width: 10, height: 2},
+        shadowOpacity: 4,
+        shadowRadius: 10,
+        elevation: 10,
+        borderWidth: 1.5,
+        borderColor: Colors.primary,
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Course Name : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+          {item.courseName}
+        </Text>
+        <View
+          style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => handleEditCourse(item.courseId)}>
+            <Icon
+              name="pencil"
+              size={20}
+              color={'#5a67f2'}
+              style={{marginLeft: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleNavigate(item.courseId, item.courseName)}>
-            <Icon name="cogs" size={20} color={Colors.primary} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => handleNavigate(item.courseId, item.courseName)}>
+            <Icon
+              name="cogs"
+              size={20}
+              color={Colors.primary}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => { DeleteCourseIdConfirm(item.courseId); setShowDelete(true); }}>
-            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+          <TouchableOpacity
+            onPress={() => {
+              DeleteCourseIdConfirm(item.courseId);
+              setShowDelete(true);
+            }}>
+            <Icon
+              name="trash"
+              size={20}
+              color={'#f25252'}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -211,69 +257,94 @@ const CourseScreen = ({ route, navigation }) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{
-        padding: 16,
-        justifyContent: 'center'
-      }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Category Name : {courseCategoryName}</Text>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          marginTop: 10,
-          marginBottom: 10
-        }} onPress={handleAddCourse}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 16,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>Add Course</Text>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View
+        style={{
+          padding: 16,
+          justifyContent: 'center',
+        }}>
+        <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+          Course Category Name : {courseCategoryName}
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginTop: 10,
+            marginBottom: 10,
+          }}
+          onPress={handleAddCourse}>
+          <Text
+            style={{
+              color: Colors.background,
+              fontSize: 16,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            Add Course
+          </Text>
         </TouchableOpacity>
 
         {showDelete && (
           <Modal transparent visible={showDelete}>
-            <View style={{
-              flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <View style={{
-                backgroundColor: Colors.background,
-                borderRadius: 10,
-                padding: 28,
-                shadowColor: Colors.shadow,
-                width: '80%',
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                  <TouchableOpacity style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                    marginRight: 3,
-                  }} onPress={() => {
-                    DeleteCourseIdConfirmYes();
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    fontWeight: 'bold',
                   }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
+                  Are You Sure You Want To Delete
+                </Text>
+
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }}
+                    onPress={() => {
+                      DeleteCourseIdConfirmYes();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      Yes
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginTop: 10,
-                  }} onPress={() => {
-                    DeleteCourseIdConfirmNo();
-                  }}>
-                    <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }}
+                    onPress={() => {
+                      DeleteCourseIdConfirmNo();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      No
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -283,24 +354,26 @@ const CourseScreen = ({ route, navigation }) => {
 
         <FlatList
           data={courseList}
-          keyExtractor={(item) => item.courseId.toString()}
+          keyExtractor={item => item.courseId.toString()}
           renderItem={renderCourseCard}
         />
 
         {modalVisible && (
           <Modal transparent visible={modalVisible}>
-            <View style={{
-              flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <View style={{
-                backgroundColor: Colors.background,
-                borderRadius: 10,
-                padding: 20,
-                width: '80%',
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 20,
+                  width: '80%',
+                }}>
                 <TextInput
                   style={{
                     borderWidth: 1,
@@ -311,45 +384,58 @@ const CourseScreen = ({ route, navigation }) => {
                   }}
                   placeholder="Course Name"
                   value={course.CourseName}
-                  onChangeText={(text) => setCourse({ ...course, CourseName: text })}
+                  onChangeText={text =>
+                    setCourse({...course, CourseName: text})
+                  }
                 />
 
-                <View style={{
-                  marginTop: 10,
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                }}>
-                  <TouchableOpacity style={{
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                  }} onPress={handleSaveCourse}>
-                    <Text style={{
-                      color: Colors.background,
-                      fontSize: 14,
-                      fontWeight: 'bold',
-                    }}>{course.CourseId === 0 ? 'Add' : 'Save'}</Text>
+                <View
+                  style={{
+                    marginTop: 10,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                  }}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                    }}
+                    onPress={handleSaveCourse}>
+                    <Text
+                      style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {course.CourseId === 0 ? 'Add' : 'Save'}
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{
-                    backgroundColor: '#f25252',
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    marginLeft: 10
-                  }} onPress={handleCloseModal}>
-                    <Text style={{
-                      color: Colors.background,
-                      fontSize: 14,
-                      fontWeight: 'bold',
-                    }}>Cancel</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginLeft: 10,
+                    }}
+                    onPress={handleCloseModal}>
+                    <Text
+                      style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      Cancel
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           </Modal>
         )}
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast ref={ref => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

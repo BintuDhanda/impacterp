@@ -1,162 +1,227 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../../constants/Colors';
-import { Get as httpGet } from '../../constants/httpService';
+import {Get as httpGet} from '../../constants/httpService';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 
-const NewsLikeScreen = ({ route }) => {
-    const { newsId } = route.params;
-    const [newsLikeList, setNewsLikeList] = useState([]);
-    const [newsLikeDeleteId, setNewsLikeDeleteId] = useState(0);
-    const [showDelete, setShowDelete] = useState(false);
+const NewsLikeScreen = ({route}) => {
+  const {newsId} = route.params;
+  const [newsLikeList, setNewsLikeList] = useState([]);
+  const [newsLikeDeleteId, setNewsLikeDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
+    GetNewsLikeList();
+  }, []);
+  const GetNewsLikeList = () => {
+    httpGet(`NewsLike/getNewsLikeByNewsId?NewsId=${newsId}`)
+      .then(result => {
+        console.log(result.data);
+        setNewsLikeList(result.data);
+      })
+      .catch(err => {
+        console.log('Get News Like error :', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
+
+  const DeleteNewsLikeIdConfirm = newsLikeid => {
+    setNewsLikeDeleteId(newsLikeid);
+  };
+
+  const DeleteNewsLikeIdConfirmYes = () => {
+    httpGet(`NewsLike/delete?Id=${newsLikeDeleteId}`)
+      .then(result => {
+        console.log(result);
         GetNewsLikeList();
-    }, []);
-    const GetNewsLikeList = () => {
-        httpGet(`NewsLike/getNewsLikeByNewsId?NewsId=${newsId}`)
-            .then((result) => {
-                console.log(result.data)
-                setNewsLikeList(result.data)
-            })
-            .catch((err) => {
-                console.log('Get News Like error :', err);
-                Toast.show({
-                    type: 'error',
-                    text1: `${err}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            })
-    }
-
-    const DeleteNewsLikeIdConfirm = (newsLikeid) => {
-        setNewsLikeDeleteId(newsLikeid);
-    }
-
-    const DeleteNewsLikeIdConfirmYes = () => {
-        httpGet(`NewsLike/delete?Id=${newsLikeDeleteId}`)
-            .then((result) => {
-                console.log(result);
-                GetNewsLikeList();
-                setNewsLikeDeleteId(0);
-                setShowDelete(false);
-            })
-            .catch((error) => {
-                console.error('Delete NewsLike error', error);
-                Toast.show({
-                    type: 'error',
-                    text1: `${error}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            })
-    }
-
-    const DeleteNewsLikeIdConfirmNo = () => {
         setNewsLikeDeleteId(0);
         setShowDelete(false);
-    }
+      })
+      .catch(error => {
+        console.error('Delete NewsLike error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
 
-    const renderNewsLikeCard = ({ item }) => {
-        return (
-            <View style={{
-                flexDirection: 'row',
-                backgroundColor: Colors.background,
-                borderRadius: 10,
-                padding: 5,
-                marginBottom: 10,
-                shadowColor: Colors.primary,
-                shadowOffset: { width: 5, height: 5 },
-                shadowOpacity: 5,
-                shadowRadius: 10,
-                elevation: 10,
-                borderWidth: 1.5,
-                borderColor: "grey",
-                alignItems: 'center'
-            }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
-                    <Text style={{ fontSize: 20, fontWeight: 'bold', borderRadius: 50, borderWidth: 2, borderColor: Colors.primary, color: Colors.secondary, padding: 8, marginRight: 10 }}>{item.userName}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                    <View style={{ justifyContent: 'center', alignItems: 'flex-start', width: '80%' }}>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold', }}>{item.userMobile}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', width: '20%' }}>
-                        <TouchableOpacity onPress={() => { DeleteNewsLikeIdConfirm(item.newsLikeId); setShowDelete(true); }}>
-                            <Icon name="trash" size={18} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View >
-        );
-    };
+  const DeleteNewsLikeIdConfirmNo = () => {
+    setNewsLikeDeleteId(0);
+    setShowDelete(false);
+  };
 
+  const renderNewsLikeCard = ({item}) => {
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={{ flex: 1, padding: 20, }}>
-
-                {showDelete && (
-                    <Modal transparent visible={showDelete}>
-                        <View style={{
-                            flex: 1,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}>
-                            <View style={{
-                                backgroundColor: Colors.background,
-                                borderRadius: 10,
-                                padding: 28,
-                                shadowColor: Colors.shadow,
-                                width: '80%',
-                            }}>
-                                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
-
-                                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                                    <TouchableOpacity style={{
-                                        backgroundColor: Colors.primary,
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                        marginRight: 3,
-                                    }} onPress={() => {
-                                        DeleteNewsLikeIdConfirmYes();
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#f25252',
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                    }} onPress={() => {
-                                        DeleteNewsLikeIdConfirmNo();
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
-                )}
-
-                <FlatList
-                    data={newsLikeList}
-                    renderItem={renderNewsLikeCard}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.newsLikeId.toString()}
-                />
-                <Toast ref={(ref) => Toast.setRef(ref)} />
-            </View>
-        </ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          backgroundColor: Colors.background,
+          borderRadius: 10,
+          padding: 5,
+          marginBottom: 10,
+          shadowColor: Colors.primary,
+          shadowOffset: {width: 5, height: 5},
+          shadowOpacity: 5,
+          shadowRadius: 10,
+          elevation: 10,
+          borderWidth: 1.5,
+          borderColor: 'grey',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignContent: 'center',
+          }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: 'bold',
+              borderRadius: 50,
+              borderWidth: 2,
+              borderColor: Colors.primary,
+              color: Colors.secondary,
+              padding: 8,
+              marginRight: 10,
+            }}>
+            {item.userName}
+          </Text>
+        </View>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              width: '80%',
+            }}>
+            <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+              {item.userMobile}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              width: '20%',
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                DeleteNewsLikeIdConfirm(item.newsLikeId);
+                setShowDelete(true);
+              }}>
+              <Icon
+                name="trash"
+                size={18}
+                color={'#f25252'}
+                style={{marginRight: 8, textAlignVertical: 'center'}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
     );
+  };
+
+  return (
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={{flex: 1, padding: 20}}>
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    fontWeight: 'bold',
+                  }}>
+                  Are You Sure You Want To Delete
+                </Text>
+
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }}
+                    onPress={() => {
+                      DeleteNewsLikeIdConfirmYes();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      Yes
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }}
+                    onPress={() => {
+                      DeleteNewsLikeIdConfirmNo();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      No
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
+        <FlatList
+          data={newsLikeList}
+          renderItem={renderNewsLikeCard}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={item => item.newsLikeId.toString()}
+        />
+        <Toast ref={ref => Toast.setRef(ref)} />
+      </View>
+    </ScrollView>
+  );
 };
 
 // const styles = StyleSheet.create({

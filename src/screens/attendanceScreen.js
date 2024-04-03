@@ -1,393 +1,509 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Animated } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Animated,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { UserContext } from '../../App';
-import { useContext } from 'react';
-import { Post as httpPost } from '../constants/httpService';
+import {UserContext} from '../../App';
+import {useContext} from 'react';
+import {Post as httpPost} from '../constants/httpService';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-const AttendanceScreen = ({ navigation }) => {
-    const { user, setUser } = useContext(UserContext);
-    const [attendance, setAttendance] = useState({ "AttendanceId": 0, "AttendanceType": "", "RegistrationNumber": "", "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
-    const [attendanceList, setAttendanceList] = useState([]);
-    const moveToRight = useRef(new Animated.Value(0)).current;
-    const scale = useRef(new Animated.Value(1)).current;
-    const [loading, setLoading] = useState(false);
-    const [take, setTake] = useState(10);
-    const [skip, setSkip] = useState(0);
-    const [isEndReached, setIsEndReached] = useState(true);
-    const [ishowQrCode, setIshowQrCode] = useState(false);
+const AttendanceScreen = ({navigation}) => {
+  const {user, setUser} = useContext(UserContext);
+  const [attendance, setAttendance] = useState({
+    AttendanceId: 0,
+    AttendanceType: '',
+    RegistrationNumber: '',
+    IsActive: true,
+    CreatedAt: null,
+    CreatedBy: user.userId,
+    LastUpdatedBy: null,
+  });
+  const [attendanceList, setAttendanceList] = useState([]);
+  const moveToRight = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const [loading, setLoading] = useState(false);
+  const [take, setTake] = useState(10);
+  const [skip, setSkip] = useState(0);
+  const [isEndReached, setIsEndReached] = useState(true);
+  const [ishowQrCode, setIshowQrCode] = useState(false);
 
-    const handleHistory = () => {
-        setAttendanceList([]);
-        if (attendance.RegistrationNumber === "") {
-            Toast.show({
+  const handleHistory = () => {
+    setAttendanceList([]);
+    if (attendance.RegistrationNumber === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Enter Registration Number after Search History',
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+    } else {
+      navigation.navigate('AttendanceHistoryScreen', {
+        registrationNumber: attendance.RegistrationNumber,
+      });
+    }
+  };
+
+  const handleAddCheckedInAttendance = () => {
+    const filter = {
+      RegistrationNumber: attendance.RegistrationNumber,
+      Take: take,
+      Skip: skip,
+    };
+    httpPost('Attendance/RegistrationIsExists', filter)
+      .then(response => {
+        if (response.data === false) {
+          Toast.show({
+            type: 'error',
+            text1: 'This Registration Number is Not Exist',
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        } else {
+          httpPost('Attendance/post', {
+            AttendanceId: 0,
+            AttendanceType: 'CheckedIn',
+            RegistrationNumber: attendance.RegistrationNumber,
+            IsActive: true,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
+          })
+            .then(response => {
+              if (response.status === 200) {
+                setAttendanceList([]);
+                setSkip(0);
+                Alert.alert('Sucess', 'Attendance is Added Successfully');
+                setLoading(true);
+                httpPost('Attendance/getAttendanceByRegistrationNumber', {
+                  RegistrationNumber: attendance.RegistrationNumber,
+                  Take: take,
+                  Skip: 0,
+                })
+                  .then(response => {
+                    console.log(attendanceList, 'AttendanceList');
+                    setLoading(false);
+                    if (response.data.length >= 0) {
+                      setIsEndReached(false);
+                      setAttendanceList(response.data);
+                    }
+                    if (response.data.length === 0) {
+                      setIsEndReached(true);
+                      Toast.show({
+                        type: 'info',
+                        text1: 'No records found',
+                        position: 'bottom',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                      });
+                    }
+                  })
+                  .catch(error => {
+                    setLoading(false);
+                    console.error(
+                      'Error in Get Attendance after Add CheckedIn',
+                      error,
+                    );
+                    Toast.show({
+                      type: 'error',
+                      text1: `${error}`,
+                      position: 'bottom',
+                      visibilityTime: 2000,
+                      autoHide: true,
+                    });
+                  });
+              }
+            })
+            .catch(err => {
+              console.error('Error saving Attendance:', err);
+              Toast.show({
                 type: 'error',
-                text1: 'Enter Registration Number after Search History',
+                text1: `${err}`,
                 position: 'bottom',
                 visibilityTime: 2000,
                 autoHide: true,
+              });
             });
         }
-        else {
-            navigation.navigate("AttendanceHistoryScreen", { registrationNumber: attendance.RegistrationNumber })
-        }
+      })
+      .catch(err => {
+        console.error('Error in Registration IsExists', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
+  const handleAddCheckedOutAttendance = () => {
+    const filter = {
+      RegistrationNumber: attendance.RegistrationNumber,
+      Take: take,
+      Skip: skip,
     };
-
-    const handleAddCheckedInAttendance = () => {
-        const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
-        httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
-            if (response.data === false) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'This Registration Number is Not Exist',
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            }
-            else {
-                httpPost("Attendance/post", { "AttendanceId": 0, "AttendanceType": "CheckedIn", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, })
-                    .then((response) => {
-                        if (response.status === 200) {
-                            setAttendanceList([]);
-                            setSkip(0);
-                            Alert.alert('Sucess', 'Attendance is Added Successfully')
-                            setLoading(true);
-                            httpPost("Attendance/getAttendanceByRegistrationNumber", { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 })
-                                .then((response) => {
-                                    console.log(attendanceList, "AttendanceList")
-                                    setLoading(false);
-                                    if (response.data.length >= 0) {
-                                        setIsEndReached(false);
-                                        setAttendanceList(response.data);
-                                    }
-                                    if (response.data.length === 0) {
-                                        setIsEndReached(true);
-                                        Toast.show({
-                                            type: 'info',
-                                            text1: 'No records found',
-                                            position: 'bottom',
-                                            visibilityTime: 2000,
-                                            autoHide: true,
-                                        });
-                                    }
-                                })
-                                .catch((error) => {
-                                    setLoading(false);
-                                    console.error('Error in Get Attendance after Add CheckedIn', error);
-                                    Toast.show({
-                                        type: 'error',
-                                        text1: `${error}`,
-                                        position: 'bottom',
-                                        visibilityTime: 2000,
-                                        autoHide: true,
-                                    });
-                                });
-                        }
-                    })
-                    .catch((err) => {
-                        console.error('Error saving Attendance:', err);
-                        Toast.show({
-                            type: 'error',
-                            text1: `${err}`,
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        });
-                    })
-            }
-        })
-            .catch((err) => {
-                console.error('Error in Registration IsExists', err);
-                Toast.show({
-                    type: 'error',
-                    text1: `${err}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
+    httpPost('Attendance/RegistrationIsExists', filter)
+      .then(response => {
+        if (response.data === false) {
+          Toast.show({
+            type: 'error',
+            text1: 'This Registration Number is Not Exist',
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
+        } else {
+          httpPost('Attendance/post', {
+            AttendanceId: 0,
+            AttendanceType: 'CheckedOut',
+            RegistrationNumber: attendance.RegistrationNumber,
+            IsActive: true,
+            CreatedAt: null,
+            CreatedBy: user.userId,
+            LastUpdatedBy: null,
+          })
+            .then(response => {
+              if (response.status === 200) {
+                setAttendanceList([]);
+                setSkip(0);
+                Alert.alert('Sucess', 'Attendance is Added Successfully');
+                setLoading(true);
+                httpPost('Attendance/getAttendanceByRegistrationNumber', {
+                  RegistrationNumber: attendance.RegistrationNumber,
+                  Take: take,
+                  Skip: 0,
+                })
+                  .then(response => {
+                    console.log(attendanceList, 'AttendanceList');
+                    setLoading(false);
+                    if (response.data.length >= 0) {
+                      setIsEndReached(false);
+                      setAttendanceList(response.data);
+                      setSkip(skip + 10);
+                    }
+                    if (response.data.length === 0) {
+                      setIsEndReached(true);
+                      Toast.show({
+                        type: 'info',
+                        text1: 'No records found',
+                        position: 'bottom',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                      });
+                    }
+                  })
+                  .catch(error => {
+                    setLoading(false);
+                    console.error(
+                      'Error in Get Attendance after Add CheckedOut',
+                      error,
+                    );
+                    Toast.show({
+                      type: 'error',
+                      text1: `${error}`,
+                      position: 'bottom',
+                      visibilityTime: 2000,
+                      autoHide: true,
+                    });
+                  });
+              }
             })
-    };
-    const handleAddCheckedOutAttendance = () => {
-        const filter = { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": skip }
-        httpPost("Attendance/RegistrationIsExists", filter).then((response) => {
-            if (response.data === false) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'This Registration Number is Not Exist',
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            }
-            else {
-                httpPost("Attendance/post", { "AttendanceId": 0, "AttendanceType": "CheckedOut", "RegistrationNumber": attendance.RegistrationNumber, "IsActive": true, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, })
-                    .then((response) => {
-                        if (response.status === 200) {
-                            setAttendanceList([]);
-                            setSkip(0);
-                            Alert.alert('Sucess', 'Attendance is Added Successfully')
-                            setLoading(true);
-                            httpPost("Attendance/getAttendanceByRegistrationNumber", { "RegistrationNumber": attendance.RegistrationNumber, "Take": take, "Skip": 0 })
-                                .then((response) => {
-                                    console.log(attendanceList, "AttendanceList")
-                                    setLoading(false);
-                                    if (response.data.length >= 0) {
-                                        setIsEndReached(false);
-                                        setAttendanceList(response.data);
-                                        setSkip(skip + 10)
-                                    }
-                                    if (response.data.length === 0) {
-                                        setIsEndReached(true);
-                                        Toast.show({
-                                            type: 'info',
-                                            text1: 'No records found',
-                                            position: 'bottom',
-                                            visibilityTime: 2000,
-                                            autoHide: true,
-                                        });
-                                    }
-                                })
-                                .catch((error) => {
-                                    setLoading(false);
-                                    console.error('Error in Get Attendance after Add CheckedOut', error);
-                                    Toast.show({
-                                        type: 'error',
-                                        text1: `${error}`,
-                                        position: 'bottom',
-                                        visibilityTime: 2000,
-                                        autoHide: true,
-                                    });
-                                });
-                        }
-                    })
-                    .catch((err) => {
-                        console.error('Error saving Attendance:', err);
-                        Toast.show({
-                            type: 'error',
-                            text1: `${err}`,
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        });
-                    })
-            }
-        })
-            .catch((err) => {
-                console.error('Error in Registration IsExists', err);
-                Toast.show({
-                    type: 'error',
-                    text1: `${err}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            })
-    };
-
-    const getFormattedDate = (datestring) => {
-        const datetimeString = datestring;
-        const date = new Date(datetimeString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${year}-${month}-${day}`;
-    }
-    const convertToIndianTimee = (datetimeString) => {
-        const utcDate = new Date(datetimeString);
-
-        // Convert to IST (Indian Standard Time)
-        // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
-
-        const istDate = new Intl.DateTimeFormat('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true, // Use 12-hour format with AM/PM
-        }).format(utcDate);
-
-        return istDate;
-    }
-
-    const handleLoadMore = async () => {
-        console.log("Execute Handle More function")
-        if (!isEndReached) {
-            Toast.show({
-                type: 'info',
-                text1: 'Get More records Search History',
+            .catch(err => {
+              console.error('Error saving Attendance:', err);
+              Toast.show({
+                type: 'error',
+                text1: `${err}`,
                 position: 'bottom',
                 visibilityTime: 2000,
                 autoHide: true,
+              });
             });
         }
-    };
+      })
+      .catch(err => {
+        console.error('Error in Registration IsExists', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
 
-    const renderFooter = () => {
-        if (!loading) return null;
-        return (
-            <View style={{ paddingVertical: 20 }}>
-                <ActivityIndicator animating size="large" />
-            </View>
-        );
-    };
+  const getFormattedDate = datestring => {
+    const datetimeString = datestring;
+    const date = new Date(datetimeString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+  const convertToIndianTimee = datetimeString => {
+    const utcDate = new Date(datetimeString);
 
+    // Convert to IST (Indian Standard Time)
+    // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
 
-    const onSuccess = e => {
-        setAttendance({ ...attendance, RegistrationNumber: e.data })
-        setIshowQrCode(false);
-    };
+    const istDate = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true, // Use 12-hour format with AM/PM
+    }).format(utcDate);
 
-    const renderAttendanceCard = ({ item }) => (
-        <View style={{
-            backgroundColor: Colors.background,
-            borderRadius: 10,
-            padding: 10,
-            marginBottom: 10,
-            shadowColor: Colors.shadow,
-            shadowOffset: { width: 10, height: 2 },
-            shadowOpacity: 4,
-            shadowRadius: 10,
-            elevation: 10,
-            borderWidth: 1.5,
-            borderColor: Colors.primary,
-        }}>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Attendance Type : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.attendanceType}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Punch Time : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{convertToIndianTimee(item.punchTime)}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Registration Number : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.registrationNumber}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Student Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.studentName}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Mobile : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.mobile}</Text>
-            </View>
-        </View>
-    );
+    return istDate;
+  };
 
+  const handleLoadMore = async () => {
+    console.log('Execute Handle More function');
+    if (!isEndReached) {
+      Toast.show({
+        type: 'info',
+        text1: 'Get More records Search History',
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loading) return null;
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={{ flex: 1 }}>
-                <Animated.View style={{ flex: 1, position: 'absolute', top: 0, padding: 16, right: 0, left: 0, bottom: 0, backgroundColor: Colors.background, transform: [{ scale: scale }, { translateX: moveToRight }] }}>
-                    {ishowQrCode && (<QRCodeScanner
-                        onRead={onSuccess}
-                        reactivate={true}
-                        reactivateTimeout={500}
-                        showMarker={true}
-                        />)}
-                    <View style={{ flexDirection: 'row', borderRadius: 10, borderColor: Colors.primary, borderWidth: 1.5, fontSize: 16, paddingHorizontal: 20 }}>
-                        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setIshowQrCode(true); }}>
-                            <Icon name="qrcode" size={20} />
-                        </TouchableOpacity>
-                        <TextInput style={{ flex: 1, marginLeft: 10 }}
-                            placeholder="Enter Registration Number"
-                            value={attendance.RegistrationNumber}
-                            keyboardType='numeric'
-                            onChangeText={(text) => {
-                                setAttendance({ ...attendance, RegistrationNumber: text })
-                                setAttendanceList([]);
-                                setSkip(0);
-                            }}
-                        />
-                        <TouchableOpacity style={{ justifyContent: 'center' }} onPress={() => { setAttendance({ ...attendance, RegistrationNumber: "" }); }}>
-                            <Icon name="trash" size={20} color="green"  />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-                        <TouchableOpacity style={{
-                            flex: 1,
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            marginTop: 10,
-                            marginRight: 3,
-                        }} onPress={() => {
-                            setAttendanceList([]);
-                            setSkip(0);
-                            handleAddCheckedInAttendance();
-                        }}>
-                            <Text style={{
-                                color: Colors.background,
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                                alignSelf: 'center'
-                            }}>Checked-In</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{
-                            flex: 1,
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            marginTop: 10,
-                            marginRight: 3
-                        }} onPress={() => {
-                            setAttendanceList([]);
-                            setSkip(0);
-                            handleAddCheckedOutAttendance();
-                        }}>
-                            <Text style={{
-                                color: Colors.background,
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                                alignSelf: 'center'
-                            }}>Checked-Out</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{
-                            flex: 1,
-                            backgroundColor: Colors.primary,
-                            borderRadius: 5,
-                            paddingVertical: 8,
-                            paddingHorizontal: 12,
-                            marginTop: 10,
-                        }} onPress={handleHistory}>
-                            <Text style={{
-                                color: Colors.background,
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                                alignSelf: 'center'
-                            }}>History</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <FlatList
-                        data={attendanceList}
-                        keyExtractor={(item) => item.attendanceId.toString()}
-                        showsVerticalScrollIndicator={false}
-                        renderItem={renderAttendanceCard}
-                        onEndReached={() => {
-                            handleLoadMore();
-                        }}
-                        ListFooterComponent={renderFooter}
-                        onEndReachedThreshold={0.1}
-                    />
-
-                    <Toast ref={(ref) => Toast.setRef(ref)} />
-                </Animated.View>
-            </View>
-        </ScrollView>
+      <View style={{paddingVertical: 20}}>
+        <ActivityIndicator animating size="large" />
+      </View>
     );
+  };
+
+  const onSuccess = e => {
+    setAttendance({...attendance, RegistrationNumber: e.data});
+    setIshowQrCode(false);
+  };
+
+  const renderAttendanceCard = ({item}) => (
+    <View
+      style={{
+        backgroundColor: Colors.background,
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 10,
+        shadowColor: Colors.shadow,
+        shadowOffset: {width: 10, height: 2},
+        shadowOpacity: 4,
+        shadowRadius: 10,
+        elevation: 10,
+        borderWidth: 1.5,
+        borderColor: Colors.primary,
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Batch Name : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.batchName}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Attendance Type : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.attendanceType}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Punch Time : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {convertToIndianTimee(item.punchTime)}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Registration Number : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.registrationNumber}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Student Name : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.studentName}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Mobile : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.mobile}
+        </Text>
+      </View>
+    </View>
+  );
+
+  return (
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={{flex: 1}}>
+        <Animated.View
+          style={{
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            padding: 16,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: Colors.background,
+            transform: [{scale: scale}, {translateX: moveToRight}],
+          }}>
+          {ishowQrCode && (
+            <QRCodeScanner
+              onRead={onSuccess}
+              reactivate={true}
+              reactivateTimeout={500}
+              showMarker={true}
+            />
+          )}
+          <View
+            style={{
+              flexDirection: 'row',
+              borderRadius: 10,
+              borderColor: Colors.primary,
+              borderWidth: 1.5,
+              fontSize: 16,
+              paddingHorizontal: 20,
+            }}>
+            <TouchableOpacity
+              style={{justifyContent: 'center'}}
+              onPress={() => {
+                setIshowQrCode(true);
+              }}>
+              <Icon name="qrcode" size={20} />
+            </TouchableOpacity>
+            <TextInput
+              style={{flex: 1, marginLeft: 10}}
+              placeholder="Enter Registration Number"
+              value={attendance.RegistrationNumber}
+              keyboardType="numeric"
+              onChangeText={text => {
+                setAttendance({...attendance, RegistrationNumber: text});
+                setAttendanceList([]);
+                setSkip(0);
+              }}
+            />
+            <TouchableOpacity
+              style={{justifyContent: 'center'}}
+              onPress={() => {
+                setAttendance({...attendance, RegistrationNumber: ''});
+              }}>
+              <Icon name="trash" size={20} color="green" />
+            </TouchableOpacity>
+          </View>
+          <View style={{flexDirection: 'row', marginBottom: 10}}>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: Colors.primary,
+                borderRadius: 5,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                marginTop: 10,
+                marginRight: 3,
+              }}
+              onPress={() => {
+                setAttendanceList([]);
+                setSkip(0);
+                handleAddCheckedInAttendance();
+              }}>
+              <Text
+                style={{
+                  color: Colors.background,
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  alignSelf: 'center',
+                }}>
+                Checked-In
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: Colors.primary,
+                borderRadius: 5,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                marginTop: 10,
+                marginRight: 3,
+              }}
+              onPress={() => {
+                setAttendanceList([]);
+                setSkip(0);
+                handleAddCheckedOutAttendance();
+              }}>
+              <Text
+                style={{
+                  color: Colors.background,
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  alignSelf: 'center',
+                }}>
+                Checked-Out
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: Colors.primary,
+                borderRadius: 5,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                marginTop: 10,
+              }}
+              onPress={handleHistory}>
+              <Text
+                style={{
+                  color: Colors.background,
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  alignSelf: 'center',
+                }}>
+                History
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={attendanceList}
+            keyExtractor={item => item.attendanceId.toString()}
+            showsVerticalScrollIndicator={false}
+            renderItem={renderAttendanceCard}
+            onEndReached={() => {
+              handleLoadMore();
+            }}
+            ListFooterComponent={renderFooter}
+            onEndReachedThreshold={0.1}
+          />
+
+          <Toast ref={ref => Toast.setRef(ref)} />
+        </Animated.View>
+      </View>
+    </ScrollView>
+  );
 };
 
 export default AttendanceScreen;

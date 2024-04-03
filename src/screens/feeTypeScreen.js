@@ -1,12 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../constants/Colors';
-import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 
 const FeeTypeScreen = () => {
-  const [feeType, setFeeType] = useState({ "Id": 0, "FeeTypeName": "", "IsActive": true });
+  const [feeType, setFeeType] = useState({
+    Id: 0,
+    FeeTypeName: '',
+    IsActive: true,
+  });
   const [feeTypeList, setFeeTypeList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -14,12 +28,12 @@ const FeeTypeScreen = () => {
     GetFeeTypeList();
   }, []);
   const GetFeeTypeList = () => {
-    httpGet("FeeType/get")
-      .then((result) => {
-        console.log(result.data)
-        setFeeTypeList(result.data)
+    httpGet('FeeType/get')
+      .then(result => {
+        console.log(result.data);
+        setFeeTypeList(result.data);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('Get FeeType error :', err);
         Toast.show({
           type: 'error',
@@ -28,12 +42,12 @@ const FeeTypeScreen = () => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
   const handleAddFeeType = () => {
     setFeeType({
       Id: 0,
-      FeeTypeName: "",
+      FeeTypeName: '',
       IsActive: true,
     });
     setModalVisible(true);
@@ -42,20 +56,20 @@ const FeeTypeScreen = () => {
   const handleSaveFeeType = () => {
     try {
       if (feeType.Id !== 0) {
-        httpPost("FeeType/put", feeType)
-          .then((response) => {
+        httpPost('FeeType/put', feeType)
+          .then(response => {
             if (response.status === 200) {
               GetFeeTypeList();
-              Alert.alert('Sucees', 'Update FeeType Successfully')
+              Alert.alert('Sucees', 'Update FeeType Successfully');
               setFeeType({
-                "Id": 0,
-                "FeeTypeName": "",
-                "IsActive": true
-              })
+                Id: 0,
+                FeeTypeName: '',
+                IsActive: true,
+              });
             }
           })
-          .catch((err) => {
-            console.log("FeeType update error : ", err);
+          .catch(err => {
+            console.log('FeeType update error : ', err);
             Toast.show({
               type: 'error',
               text1: `${err}`,
@@ -64,21 +78,20 @@ const FeeTypeScreen = () => {
               autoHide: true,
             });
           });
-      }
-      else {
-        httpPost("FeeType/post", feeType)
-          .then((response) => {
+      } else {
+        httpPost('FeeType/post', feeType)
+          .then(response => {
             if (response.status === 200) {
               GetFeeTypeList();
-              Alert.alert('Success', 'Add FeeType Successfully')
+              Alert.alert('Success', 'Add FeeType Successfully');
               setFeeType({
-                "Id": 0,
-                "FeeTypeName": "",
-                "IsActive": true
-              })
+                Id: 0,
+                FeeTypeName: '',
+                IsActive: true,
+              });
             }
           })
-          .catch((err) => {
+          .catch(err => {
             console.log('FeeType Add error :', err);
             Toast.show({
               type: 'error',
@@ -90,8 +103,7 @@ const FeeTypeScreen = () => {
           });
       }
       setModalVisible(false);
-    }
-    catch (error) {
+    } catch (error) {
       console.log('Error saving FeeType:', error);
       Toast.show({
         type: 'error',
@@ -101,16 +113,16 @@ const FeeTypeScreen = () => {
         autoHide: true,
       });
     }
-  }
+  };
 
-  const handleDeleteFeeType = (feeTypeId) => {
+  const handleDeleteFeeType = feeTypeId => {
     httpGet(`FeeType/delete?Id=${feeTypeId}`)
-      .then((result) => {
+      .then(result => {
         console.log(result);
         GetFeeTypeList();
       })
-      .catch((err) => {
-        console.error("Delete Error", err);
+      .catch(err => {
+        console.error('Delete Error', err);
         Toast.show({
           type: 'error',
           text1: `${err}`,
@@ -121,16 +133,16 @@ const FeeTypeScreen = () => {
       });
   };
 
-  const handleEditFeeType = (feeTypeId) => {
+  const handleEditFeeType = feeTypeId => {
     httpGet(`FeeType/getById?Id=${feeTypeId}`)
-      .then((response) => {
+      .then(response => {
         setFeeType({
           Id: response.data.id,
           FeeTypeName: response.data.feeTypeName,
-          IsActive: response.data.isActive
-        })
+          IsActive: response.data.isActive,
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('FeeType Get By Id :', error);
         Toast.show({
           type: 'error',
@@ -139,80 +151,103 @@ const FeeTypeScreen = () => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
+      });
     setModalVisible(true);
   };
 
   const handleClose = () => {
     setModalVisible(false);
-  }
+  };
 
-  const renderFeeTypeCard = ({ item }) => {
+  const renderFeeTypeCard = ({item}) => {
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: Colors.background,
-        borderRadius: 10,
-        padding: 10,
-        marginBottom: 10,
-        shadowColor: Colors.shadow,
-        shadowOffset: { width: 10, height: 2 },
-        shadowOpacity: 4,
-        shadowRadius: 10,
-        elevation: 10,
-        borderColor: Colors.primary,
-        borderWidth: 1.5,
-      }}>
-        <Text style={{
-          fontSize: 16,
-          fontWeight: 'bold',
-        }}>{item.feeTypeName}</Text>
-        <View style={{ flexDirection: 'row', }}>
-          <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditFeeType(item.id)} >
-            <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: Colors.background,
+          borderRadius: 10,
+          padding: 10,
+          marginBottom: 10,
+          shadowColor: Colors.shadow,
+          shadowOffset: {width: 10, height: 2},
+          shadowOpacity: 4,
+          shadowRadius: 10,
+          elevation: 10,
+          borderColor: Colors.primary,
+          borderWidth: 1.5,
+        }}>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: 'bold',
+          }}>
+          {item.feeTypeName}
+        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => handleEditFeeType(item.id)}>
+            <Icon
+              name="pencil"
+              size={20}
+              color={'#5a67f2'}
+              style={{marginLeft: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDeleteFeeType(item.id)}>
-            <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
+            <Icon
+              name="trash"
+              size={20}
+              color={'#f25252'}
+              style={{marginRight: 8, textAlignVertical: 'center'}}
+            />
           </TouchableOpacity>
         </View>
-      </View >
+      </View>
     );
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={{ flex: 1, padding: 20, }}>
-        <TouchableOpacity style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 5,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          marginBottom: 20,
-        }} onPress={handleAddFeeType}>
-          <Text style={{
-            color: Colors.background,
-            fontSize: 16,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>Add Fee Type</Text>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View style={{flex: 1, padding: 20}}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginBottom: 20,
+          }}
+          onPress={handleAddFeeType}>
+          <Text
+            style={{
+              color: Colors.background,
+              fontSize: 16,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            Add Fee Type
+          </Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
-          <View style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}>
-            <View style={{
-              backgroundColor: Colors.background,
-              borderRadius: 10,
-              padding: 20,
-              width: '80%',
-              marginBottom: 20,
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}>
+            <View
+              style={{
+                backgroundColor: Colors.background,
+                borderRadius: 10,
+                padding: 20,
+                width: '80%',
+                marginBottom: 20,
+              }}>
               <TextInput
                 style={{
                   width: '100%',
@@ -224,22 +259,29 @@ const FeeTypeScreen = () => {
                 }}
                 placeholder="Fee Type Name"
                 value={feeType.FeeTypeName}
-                onChangeText={(text) => setFeeType({ ...feeType, FeeTypeName: text })}
+                onChangeText={text =>
+                  setFeeType({...feeType, FeeTypeName: text})
+                }
               />
 
-              <TouchableOpacity style={{
-                backgroundColor: Colors.primary,
-                borderRadius: 5,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-                marginBottom: 10,
-              }} onPress={handleSaveFeeType}>
-                <Text style={{
-                  color: Colors.background,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>{feeType.Id !== 0 ? 'Save' : 'Add'}</Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: Colors.primary,
+                  borderRadius: 5,
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  marginBottom: 10,
+                }}
+                onPress={handleSaveFeeType}>
+                <Text
+                  style={{
+                    color: Colors.background,
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}>
+                  {feeType.Id !== 0 ? 'Save' : 'Add'}
+                </Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -249,14 +291,16 @@ const FeeTypeScreen = () => {
                 paddingVertical: 10,
                 paddingHorizontal: 20,
               }}
-              onPress={handleClose}
-            >
-              <Text style={{
-                color: Colors.background,
-                fontSize: 16,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>Close</Text>
+              onPress={handleClose}>
+              <Text
+                style={{
+                  color: Colors.background,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                Close
+              </Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -264,10 +308,10 @@ const FeeTypeScreen = () => {
         <FlatList
           data={feeTypeList}
           renderItem={renderFeeTypeCard}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ flexGrow: 1, }}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{flexGrow: 1}}
         />
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast ref={ref => Toast.setRef(ref)} />
       </View>
     </ScrollView>
   );

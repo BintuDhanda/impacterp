@@ -1,542 +1,645 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Modal, TextInput, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { UserContext } from '../../App';
-import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost } from '../constants/httpService';
+import {UserContext} from '../../App';
+import {useContext} from 'react';
+import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 import ShowError from '../constants/ShowError';
 
-const BatchScreen = ({ route }) => {
-    const { user, setUser } = useContext(UserContext);
-    const { courseId, courseName } = route.params;
-    const [batch, setBatch] = useState({ "BatchId": 0, "BatchName": "", "Code": "", "StartDate": "", "EndDate": "", "IsActive": true, "CourseId": courseId, "CreatedAt": null, "CreatedBy": user.userId, "LastUpdatedBy": null, });
-    const [batchList, setBatchList] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false);
+const BatchScreen = ({route}) => {
+  const {user, setUser} = useContext(UserContext);
+  const {courseId, courseName} = route.params;
+  const [batch, setBatch] = useState({
+    BatchId: 0,
+    BatchName: '',
+    Code: '',
+    StartDate: '',
+    EndDate: '',
+    IsActive: true,
+    CourseId: courseId,
+    CreatedAt: null,
+    CreatedBy: user.userId,
+    LastUpdatedBy: null,
+  });
+  const [batchList, setBatchList] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
-    const [selectStartDate, setSelectStartDate] = useState(new Date());
-    const [selectEndDate, setSelectEndDate] = useState(new Date())
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-    const [batchDeleteId, setBatchDeleteId] = useState(0);
-    const [showDelete, setShowDelete] = useState(false);
+  const [selectStartDate, setSelectStartDate] = useState(new Date());
+  const [selectEndDate, setSelectEndDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [batchDeleteId, setBatchDeleteId] = useState(0);
+  const [showDelete, setShowDelete] = useState(false);
 
-    const handleStartDateChange = (event, date) => {
-        if (date !== undefined) {
-            setSelectStartDate(date);
-            setBatch({ ...batch, StartDate: date })
-        }
-        setShowDatePicker(false);
-    };
+  const handleStartDateChange = (event, date) => {
+    if (date !== undefined) {
+      setSelectStartDate(date);
+      setBatch({...batch, StartDate: date});
+    }
+    setShowDatePicker(false);
+  };
 
-    const handleOpenStartDatePicker = () => {
-        setShowDatePicker(true);
-    };
-    const handleConfirmStartDatePicker = () => {
-        setShowDatePicker(false);
-    };
+  const handleOpenStartDatePicker = () => {
+    setShowDatePicker(true);
+  };
+  const handleConfirmStartDatePicker = () => {
+    setShowDatePicker(false);
+  };
 
-    const handleToDateChange = (event, date) => {
-        if (date !== undefined) {
-            setSelectEndDate(date);
-            setBatch({ ...batch, EndDate: date })
-        }
-        setShowEndDatePicker(false);
-    };
+  const handleToDateChange = (event, date) => {
+    if (date !== undefined) {
+      setSelectEndDate(date);
+      setBatch({...batch, EndDate: date});
+    }
+    setShowEndDatePicker(false);
+  };
 
-    const handleOpenEndDatePicker = () => {
-        setShowEndDatePicker(true);
-    };
+  const handleOpenEndDatePicker = () => {
+    setShowEndDatePicker(true);
+  };
 
-    const handleConfirmToDatePicker = () => {
-        setShowEndDatePicker(false);
-    };
+  const handleConfirmToDatePicker = () => {
+    setShowEndDatePicker(false);
+  };
 
-    useEffect(() => {
-        fetchBatchByCourseId();
-    }, []);
+  useEffect(() => {
+    fetchBatchByCourseId();
+  }, []);
 
-    const fetchBatchByCourseId = async () => {
-        try {
-            const response = await httpGet(`Batch/getBatchByCourseId?Id=${courseId}`)
-            setBatchList(response.data);
-            console.log(batchList, 'BatchList')
-        } catch (error) {
-            console.error('Error fetching Batch:', error);
-            Toast.show({
-                type: 'error',
-                text1: `${error}`,
-                position: 'bottom',
-                visibilityTime: 2000,
-                autoHide: true,
-            });
-        }
-    };
+  const fetchBatchByCourseId = async () => {
+    try {
+      const response = await httpGet(`Batch/getBatchByCourseId?Id=${courseId}`);
+      setBatchList(response.data);
+      console.log(batchList, 'BatchList');
+    } catch (error) {
+      console.error('Error fetching Batch:', error);
+      Toast.show({
+        type: 'error',
+        text1: `${error}`,
+        position: 'bottom',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+    }
+  };
 
-    const handleAddBatch = () => {
+  const handleAddBatch = () => {
+    setBatch({
+      BatchId: 0,
+      BatchName: '',
+      Code: '',
+      StartDate: '',
+      EndDate: '',
+      IsActive: true,
+      CourseId: courseId,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
+    });
+    setModalVisible(true);
+  };
+
+  const handleEditBatch = id => {
+    httpGet(`Batch/getById?Id=${id}`)
+      .then(result => {
+        console.log(result);
         setBatch({
-            BatchId: 0,
-            BatchName: "",
-            Code: "",
-            StartDate: "",
-            EndDate: "",
-            IsActive: true,
-            CourseId: courseId,
-            CreatedAt: null,
-            CreatedBy: user.userId,
-            LastUpdatedBy: null,
+          BatchId: result.data.batchId,
+          BatchName: result.data.batchName,
+          Code: result.data.code,
+          StartDate: result.data.startDate,
+          EndDate: result.data.endDate,
+          CourseId: result.data.courseId,
+          IsActive: result.data.isActive,
+          CreatedAt: result.data.createdAt,
+          CreatedBy: result.data.createdBy,
+          LastUpdatedBy: user.userId,
         });
-        setModalVisible(true);
-    };
+      })
+      .catch(err => {
+        console.error('Get By Id Error', err);
+        Toast.show({
+          type: 'error',
+          text1: `${err}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+    setModalVisible(true);
+  };
 
-    const handleEditBatch = (id) => {
-        httpGet(`Batch/getById?Id=${id}`)
-            .then((result) => {
-                console.log(result);
-                setBatch(
-                    {
-                        BatchId: result.data.batchId,
-                        BatchName: result.data.batchName,
-                        Code: result.data.code,
-                        StartDate: result.data.startDate,
-                        EndDate: result.data.endDate,
-                        CourseId: result.data.courseId,
-                        IsActive: result.data.isActive,
-                        CreatedAt: result.data.createdAt,
-                        CreatedBy: result.data.createdBy,
-                        LastUpdatedBy: user.userId
-                    }
-                );
-            })
-            .catch((err) => {
-                console.error("Get By Id Error", err);
-                Toast.show({
-                    type: 'error',
-                    text1: `${err}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            });
-        setModalVisible(true);
-    };
+  const DeleteBatchIdConfirm = batchid => {
+    setBatchDeleteId(batchid);
+  };
 
-    const DeleteBatchIdConfirm = (batchid) => {
-        setBatchDeleteId(batchid);
-    }
-
-    const DeleteBatchIdConfirmYes = () => {
-        httpGet(`Batch/delete?Id=${batchDeleteId}`)
-            .then((result) => {
-                console.log(result);
-                fetchBatchByCourseId();
-                setBatchDeleteId(0);
-                setShowDelete(false);
-            })
-            .catch((error) => {
-                console.error('Delete Batch error', error);
-                Toast.show({
-                    type: 'error',
-                    text1: `${error}`,
-                    position: 'bottom',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                });
-            })
-    }
-
-    const DeleteBatchIdConfirmNo = () => {
+  const DeleteBatchIdConfirmYes = () => {
+    httpGet(`Batch/delete?Id=${batchDeleteId}`)
+      .then(result => {
+        console.log(result);
+        fetchBatchByCourseId();
         setBatchDeleteId(0);
         setShowDelete(false);
-    }
+      })
+      .catch(error => {
+        console.error('Delete Batch error', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      });
+  };
 
-    const handleSaveBatch = async () => {
-        if(IsFormValid()){try {
-            if (batch.BatchId !== 0) {
-                await httpPost("Batch/put", batch)
-                    .then((response) => {
-                        if (response.status === 200) {
-                            fetchBatchByCourseId();
-                            Alert.alert('Success', 'Batch Update successfully');
-                            setBatch({
-                                "BatchId": 0,
-                                "BatchName": "",
-                                "Code": "",
-                                "StartDate": "",
-                                "EndDate": "",
-                                "CourseId": courseId,
-                                "IsActive": true,
-                                "CreatedAt": null,
-                                "CreatedBy": user.userId,
-                                "LastUpdatedBy": null,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Update error in Batch", err);
-                        Toast.show({
-                            type: 'error',
-                            text1: `${err}`,
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                        });
-                    });
-            } else {
-                await httpPost("Batch/post", batch)
-                    .then((response) => {
-                        if (response.status === 200) {
-                            fetchBatchByCourseId();
-                            Alert.alert('Success', 'Batch is Added Successfully')
-                            setBatch({
-                                "BatchId": 0,
-                                "BatchName": "",
-                                "Code": "",
-                                "StartDate": "",
-                                "EndDate": "",
-                                "CourseId": courseId,
-                                "IsActive": true,
-                                "CreatedAt": null,
-                                "CreatedBy": user.userId,
-                                "LastUpdatedBy": null,
-                            });
-                        }
-                    })
-            }
-            setModalVisible(false);
-        } catch (error) {
-            console.error('Error saving Batch:', error);
-            Toast.show({
+  const DeleteBatchIdConfirmNo = () => {
+    setBatchDeleteId(0);
+    setShowDelete(false);
+  };
+
+  const handleSaveBatch = async () => {
+    if (IsFormValid()) {
+      try {
+        if (batch.BatchId !== 0) {
+          await httpPost('Batch/put', batch)
+            .then(response => {
+              if (response.status === 200) {
+                fetchBatchByCourseId();
+                Alert.alert('Success', 'Batch Update successfully');
+                setBatch({
+                  BatchId: 0,
+                  BatchName: '',
+                  Code: '',
+                  StartDate: '',
+                  EndDate: '',
+                  CourseId: courseId,
+                  IsActive: true,
+                  CreatedAt: null,
+                  CreatedBy: user.userId,
+                  LastUpdatedBy: null,
+                });
+              }
+            })
+            .catch(err => {
+              console.error('Update error in Batch', err);
+              Toast.show({
                 type: 'error',
-                text1: `${error}`,
+                text1: `${err}`,
                 position: 'bottom',
                 visibilityTime: 2000,
                 autoHide: true,
+              });
             });
-        }}
-    };
-    const IsFormValid=()=>{
-        if(batch.BatchName.length==0)
-        {
-           ShowError("Enter a Valid Batch Name");
-           return false;
+        } else {
+          await httpPost('Batch/post', batch).then(response => {
+            if (response.status === 200) {
+              fetchBatchByCourseId();
+              Alert.alert('Success', 'Batch is Added Successfully');
+              setBatch({
+                BatchId: 0,
+                BatchName: '',
+                Code: '',
+                StartDate: '',
+                EndDate: '',
+                CourseId: courseId,
+                IsActive: true,
+                CreatedAt: null,
+                CreatedBy: user.userId,
+                LastUpdatedBy: null,
+              });
+            }
+          });
         }
-        if(batch.Code.length==0){
-           ShowError("Enter Valid Code");
-           return false;
-        }
-        if(batch.StartDate.length==0)
-        {
-           ShowError("Select Start Date")
-           return false;
-        }
-        if(batch.EndDate.length==0)
-        {
-           ShowError("Select End Date")
-           return false;
-        }
-        if(batch.CourseId.length==0)
-        {
-           ShowError("Select Course")
-           return false;
-        }
-   
-        return true;
-       }
-    const handleCloseModal = () => {
         setModalVisible(false);
-    };
-
-    const getFormattedDate = (datestring) => {
-        const datetimeString = datestring;
-        const date = new Date(datetimeString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${year}-${month}-${day}`;
+      } catch (error) {
+        console.error('Error saving Batch:', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+      }
     }
-    const convertToIndianTimee = (datetimeString) => {
-        const utcDate = new Date(datetimeString);
-
-        // Convert to IST (Indian Standard Time)
-        // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
-
-        const istDate = new Intl.DateTimeFormat('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true, // Use 12-hour format with AM/PM
-        }).format(utcDate);
-
-        return istDate;
+  };
+  const IsFormValid = () => {
+    if (batch.BatchName.length == 0) {
+      ShowError('Enter a Valid Batch Name');
+      return false;
+    }
+    if (batch.Code.length == 0) {
+      ShowError('Enter Valid Code');
+      return false;
+    }
+    if (batch.StartDate.length == 0) {
+      ShowError('Select Start Date');
+      return false;
+    }
+    if (batch.EndDate.length == 0) {
+      ShowError('Select End Date');
+      return false;
+    }
+    if (batch.CourseId.length == 0) {
+      ShowError('Select Course');
+      return false;
     }
 
-    const renderBatchCard = ({ item }) => (
-        <View style={{
-            justifyContent: 'space-between',
-            backgroundColor: Colors.background,
-            borderRadius: 10,
-            padding: 10,
-            marginBottom: 10,
-            shadowColor: Colors.shadow,
-            shadowOffset: { width: 10, height: 2 },
-            shadowOpacity: 4,
-            shadowRadius: 10,
-            elevation: 10,
-            borderWidth: 1.5,
-            borderColor: Colors.primary
+    return true;
+  };
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const getFormattedDate = datestring => {
+    const datetimeString = datestring;
+    const date = new Date(datetimeString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+  const convertToIndianTimee = datetimeString => {
+    const utcDate = new Date(datetimeString);
+
+    // Convert to IST (Indian Standard Time)
+    // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
+
+    const istDate = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true, // Use 12-hour format with AM/PM
+    }).format(utcDate);
+
+    return istDate;
+  };
+
+  const renderBatchCard = ({item}) => (
+    <View
+      style={{
+        justifyContent: 'space-between',
+        backgroundColor: Colors.background,
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 10,
+        shadowColor: Colors.shadow,
+        shadowOffset: {width: 10, height: 2},
+        shadowOpacity: 4,
+        shadowRadius: 10,
+        elevation: 10,
+        borderWidth: 1.5,
+        borderColor: Colors.primary,
+      }}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Batch Name : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.batchName}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Batch Code : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.code}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Start Date : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {convertToIndianTimee(item.startDate)}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>End Date : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {convertToIndianTimee(item.endDate)}
+        </Text>
+      </View>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={{fontSize: 16}}>Duration : </Text>
+        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
+          {item.duration}
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 10,
+          justifyContent: 'flex-end',
         }}>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Batch Name : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>{item.batchName}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Batch Code : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.code}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Start Date : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{convertToIndianTimee(item.startDate)}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>End Date : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{convertToIndianTimee(item.endDate)}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ fontSize: 16 }}>Duration : </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, }}>{item.duration}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-                <TouchableOpacity style={{ marginRight: 10, }} onPress={() => handleEditBatch(item.batchId)}>
-                    <Icon name="pencil" size={20} color={'#5a67f2'} style={{ marginLeft: 8, textAlignVertical: 'center' }} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => { DeleteBatchIdConfirm(item.batchId); setShowDelete(true); }}>
-                    <Icon name="trash" size={20} color={'#f25252'} style={{ marginRight: 8, textAlignVertical: 'center' }} />
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+        <TouchableOpacity
+          style={{marginRight: 10}}
+          onPress={() => handleEditBatch(item.batchId)}>
+          <Icon
+            name="pencil"
+            size={20}
+            color={'#5a67f2'}
+            style={{marginLeft: 8, textAlignVertical: 'center'}}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            DeleteBatchIdConfirm(item.batchId);
+            setShowDelete(true);
+          }}>
+          <Icon
+            name="trash"
+            size={20}
+            color={'#f25252'}
+            style={{marginRight: 8, textAlignVertical: 'center'}}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
-    return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={{
-                padding: 16,
-                justifyContent: 'center'
+  return (
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <View
+        style={{
+          padding: 16,
+          justifyContent: 'center',
+        }}>
+        <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+          Course Name : {courseName}
+        </Text>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: Colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            marginTop: 10,
+            marginBottom: 10,
+          }}
+          onPress={handleAddBatch}>
+          <Text
+            style={{
+              color: Colors.background,
+              fontSize: 16,
+              fontWeight: 'bold',
+              textAlign: 'center',
             }}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Course Name : {courseName}</Text>
-                <TouchableOpacity style={{
-                    flex: 1,
-                    backgroundColor: Colors.primary,
-                    borderRadius: 5,
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                    marginTop: 10,
-                    marginBottom: 10,
-                }} onPress={handleAddBatch}>
-                    <Text style={{
-                        color: Colors.background,
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                    }}>Add Batch</Text>
-                </TouchableOpacity>
+            Add Batch
+          </Text>
+        </TouchableOpacity>
 
-                {showDelete && (
-                    <Modal transparent visible={showDelete}>
-                        <View style={{
-                            flex: 1,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}>
-                            <View style={{
-                                backgroundColor: Colors.background,
-                                borderRadius: 10,
-                                padding: 28,
-                                shadowColor: Colors.shadow,
-                                width: '80%',
-                            }}>
-                                <Text style={{ fontSize: 18, marginBottom: 5, alignSelf: 'center', fontWeight: 'bold' }}>Are You Sure You Want To Delete</Text>
+        {showDelete && (
+          <Modal transparent visible={showDelete}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 28,
+                  shadowColor: Colors.shadow,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    marginBottom: 5,
+                    alignSelf: 'center',
+                    fontWeight: 'bold',
+                  }}>
+                  Are You Sure You Want To Delete
+                </Text>
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                                    <TouchableOpacity style={{
-                                        backgroundColor: Colors.primary,
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                        marginRight: 3,
-                                    }} onPress={() => {
-                                        DeleteBatchIdConfirmYes();
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>Yes</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#f25252',
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginTop: 10,
-                                    }} onPress={() => {
-                                        DeleteBatchIdConfirmNo();
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: Colors.background }}>No</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
-                )}
-
-                <FlatList
-                    data={batchList}
-                    keyExtractor={(item) => item.batchId.toString()}
-                    renderItem={renderBatchCard}
-                />
-
-                {modalVisible && (
-                    <Modal transparent visible={modalVisible}>
-                        <View style={{
-                            flex: 1,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}>
-                            <View style={{
-                                backgroundColor: Colors.background,
-                                borderRadius: 10,
-                                padding: 20,
-                                width: '80%',
-                            }}>
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary,
-                                        borderRadius: 8,
-                                        padding: 8,
-                                        marginBottom: 10,
-                                    }}
-                                    placeholder="Batch Name"
-                                    value={batch.BatchName}
-                                    onChangeText={(text) => setBatch({ ...batch, BatchName: text })}
-                                />
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary,
-                                        borderRadius: 8,
-                                        padding: 8,
-                                        marginBottom: 10,
-                                    }}
-                                    placeholder="Batch Code"
-                                    value={batch.Code.toString()}
-                                    onChangeText={(text) => setBatch({ ...batch, Code: text })}
-                                />
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginBottom: 10,
-                                    paddingHorizontal: 10,
-                                    borderWidth: 1,
-                                    borderColor: Colors.primary,
-                                    borderRadius: 8,
-                                }}>
-                                    <TouchableOpacity onPress={handleOpenStartDatePicker}>
-                                        <Icon name={'calendar'} size={25} />
-                                    </TouchableOpacity>
-                                    <TextInput style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                                        value={batch.StartDate === "" ? ("Select Start Date") : (getFormattedDate(batch.StartDate))}
-                                        placeholder="Select Start date"
-                                        editable={false}
-                                    />
-
-                                </View>
-                                {showDatePicker && (
-                                    <DateTimePicker
-                                        value={selectStartDate}
-                                        mode="date"
-                                        display="default"
-                                        onChange={handleStartDateChange}
-                                        onConfirm={handleConfirmStartDatePicker}
-                                        onCancel={handleConfirmStartDatePicker}
-                                    />
-                                )}
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginBottom: 10,
-                                    paddingHorizontal: 10,
-                                    borderWidth: 1,
-                                    borderColor: Colors.primary,
-                                    borderRadius: 8,
-                                }}>
-                                    <TouchableOpacity onPress={handleOpenEndDatePicker}>
-                                        <Icon name={'calendar'} size={25} />
-                                    </TouchableOpacity>
-                                    <TextInput
-                                        style={{ marginLeft: 10, fontSize: 16, color: Colors.secondary }}
-                                        value={batch.EndDate === "" ? "Select End Date" : getFormattedDate(batch.EndDate)}
-                                        placeholder="Select End date"
-                                        editable={false}
-                                    />
-
-                                </View>
-                                {showEndDatePicker && (
-                                    <DateTimePicker
-                                        value={selectEndDate}
-                                        mode="date"
-                                        display="default"
-                                        onChange={handleToDateChange}
-                                        onConfirm={handleConfirmToDatePicker}
-                                        onCancel={handleConfirmToDatePicker}
-                                    />
-                                )}
-                                <View style={{
-                                    marginTop: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'flex-end',
-                                }}>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: Colors.primary,
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                    }} onPress={handleSaveBatch}>
-                                        <Text style={{
-                                            color: Colors.background,
-                                            fontSize: 14,
-                                            fontWeight: 'bold',
-                                        }}>{batch.BatchId === 0 ? 'Add' : 'Save'}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#f25252',
-                                        borderRadius: 5,
-                                        paddingVertical: 8,
-                                        paddingHorizontal: 12,
-                                        marginLeft: 10
-                                    }} onPress={handleCloseModal}>
-                                        <Text style={{
-                                            color: Colors.background,
-                                            fontSize: 14,
-                                            fontWeight: 'bold',
-                                        }}>Cancel</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
-                )}
-                <Toast ref={(ref) => Toast.setRef(ref)} />
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                      marginRight: 3,
+                    }}
+                    onPress={() => {
+                      DeleteBatchIdConfirmYes();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      Yes
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginTop: 10,
+                    }}
+                    onPress={() => {
+                      DeleteBatchIdConfirmNo();
+                    }}>
+                    <Text style={{fontSize: 16, color: Colors.background}}>
+                      No
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-        </ScrollView>
-    );
+          </Modal>
+        )}
+
+        <FlatList
+          data={batchList}
+          keyExtractor={item => item.batchId.toString()}
+          renderItem={renderBatchCard}
+        />
+
+        {modalVisible && (
+          <Modal transparent visible={modalVisible}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  backgroundColor: Colors.background,
+                  borderRadius: 10,
+                  padding: 20,
+                  width: '80%',
+                }}>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    padding: 8,
+                    marginBottom: 10,
+                  }}
+                  placeholder="Batch Name"
+                  value={batch.BatchName}
+                  onChangeText={text => setBatch({...batch, BatchName: text})}
+                />
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                    padding: 8,
+                    marginBottom: 10,
+                  }}
+                  placeholder="Batch Code"
+                  value={batch.Code.toString()}
+                  onChangeText={text => setBatch({...batch, Code: text})}
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                  }}>
+                  <TouchableOpacity onPress={handleOpenStartDatePicker}>
+                    <Icon name={'calendar'} size={25} />
+                  </TouchableOpacity>
+                  <TextInput
+                    style={{
+                      marginLeft: 10,
+                      fontSize: 16,
+                      color: Colors.secondary,
+                    }}
+                    value={
+                      batch.StartDate === ''
+                        ? 'Select Start Date'
+                        : getFormattedDate(batch.StartDate)
+                    }
+                    placeholder="Select Start date"
+                    editable={false}
+                  />
+                </View>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={selectStartDate}
+                    mode="date"
+                    display="default"
+                    onChange={handleStartDateChange}
+                    onConfirm={handleConfirmStartDatePicker}
+                    onCancel={handleConfirmStartDatePicker}
+                  />
+                )}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: Colors.primary,
+                    borderRadius: 8,
+                  }}>
+                  <TouchableOpacity onPress={handleOpenEndDatePicker}>
+                    <Icon name={'calendar'} size={25} />
+                  </TouchableOpacity>
+                  <TextInput
+                    style={{
+                      marginLeft: 10,
+                      fontSize: 16,
+                      color: Colors.secondary,
+                    }}
+                    value={
+                      batch.EndDate === ''
+                        ? 'Select End Date'
+                        : getFormattedDate(batch.EndDate)
+                    }
+                    placeholder="Select End date"
+                    editable={false}
+                  />
+                </View>
+                {showEndDatePicker && (
+                  <DateTimePicker
+                    value={selectEndDate}
+                    mode="date"
+                    display="default"
+                    onChange={handleToDateChange}
+                    onConfirm={handleConfirmToDatePicker}
+                    onCancel={handleConfirmToDatePicker}
+                  />
+                )}
+                <View
+                  style={{
+                    marginTop: 10,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                  }}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: Colors.primary,
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                    }}
+                    onPress={handleSaveBatch}>
+                    <Text
+                      style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      {batch.BatchId === 0 ? 'Add' : 'Save'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#f25252',
+                      borderRadius: 5,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      marginLeft: 10,
+                    }}
+                    onPress={handleCloseModal}>
+                    <Text
+                      style={{
+                        color: Colors.background,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                      }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+        <Toast ref={ref => Toast.setRef(ref)} />
+      </View>
+    </ScrollView>
+  );
 };
 
 export default BatchScreen;

@@ -5,7 +5,6 @@ import {
   View,
   Modal,
   TextInput,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -13,6 +12,7 @@ import {
   ScrollView,
   Animated,
 } from 'react-native';
+import {FlatList} from 'components/flatlist';
 import Toast from 'react-native-toast-message';
 import Colors from '../../constants/Colors';
 import {Post as httpPost} from '../../constants/httpService';
