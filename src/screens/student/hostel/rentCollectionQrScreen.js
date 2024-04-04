@@ -431,7 +431,9 @@ const RentCollectionQrScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <Modal
         visible={ishowQrCode}
         transparent

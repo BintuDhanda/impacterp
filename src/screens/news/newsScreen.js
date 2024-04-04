@@ -401,6 +401,7 @@ const NewsScreen = ({navigation}) => {
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={{flexGrow: 1}}
       showsVerticalScrollIndicator={false}>
       <View style={{flex: 1}}>

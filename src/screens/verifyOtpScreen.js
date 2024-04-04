@@ -1,28 +1,37 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native';
+import {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Post as httpPost } from '../constants/httpService';
+import {Post as httpPost} from '../constants/httpService';
 import Toast from 'react-native-toast-message';
-import { sendOTP } from '../constants/smsService';
+import {sendOTP} from '../constants/smsService';
 import Colors from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserContext } from '../../App';
-import { useContext } from 'react';
+import {UserContext} from '../../App';
+import {useContext} from 'react';
 
-const VerifyOTPScreen = ({ route, navigation }) => {
-  const { verifyOtp, mobile } = route.params;
+const VerifyOTPScreen = ({route, navigation}) => {
+  const {verifyOtp, mobile} = route.params;
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
-  const [count, setCount] = useState(1)
+  const [count, setCount] = useState(1);
   const [timer, setTimer] = useState(60);
   const [showResend, setShowResend] = useState(false);
-  const { user, setUser } = useContext(UserContext);
+  const {user, setUser} = useContext(UserContext);
 
   useEffect(() => {
     let interval;
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
+        setTimer(prevTimer => prevTimer - 1);
       }, 1000);
     } else {
       setShowResend(true);
@@ -31,51 +40,56 @@ const VerifyOTPScreen = ({ route, navigation }) => {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleOtpChange = (value) => {
+  const handleOtpChange = value => {
     setOtp(value);
   };
 
   const handleConfirmOtp = () => {
     // Update the isLogedIn state to true
-    console.log(otp, verifyOtp)
+    console.log(otp, verifyOtp);
     if (otp == verifyOtp) {
       // get user token api call
-      httpPost("User/ERPlogin", { userMobile: mobile, userPassword: password }).then((response) => {
-        console.log(response.data, "Response")
-        if (response.data === 0) {
+      httpPost('User/ERPlogin', {userMobile: mobile, userPassword: password})
+        .then(response => {
+          console.log(response.data, 'Response');
+          if (response.data === 0) {
+            Toast.show({
+              type: 'error',
+              text1: 'Invalid Password or Phone No. Try Again!',
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          } else if (
+            response.data.userId === 0 &&
+            response.data.token == null &&
+            response.data.message == null
+          ) {
+            Toast.show({
+              type: 'error',
+              text1: 'User not exist Please Contact for Admin',
+              position: 'bottom',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          } else {
+            AsyncStorage.setItem('user', JSON.stringify(response.data));
+            setUser(response.data);
+          }
+        })
+        .catch(err => {
           Toast.show({
             type: 'error',
-            text1: "Invalid Password or Phone No. Try Again!",
+            text1: `${err}`,
             position: 'bottom',
             visibilityTime: 2000,
             autoHide: true,
           });
-        } else if (response.data.userId === 0 && response.data.token == null && response.data.message == null) {
-          Toast.show({
-            type: 'error',
-            text1: "User not exist Please Contact for Admin",
-            position: 'bottom',
-            visibilityTime: 2000,
-            autoHide: true,
-          });
-        }
-        else {
-          AsyncStorage.setItem('user', JSON.stringify(response.data));
-          setUser(response.data);
-        }
-      }).catch((err) => {
-        Toast.show({
-          type: 'error',
-          text1: `${err}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
         });
-      })
     } else {
       Toast.show({
         type: 'error',
-        text1: "Invalid Otp!",
+        text1: 'Invalid Otp!',
         position: 'bottom',
         visibilityTime: 2000,
         autoHide: true,
@@ -85,8 +99,8 @@ const VerifyOTPScreen = ({ route, navigation }) => {
   };
 
   const handleResendOtp = () => {
-    setCount(count + 1)
-    console.log(count, "Count")
+    setCount(count + 1);
+    console.log(count, 'Count');
     if (count >= 3) {
       Toast.show({
         type: 'error',
@@ -95,82 +109,112 @@ const VerifyOTPScreen = ({ route, navigation }) => {
         visibilityTime: 2000,
         autoHide: true,
       });
-    }
-    else {
-      sendOTP(verifyOtp, mobile).then((res) => {
-        console.log(res.data, "Response otp")
-        if (res.status == 200) {
-          setTimer(60);
-          setShowResend(false);
-        }
-      }
-      ).catch((err) => {
-        console.error("Send Otp Error : ", err)
-        Toast.show({
-          type: 'error',
-          text1: `${err}`,
-          position: 'bottom',
-          visibilityTime: 2000,
-          autoHide: true,
+    } else {
+      sendOTP(verifyOtp, mobile)
+        .then(res => {
+          console.log(res.data, 'Response otp');
+          if (res.status == 200) {
+            setTimer(60);
+            setShowResend(false);
+          }
+        })
+        .catch(err => {
+          console.error('Send Otp Error : ', err);
+          Toast.show({
+            type: 'error',
+            text1: `${err}`,
+            position: 'bottom',
+            visibilityTime: 2000,
+            autoHide: true,
+          });
         });
-      })
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: Colors.background }}>
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
-        <View style={{ paddingHorizontal: 25 }}>
-          <View style={{ alignItems: 'center' }}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1, backgroundColor: Colors.background}}>
+      <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
+        <View style={{paddingHorizontal: 25}}>
+          <View style={{alignItems: 'center'}}>
             <Image source={require('../assets/impact.png')} />
           </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{
-              fontSize: 24,
-              fontWeight: 'bold',
-              marginBottom: 30,
-            }}>Welcome Back!</Text>
+          <View style={{alignItems: 'center'}}>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: 'bold',
+                marginBottom: 30,
+              }}>
+              Welcome Back!
+            </Text>
           </View>
-          <View style={{
-            flexDirection: 'row',
-            borderBottomColor: Colors.primary,
-            borderBottomWidth: 1,
-            paddingBottom: 8,
-            marginBottom: 25
-          }}>
-            <Icon name="verified" style={{ marginRight: 5 }} size={20} color="#666" />
+          <View
+            style={{
+              flexDirection: 'row',
+              borderBottomColor: Colors.primary,
+              borderBottomWidth: 1,
+              paddingBottom: 8,
+              marginBottom: 25,
+            }}>
+            <Icon
+              name="verified"
+              style={{marginRight: 5}}
+              size={20}
+              color="#666"
+            />
             <TextInput
-              style={{ flex: 1, paddingVertical: 0 }}
+              style={{flex: 1, paddingVertical: 0}}
               placeholder="Enter OTP"
               value={otp}
-              onChangeText={(text) => setOtp(text)}
-              keyboardType='numeric'
+              onChangeText={text => setOtp(text)}
+              keyboardType="numeric"
               maxLength={4}
             />
           </View>
-          <View style={{
-            flexDirection: 'row',
-            borderBottomColor: Colors.primary,
-            borderBottomWidth: 1,
-            paddingBottom: 8,
-            marginBottom: 25
-          }}>
-            <Icon name="lock" style={{ marginRight: 5 }} size={20} color="#666" />
+          <View
+            style={{
+              flexDirection: 'row',
+              borderBottomColor: Colors.primary,
+              borderBottomWidth: 1,
+              paddingBottom: 8,
+              marginBottom: 25,
+            }}>
+            <Icon name="lock" style={{marginRight: 5}} size={20} color="#666" />
             <TextInput
-              style={{ flex: 1, paddingVertical: 0 }}
+              style={{flex: 1, paddingVertical: 0}}
               placeholder="Enter Password"
               value={password}
-              onChangeText={(text) => setPassword(text)}
+              onChangeText={text => setPassword(text)}
               secureTextEntry={true}
             />
           </View>
           {showResend ? (
-            <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleResendOtp}>
-              <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Resend OTP</Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.primary,
+                padding: 15,
+                borderRadius: 10,
+                marginBottom: 30,
+              }}
+              onPress={handleResendOtp}>
+              <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
+                Resend OTP
+              </Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={{ backgroundColor: Colors.primary, padding: 15, borderRadius: 10, marginBottom: 30, }} onPress={handleConfirmOtp}>
-              <Text style={{ textAlign: 'center', fontSize: 16, color: '#fff', }}>Confirm OTP</Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.primary,
+                padding: 15,
+                borderRadius: 10,
+                marginBottom: 30,
+              }}
+              onPress={handleConfirmOtp}>
+              <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
+                Confirm OTP
+              </Text>
             </TouchableOpacity>
           )}
           <View
@@ -181,7 +225,7 @@ const VerifyOTPScreen = ({ route, navigation }) => {
             }}>
             <Text>or resend in {timer} Seconds.</Text>
           </View>
-          <Toast ref={(ref) => Toast.setRef(ref)} />
+          <Toast ref={ref => Toast.setRef(ref)} />
         </View>
       </SafeAreaView>
     </ScrollView>

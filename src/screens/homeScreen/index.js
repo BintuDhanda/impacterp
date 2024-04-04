@@ -77,6 +77,7 @@ const HomeScreen = () => {
   });
   return (
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={{flexGrow: 1}}
       showsVerticalScrollIndicator={false}>
       <View style={styles.container}>

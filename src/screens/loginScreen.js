@@ -14,16 +14,19 @@ import {Post as httpPost} from '../constants/httpService';
 import Toast from 'react-native-toast-message';
 import {sendOTP} from '../constants/smsService';
 import Colors from '../constants/Colors';
+import {PrimaryButton} from '@src/components/buttons';
 
 const LogInScreen = ({navigation}) => {
   const [phone, setPhone] = useState('');
   const [isPress, setIsPress] = useState({IsPress: false});
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
     // Handle login logic
     //navigation.navigate('VerifyOTPScreen')
 
     //check if user exists or not
+    setLoading(true);
     httpPost(`User/IsExists`, {Mobile: phone})
       .then(res => {
         if (res.data == false) {
@@ -83,6 +86,9 @@ const LogInScreen = ({navigation}) => {
           visibilityTime: 2000,
           autoHide: true,
         });
+      })
+      .then(() => {
+        setLoading(false);
       });
   };
 
@@ -103,7 +109,9 @@ const LogInScreen = ({navigation}) => {
   // }
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <SafeAreaView
         style={{
           flex: 1,
@@ -151,23 +159,14 @@ const LogInScreen = ({navigation}) => {
               onChangeText={text => setPhone(text)}
             />
           </View>
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              backgroundColor: Colors.primary,
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 30,
-            }}
-            disabled={isPress.IsPress === true ? true : false}
+          <PrimaryButton
+            loading={loading}
             onPress={() => {
               handleLogin();
               setIsPress(true);
-            }}>
-            <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
-              Login
-            </Text>
-          </TouchableOpacity>
+            }}
+            title="Login"
+          />
         </View>
         <Toast ref={ref => Toast.setRef(ref)} />
       </SafeAreaView>

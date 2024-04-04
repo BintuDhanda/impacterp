@@ -312,7 +312,9 @@ const SliderScreen = ({navigation}) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <View
         style={{
           padding: 16,

@@ -1,29 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import Colors from '../../constants/Colors';
 import Toast from 'react-native-toast-message';
-import { Dropdown } from 'react-native-element-dropdown';
-import { UserContext } from '../../../App';
-import { useContext } from 'react';
-import { Get as httpGet, Post as httpPost } from '../../constants/httpService';
+import {Dropdown} from 'react-native-element-dropdown';
+import {UserContext} from '../../../App';
+import {useContext} from 'react';
+import {Get as httpGet, Post as httpPost} from '../../constants/httpService';
 import ShowError from '../../constants/ShowError';
 
-const StudentAddressFormScreen = ({ route, navigation }) => {
-  const { user, setUser } = useContext(UserContext);
-  const { addressId, studentId } = route.params;
+const StudentAddressFormScreen = ({route, navigation}) => {
+  const {user, setUser} = useContext(UserContext);
+  const {addressId, studentId} = route.params;
   const [studentAddress, setStudentAddress] = useState({
-    "StudentAddressId": 0,
-    "AddressTypeId": "",
-    "Address": "",
-    "CountryId": "",
-    "StateId": "",
-    "CityId": "",
-    "Pincode": "",
-    "StudentId": studentId,
-    "IsActive": true,
-    "CreatedAt": null,
-    "CreatedBy": user.userId,
-    "LastUpdatedBy": null,
+    StudentAddressId: 0,
+    AddressTypeId: '',
+    Address: '',
+    CountryId: '',
+    StateId: '',
+    CityId: '',
+    Pincode: '',
+    StudentId: studentId,
+    IsActive: true,
+    CreatedAt: null,
+    CreatedBy: user.userId,
+    LastUpdatedBy: null,
   });
   const [addressTypeList, setAddressTypeList] = useState([]);
   const [countryList, setCountryList] = useState([]);
@@ -39,22 +47,22 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
     if (addressTypeList.length === 0) {
       GetAddressTypeList();
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (countryList.length === 0) {
       GetCountryList();
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (addressId !== undefined) {
       GetAddressById();
     }
-  }, [addressId])
+  }, [addressId]);
 
   const handleInputChange = (name, value) => {
-    setStudentAddress((prevStudentAddress) => ({
+    setStudentAddress(prevStudentAddress => ({
       ...prevStudentAddress,
       [name]: value,
     }));
@@ -62,7 +70,7 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
 
   const GetAddressById = () => {
     httpGet(`StudentAddress/getById?Id=${addressId}`)
-      .then((response) => {
+      .then(response => {
         setStudentAddress({
           StudentAddressId: response.data.studentAddressId,
           AddressTypeId: response.data.addressTypeId,
@@ -76,9 +84,9 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           CreatedAt: response.data.createdAt,
           CreatedBy: response.data.createdBy,
           LastUpdatedBy: user.userId,
-        })
+        });
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('Get Student Address Get By Id : ', err);
         Toast.show({
           type: 'error',
@@ -87,17 +95,17 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
 
   const GetAddressTypeList = () => {
-    httpGet("AddressType/get")
-      .then((response) => {
+    httpGet('AddressType/get')
+      .then(response => {
         console.log(response.data);
         setAddressTypeList(response.data);
       })
-      .catch((error) => {
-        console.error(error, "Get Address Type List Error");
+      .catch(error => {
+        console.error(error, 'Get Address Type List Error');
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -106,15 +114,15 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           autoHide: true,
         });
       });
-  }
+  };
 
   const GetCountryList = () => {
-    httpGet("Country/get")
-      .then((response) => {
+    httpGet('Country/get')
+      .then(response => {
         setCountryList(response.data);
       })
-      .catch((error) => {
-        console.error(error, "Get Country List Error");
+      .catch(error => {
+        console.error(error, 'Get Country List Error');
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -123,15 +131,15 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           autoHide: true,
         });
       });
-  }
+  };
 
-  const fetchStateByCountryId = async (countryId) => {
+  const fetchStateByCountryId = async countryId => {
     await httpGet(`State/getStateByCountryId?Id=${countryId}`)
-      .then((response) => {
-        setStateList(response.data)
+      .then(response => {
+        setStateList(response.data);
       })
-      .catch((error) => {
-        console.error("Error Get State By Country Id", error);
+      .catch(error => {
+        console.error('Error Get State By Country Id', error);
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -139,16 +147,16 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
+      });
+  };
 
-  const fetchCityByStateId = async (stateId) => {
+  const fetchCityByStateId = async stateId => {
     await httpGet(`City/getCityByStateId?Id=${stateId}`)
-      .then((response) => {
-        setCityList(response.data)
+      .then(response => {
+        setCityList(response.data);
       })
-      .catch((error) => {
-        console.error("Error Get City By State Id", error);
+      .catch(error => {
+        console.error('Error Get City By State Id', error);
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -156,181 +164,188 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
           visibilityTime: 2000,
           autoHide: true,
         });
-      })
-  }
-  const handleCountrySelect = (country) => {
+      });
+  };
+  const handleCountrySelect = country => {
     setCountryValue(country.countryId);
-    setStudentAddress({ ...studentAddress, CountryId: country.countryId })
+    setStudentAddress({...studentAddress, CountryId: country.countryId});
     fetchStateByCountryId(country.countryId);
   };
-  const handleStateSelect = (state) => {
+  const handleStateSelect = state => {
     setStateValue(state.stateId);
-    setStudentAddress({ ...studentAddress, StateId: state.stateId })
+    setStudentAddress({...studentAddress, StateId: state.stateId});
     fetchCityByStateId(state.stateId);
   };
-  const handleCitySelect = (city) => {
+  const handleCitySelect = city => {
     setCityValue(city.cityId);
-    setStudentAddress({ ...studentAddress, CityId: city.cityId })
+    setStudentAddress({...studentAddress, CityId: city.cityId});
   };
 
   const handleSaveStudentAddress = async () => {
-    if(IsFormValid()){try {
-      if (studentAddress.StudentAddressId !== 0) {
-        await httpPost('StudentAddress/put', studentAddress)
-          .then((response) => {
-            if (response.status === 200) {
-              Alert.alert('Success', 'Update Address Successfully')
-              setStudentAddress({
-                "StudentAddressId": 0,
-                "AddressTypeId": "",
-                "Address": "",
-                "CountryId": "",
-                "StateId": "",
-                "CityId": "",
-                "Pincode": "",
-                "StudentId": studentId,
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
-              })
-              navigation.goBack();
-            }
-          })
-          .catch((err) => {
-            console.error("Address update error : ", err);
-            Toast.show({
-              type: 'error',
-              text1: `${err}`,
-              position: 'bottom',
-              visibilityTime: 2000,
-              autoHide: true,
+    if (IsFormValid()) {
+      try {
+        if (studentAddress.StudentAddressId !== 0) {
+          await httpPost('StudentAddress/put', studentAddress)
+            .then(response => {
+              if (response.status === 200) {
+                Alert.alert('Success', 'Update Address Successfully');
+                setStudentAddress({
+                  StudentAddressId: 0,
+                  AddressTypeId: '',
+                  Address: '',
+                  CountryId: '',
+                  StateId: '',
+                  CityId: '',
+                  Pincode: '',
+                  StudentId: studentId,
+                  IsActive: true,
+                  CreatedAt: null,
+                  CreatedBy: user.userId,
+                  LastUpdatedBy: null,
+                });
+                navigation.goBack();
+              }
+            })
+            .catch(err => {
+              console.error('Address update error : ', err);
+              Toast.show({
+                type: 'error',
+                text1: `${err}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+              });
             });
-          });
-      }
-      else {
-        await httpPost("StudentAddress/post", studentAddress)
-          .then((response) => {
-            if (response.status === 200) {
-              Alert.alert('Success', 'Add Address Successfully')
-              setStudentAddress({
-                "StudentAddressId": 0,
-                "AddressTypeId": "",
-                "Address": "",
-                "CountryId": "",
-                "StateId": "",
-                "CityId": "",
-                "Pincode": "",
-                "StudentId": studentId,
-                "IsActive": true,
-                "CreatedAt": null,
-                "CreatedBy": user.userId,
-                "LastUpdatedBy": null,
-              })
-              navigation.goBack();
-            }
-          })
-          .catch((err) => {
-            console.error('Address Add error :', err);
-            Toast.show({
-              type: 'error',
-              text1: `${err}`,
-              position: 'bottom',
-              visibilityTime: 2000,
-              autoHide: true,
+        } else {
+          await httpPost('StudentAddress/post', studentAddress)
+            .then(response => {
+              if (response.status === 200) {
+                Alert.alert('Success', 'Add Address Successfully');
+                setStudentAddress({
+                  StudentAddressId: 0,
+                  AddressTypeId: '',
+                  Address: '',
+                  CountryId: '',
+                  StateId: '',
+                  CityId: '',
+                  Pincode: '',
+                  StudentId: studentId,
+                  IsActive: true,
+                  CreatedAt: null,
+                  CreatedBy: user.userId,
+                  LastUpdatedBy: null,
+                });
+                navigation.goBack();
+              }
+            })
+            .catch(err => {
+              console.error('Address Add error :', err);
+              Toast.show({
+                type: 'error',
+                text1: `${err}`,
+                position: 'bottom',
+                visibilityTime: 2000,
+                autoHide: true,
+              });
             });
-          });
+        }
+      } catch (error) {
+        console.error('Error saving Address:', error);
+        Toast.show({
+          type: 'error',
+          text1: `${error}`,
+          position: 'bottom',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
       }
     }
-    catch (error) {
-      console.error('Error saving Address:', error);
-      Toast.show({
-        type: 'error',
-        text1: `${error}`,
-        position: 'bottom',
-        visibilityTime: 2000,
-        autoHide: true,
-      });
-    }}
-  }
+  };
 
   const handleCancel = () => {
     setStudentAddress({
-      "StudentAddressId": 0,
-      "AddressTypeId": "",
-      "Address": "",
-      "CountryId": "",
-      "StateId": "",
-      "CityId": "",
-      "Pincode": "",
-      "StudentId": studentId,
-      "IsActive": true,
-      "CreatedAt": null,
-      "CreatedBy": user.userId,
-      "LastUpdatedBy": null,
-    })
+      StudentAddressId: 0,
+      AddressTypeId: '',
+      Address: '',
+      CountryId: '',
+      StateId: '',
+      CityId: '',
+      Pincode: '',
+      StudentId: studentId,
+      IsActive: true,
+      CreatedAt: null,
+      CreatedBy: user.userId,
+      LastUpdatedBy: null,
+    });
     navigation.goBack();
-  }
-  const IsFormValid=()=>{
-    if(studentAddress.AddressTypeId.length==0)
-    {
-       ShowError("Select Address Type");
-       return false;
+  };
+  const IsFormValid = () => {
+    if (studentAddress.AddressTypeId.length == 0) {
+      ShowError('Select Address Type');
+      return false;
     }
-    if(studentAddress.Address.length==0){
-       ShowError("Enter Valid Address");
-       return false;
+    if (studentAddress.Address.length == 0) {
+      ShowError('Enter Valid Address');
+      return false;
     }
-    if(studentAddress.CountryId.length==0)
-    {
-       ShowError("Select Country")
-       return false;
+    if (studentAddress.CountryId.length == 0) {
+      ShowError('Select Country');
+      return false;
     }
-    if(studentAddress.StateId.length==0)
-    {
-       ShowError("Select State")
-       return false;
+    if (studentAddress.StateId.length == 0) {
+      ShowError('Select State');
+      return false;
     }
-    if(studentAddress.CityId.length==0)
-    {
-       ShowError("Select City")
-       return false;
+    if (studentAddress.CityId.length == 0) {
+      ShowError('Select City');
+      return false;
     }
 
-    if(studentAddress.Pincode.length==0)
-    {
-       ShowError("Enter a Valid Pincode")
-       return false;
+    if (studentAddress.Pincode.length == 0) {
+      ShowError('Enter a Valid Pincode');
+      return false;
     }
 
     return true;
-   }
+  };
   return (
-    <View style={{ flex: 1, padding: 10, }}>
-      <View style={{
-        backgroundColor: Colors.background,
-        borderRadius: 8,
-        padding: 16,
-        shadowColor: Colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-      }}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 16, }}>Student Address Form</Text>
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Address Type:</Text>
+    <View style={{flex: 1, padding: 10}}>
+      <View
+        style={{
+          backgroundColor: Colors.background,
+          borderRadius: 8,
+          padding: 16,
+          shadowColor: Colors.shadow,
+          shadowOffset: {width: 0, height: 2},
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+          elevation: 2,
+        }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{flexGrow: 1}}
+          showsVerticalScrollIndicator={false}>
+          <Text style={{fontSize: 18, fontWeight: 'bold', marginBottom: 16}}>
+            Student Address Form
+          </Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            Address Type:
+          </Text>
           <Dropdown
-            style={[{
-              height: 50,
-              borderColor: Colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              marginBottom: 10,
-            }, isFocus && { borderColor: 'blue' }]}
-            placeholderStyle={{ fontSize: 16, }}
-            selectedTextStyle={{ fontSize: 16, }}
+            style={[
+              {
+                height: 50,
+                borderColor: Colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                paddingHorizontal: 8,
+                marginBottom: 10,
+              },
+              isFocus && {borderColor: 'blue'},
+            ]}
+            placeholderStyle={{fontSize: 16}}
+            selectedTextStyle={{fontSize: 16}}
             inputSearchStyle={{
               height: 40,
               fontSize: 16,
@@ -349,36 +364,53 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             value={studentAddress.AddressTypeId}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
-            onChange={(value) => setStudentAddress({ ...studentAddress, AddressTypeId: value.addressTypeId })}
+            onChange={value =>
+              setStudentAddress({
+                ...studentAddress,
+                AddressTypeId: value.addressTypeId,
+              })
+            }
           />
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Address :</Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            Address :
+          </Text>
           <TextInput
-            style={[{
-              borderWidth: 1,
-              borderColor: Colors.primary,
-              borderRadius: 5,
-              paddingHorizontal: 10,
-              paddingVertical: 8,
-              marginBottom: 10,
-              fontSize: 16,
-            }, { height: 80, textAlignVertical: 'top', }]}
+            style={[
+              {
+                borderWidth: 1,
+                borderColor: Colors.primary,
+                borderRadius: 5,
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                marginBottom: 10,
+                fontSize: 16,
+              },
+              {height: 80, textAlignVertical: 'top'},
+            ]}
             value={studentAddress.Address}
-            onChangeText={(value) => handleInputChange('Address', value)}
+            onChangeText={value => handleInputChange('Address', value)}
             placeholder="Enter Address"
             multiline
           />
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Country :</Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            Country :
+          </Text>
           <Dropdown
-            style={[{
-              height: 50,
-              borderColor: Colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              marginBottom: 10,
-            }, isFocus && { borderColor: 'blue' }]}
-            placeholderStyle={{ fontSize: 16, }}
-            selectedTextStyle={{ fontSize: 16, }}
+            style={[
+              {
+                height: 50,
+                borderColor: Colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                paddingHorizontal: 8,
+                marginBottom: 10,
+              },
+              isFocus && {borderColor: 'blue'},
+            ]}
+            placeholderStyle={{fontSize: 16}}
+            selectedTextStyle={{fontSize: 16}}
             inputSearchStyle={{
               height: 40,
               fontSize: 16,
@@ -399,18 +431,24 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             onBlur={() => setIsFocus(false)}
             onChange={handleCountrySelect}
           />
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>State :</Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            State :
+          </Text>
           <Dropdown
-            style={[{
-              height: 50,
-              borderColor: Colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              marginBottom: 10,
-            }, isFocus && { borderColor: 'blue' }]}
-            placeholderStyle={{ fontSize: 16, }}
-            selectedTextStyle={{ fontSize: 16, }}
+            style={[
+              {
+                height: 50,
+                borderColor: Colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                paddingHorizontal: 8,
+                marginBottom: 10,
+              },
+              isFocus && {borderColor: 'blue'},
+            ]}
+            placeholderStyle={{fontSize: 16}}
+            selectedTextStyle={{fontSize: 16}}
             inputSearchStyle={{
               height: 40,
               fontSize: 16,
@@ -431,18 +469,24 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             onBlur={() => setIsFocus(false)}
             onChange={handleStateSelect}
           />
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>City :</Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            City :
+          </Text>
           <Dropdown
-            style={[{
-              height: 50,
-              borderColor: Colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              marginBottom: 10,
-            }, isFocus && { borderColor: 'blue' }]}
-            placeholderStyle={{ fontSize: 16, }}
-            selectedTextStyle={{ fontSize: 16, }}
+            style={[
+              {
+                height: 50,
+                borderColor: Colors.primary,
+                borderWidth: 1,
+                borderRadius: 10,
+                paddingHorizontal: 8,
+                marginBottom: 10,
+              },
+              isFocus && {borderColor: 'blue'},
+            ]}
+            placeholderStyle={{fontSize: 16}}
+            selectedTextStyle={{fontSize: 16}}
             inputSearchStyle={{
               height: 40,
               fontSize: 16,
@@ -464,7 +508,10 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
             onChange={handleCitySelect}
           />
 
-          <Text style={{ fontSize: 16, marginBottom: 5, color: Colors.secondary }}>Pincode :</Text>
+          <Text
+            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
+            Pincode :
+          </Text>
           <TextInput
             style={{
               borderWidth: 1,
@@ -476,35 +523,58 @@ const StudentAddressFormScreen = ({ route, navigation }) => {
               fontSize: 16,
             }}
             value={studentAddress.Pincode.toString()}
-            onChangeText={(value) => setStudentAddress({ ...studentAddress, Pincode: isNaN(parseInt(value)) ? "" : parseInt(value) })}
+            onChangeText={value =>
+              setStudentAddress({
+                ...studentAddress,
+                Pincode: isNaN(parseInt(value)) ? '' : parseInt(value),
+              })
+            }
             placeholder="Enter Pincode"
             keyboardType="numeric"
           />
 
-          <TouchableOpacity style={{
-            backgroundColor: Colors.primary,
-            padding: 10,
-            borderRadius: 5,
-            marginTop: 10,
-            alignItems: 'center',
-          }} onPress={handleSaveStudentAddress}>
-            <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>{studentAddress.StudentAddressId !== 0 ? "Save" : "Add"}</Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary,
+              padding: 10,
+              borderRadius: 5,
+              marginTop: 10,
+              alignItems: 'center',
+            }}
+            onPress={handleSaveStudentAddress}>
+            <Text
+              style={{
+                color: Colors.background,
+                fontSize: 16,
+                fontWeight: 'bold',
+              }}>
+              {studentAddress.StudentAddressId !== 0 ? 'Save' : 'Add'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{
-            backgroundColor: '#f25252',
-            padding: 10,
-            borderRadius: 5,
-            marginTop: 10,
-            alignItems: 'center',
-          }} onPress={handleCancel}>
-            <Text style={{ color: Colors.background, fontSize: 16, fontWeight: 'bold', }}>Cancel</Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#f25252',
+              padding: 10,
+              borderRadius: 5,
+              marginTop: 10,
+              alignItems: 'center',
+            }}
+            onPress={handleCancel}>
+            <Text
+              style={{
+                color: Colors.background,
+                fontSize: 16,
+                fontWeight: 'bold',
+              }}>
+              Cancel
+            </Text>
           </TouchableOpacity>
         </ScrollView>
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast ref={ref => Toast.setRef(ref)} />
       </View>
     </View>
   );
-}
+};
 
 // const styles = StyleSheet.create({
 //     container: {

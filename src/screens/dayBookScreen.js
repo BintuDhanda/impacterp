@@ -461,7 +461,9 @@ const DayBookScreen = () => {
   );
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1}}>
         <Animated.View
           style={{

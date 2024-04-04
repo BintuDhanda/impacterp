@@ -286,7 +286,9 @@ const NewsCommentScreen = ({route}) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1, padding: 20}}>
         <TouchableOpacity
           style={{

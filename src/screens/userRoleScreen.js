@@ -193,7 +193,9 @@ const UserRoleScreen = ({route}) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1, padding: 20}}>
         <Text style={{fontSize: 20, fontWeight: 'bold'}}>
           User Mobile : {userMobile}
