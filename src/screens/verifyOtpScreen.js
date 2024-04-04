@@ -17,6 +17,7 @@ import Colors from '../constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {UserContext} from '../../App';
 import {useContext} from 'react';
+import {PrimaryButton} from '@src/components/buttons';
 
 const VerifyOTPScreen = ({route, navigation}) => {
   const {verifyOtp, mobile} = route.params;
@@ -26,6 +27,7 @@ const VerifyOTPScreen = ({route, navigation}) => {
   const [timer, setTimer] = useState(60);
   const [showResend, setShowResend] = useState(false);
   const {user, setUser} = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let interval;
@@ -49,6 +51,7 @@ const VerifyOTPScreen = ({route, navigation}) => {
     console.log(otp, verifyOtp);
     if (otp == verifyOtp) {
       // get user token api call
+      setLoading(true);
       httpPost('User/ERPlogin', {userMobile: mobile, userPassword: password})
         .then(response => {
           console.log(response.data, 'Response');
@@ -85,6 +88,9 @@ const VerifyOTPScreen = ({route, navigation}) => {
             visibilityTime: 2000,
             autoHide: true,
           });
+        })
+        .then(() => {
+          setLoading(false);
         });
     } else {
       Toast.show({
@@ -110,6 +116,7 @@ const VerifyOTPScreen = ({route, navigation}) => {
         autoHide: true,
       });
     } else {
+      setLoading(true);
       sendOTP(verifyOtp, mobile)
         .then(res => {
           console.log(res.data, 'Response otp');
@@ -127,6 +134,9 @@ const VerifyOTPScreen = ({route, navigation}) => {
             visibilityTime: 2000,
             autoHide: true,
           });
+        })
+        .then(() => {
+          setLoading(false);
         });
     }
   };
@@ -190,33 +200,11 @@ const VerifyOTPScreen = ({route, navigation}) => {
               secureTextEntry={true}
             />
           </View>
-          {showResend ? (
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary,
-                padding: 15,
-                borderRadius: 10,
-                marginBottom: 30,
-              }}
-              onPress={handleResendOtp}>
-              <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
-                Resend OTP
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary,
-                padding: 15,
-                borderRadius: 10,
-                marginBottom: 30,
-              }}
-              onPress={handleConfirmOtp}>
-              <Text style={{textAlign: 'center', fontSize: 16, color: '#fff'}}>
-                Confirm OTP
-              </Text>
-            </TouchableOpacity>
-          )}
+          <PrimaryButton
+            loading={loading}
+            onPress={showResend ? handleResendOtp : handleConfirmOtp}
+            title={showResend ? 'Resend OTP' : 'Confirm OTP'}
+          />
           <View
             style={{
               flexDirection: 'row',
