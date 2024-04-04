@@ -11,7 +11,7 @@ import {
   ScrollView,
   Animated,
 } from 'react-native';
-import {FlatList} from 'components/flatlist';
+import {FlatList} from '@src/components/flatlist';
 import Toast from 'react-native-toast-message';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';

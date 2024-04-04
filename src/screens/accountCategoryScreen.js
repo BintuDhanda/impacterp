@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import {FlatList} from 'components/flatlist';
+import {FlatList} from '@src/components/flatlist';
 import Colors from '../constants/Colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {UserContext} from '../../App';

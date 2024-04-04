@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {FlatList} from 'components/flatlist';
+import {FlatList} from '@src/components/flatlist';
 import AcademyItem from './AcademyItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Get as httpGet} from '../../constants/httpService';

@@ -11,7 +11,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {FlatList} from 'components/flatlist';
+import {FlatList} from '@src/components/flatlist';
 import {Dropdown} from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';

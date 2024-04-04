@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import {FlatList} from 'components/flatlist';
+import {FlatList} from '@src/components/flatlist';
 import Colors from '../../../constants/Colors';
 import {useFocusEffect} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
