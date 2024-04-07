@@ -19,6 +19,7 @@ import {Post as httpPost} from '../../constants/httpService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {News_URL} from '../../constants/constant';
+import {PrimaryButton, SecondaryButton} from '@src/components/buttons';
 
 const StudentDetailsScreen = ({navigation}) => {
   const ToDate = new Date();
@@ -60,7 +61,7 @@ const StudentDetailsScreen = ({navigation}) => {
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
   const [studentDeleteId, setStudentDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -94,14 +95,18 @@ const StudentDetailsScreen = ({navigation}) => {
   const handleConfirmToDatePicker = () => {
     setShowToDatePicker(false);
   };
-
+  const [searching, setSearching] = useState(false);
   const handleSearch = () => {
+    setSearching(true);
     setStudentDetailsList([]);
     setSkip(0);
     GetStudentList();
+    setSearching(false);
     setShowSearch(false);
   };
-
+  useEffect(() => {
+    handleSearch();
+  }, []);
   const DeleteStudentIdConfirm = studentid => {
     setStudentDeleteId(studentid);
   };
@@ -218,15 +223,6 @@ const StudentDetailsScreen = ({navigation}) => {
     if (!isEndReached) {
       GetStudentList();
     }
-  };
-
-  const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={{paddingVertical: 20}}>
-        <ActivityIndicator animating size="large" />
-      </View>
-    );
   };
 
   const renderStudentDetailsCard = ({item}) => (
@@ -523,37 +519,22 @@ const StudentDetailsScreen = ({navigation}) => {
                   />
                   <View
                     style={{flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
-                        marginRight: 3,
-                      }}
+                    <PrimaryButton
+                      loading={searching}
                       onPress={() => {
                         handleSearch();
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Search
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                      }}
+                      title="Search"
+                    />
+                    <SecondaryButton
                       style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
+                        marginLeft: 10,
                       }}
                       onPress={() => {
                         setShowSearch(false);
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Close
-                      </Text>
-                    </TouchableOpacity>
+                      }}
+                      title="Close"
+                    />
                   </View>
                 </View>
               </View>
@@ -640,10 +621,10 @@ const StudentDetailsScreen = ({navigation}) => {
           </View>
           <FlatList
             data={studentDetailsList}
+            loading={loading}
             keyExtractor={item => item.value.toString()}
             showsVerticalScrollIndicator={false}
             renderItem={renderStudentDetailsCard}
-            ListFooterComponent={renderFooter}
             onEndReached={() => {
               handleLoadMore();
             }}

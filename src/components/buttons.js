@@ -18,13 +18,14 @@ export const PrimaryButton = (props: buttonProps) => {
       disabled={props?.disabled || props?.loading}
       style={{
         backgroundColor: Colors.primary,
-        padding: 15,
+        padding: 10,
+        paddingHorizontal: 20,
         borderRadius: 10,
         marginBottom: 10,
         ...props?.style,
       }}>
       {props?.loading ? (
-        <ActivityIndicator size={22} color={'white'} />
+        <ActivityIndicator size={24} color={'white'} />
       ) : typeof props?.title == 'string' ? (
         <Text
           style={{
@@ -48,15 +49,15 @@ export const SecondaryButton = (props: buttonProps) => {
       {...props}
       disabled={props?.disabled || props?.loading}
       style={{
-        flex: 1,
-        backgroundColor: Colors.secondary,
-        padding: 15,
+        backgroundColor: '#f25252',
+        padding: 10,
+        paddingHorizontal: 20,
         borderRadius: 10,
-        marginBottom: 20,
+        marginBottom: 10,
         ...props?.style,
       }}>
       {props?.loading ? (
-        <ActivityIndicator size={22} color={'white'} />
+        <ActivityIndicator size={24} color={'white'} />
       ) : typeof props?.title == 'string' ? (
         <Text
           style={{

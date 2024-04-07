@@ -44,13 +44,17 @@ export const FlatList = (props: FlatListProps<any>) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text
-            style={{
-              color: props?.emptyMessageColor || 'gray',
-              fontSize: 18,
-            }}>
-            {props.emptyMessageText || 'No item'}
-          </Text>
+          {props?.loading && dataLength === 0 ? (
+            <ActivityIndicator animating size="large" />
+          ) : (
+            <Text
+              style={{
+                color: props?.emptyMessageColor || 'gray',
+                fontSize: 18,
+              }}>
+              {props.emptyMessageText || 'No item'}
+            </Text>
+          )}
         </View>
       )}
       {...props}

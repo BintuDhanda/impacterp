@@ -19,6 +19,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {UserContext} from '../../App';
 import {useContext} from 'react';
 import {Post as httpPost, Get as httpGet} from '../constants/httpService';
+import {PrimaryButton, SecondaryButton} from '@src/components/buttons';
 
 const UserScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
@@ -28,7 +29,8 @@ const UserScreen = ({navigation}) => {
   FromDate.setDate(FromDate.getDate() - 7);
   const moveToRight = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
-  const [isFocus, setIsFocus] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fromDate, setFromDate] = useState(
     FromDate.toISOString().slice(0, 10).toString(),
@@ -49,7 +51,7 @@ const UserScreen = ({navigation}) => {
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
   const [userDeleteId, setUserDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -100,13 +102,12 @@ const UserScreen = ({navigation}) => {
 
   // Function to handle button press
   const handleSearch = () => {
+    setSearching(true);
     setUserList([]);
     setSkip(0);
     GetUserList();
-    setShowSearch(false);
-    console.log(selectFromDate, selectToDate, skip);
   };
-
+  useEffect(() => handleSearch(), []);
   const DeleteUserIdConfirm = userid => {
     setUserDeleteId(userid);
   };
@@ -183,6 +184,10 @@ const UserScreen = ({navigation}) => {
           visibilityTime: 2000,
           autoHide: true,
         });
+      })
+      .then(() => {
+        setSearching(false);
+        setShowSearch(false);
       });
   };
   const handleAddUser = () => {
@@ -201,6 +206,7 @@ const UserScreen = ({navigation}) => {
   };
 
   const handleSaveUser = () => {
+    setSubmitting(true);
     try {
       if (users.UsersId !== 0) {
         httpPost('User/put', users)
@@ -265,6 +271,7 @@ const UserScreen = ({navigation}) => {
             });
           });
       }
+      setSubmitting(false);
       setModalVisible(false);
     } catch (error) {
       console.error('Error saving User:', error);
@@ -615,38 +622,27 @@ const UserScreen = ({navigation}) => {
                     onChangeText={text => setMobile(text)}
                   />
                   <View
-                    style={{flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
-                        marginRight: 3,
-                      }}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <PrimaryButton
+                      loading={searching}
                       onPress={() => {
                         handleSearch();
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Search
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                      }}
+                      title="Search"
+                    />
+                    <SecondaryButton
                       style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
+                        marginLeft: 10,
                       }}
                       onPress={() => {
                         setShowSearch(false);
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Close
-                      </Text>
-                    </TouchableOpacity>
+                      }}
+                      title="Close"
+                    />
                   </View>
                 </View>
               </View>
@@ -815,43 +811,18 @@ const UserScreen = ({navigation}) => {
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
                   }}>
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: Colors.primary,
-                      borderRadius: 5,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                    }}
+                  <PrimaryButton
+                    loading={submitting}
+                    title={users.UsersId !== 0 ? 'Save' : 'Add'}
                     onPress={() => {
                       handleSaveUser();
-                    }}>
-                    <Text
-                      style={{
-                        color: Colors.background,
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                      }}>
-                      {users.UsersId !== 0 ? 'Save' : 'Add'}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: '#f25252',
-                      borderRadius: 5,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      marginLeft: 10,
                     }}
-                    onPress={handleClose}>
-                    <Text
-                      style={{
-                        color: Colors.background,
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                      }}>
-                      Close
-                    </Text>
-                  </TouchableOpacity>
+                  />
+                  <SecondaryButton
+                    style={{marginLeft: 10}}
+                    onPress={handleClose}
+                    title="Close"
+                  />
                 </View>
               </View>
             </View>

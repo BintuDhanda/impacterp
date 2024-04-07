@@ -62,7 +62,7 @@ const HomeScreen = () => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={handleLogOut}>
+        <TouchableOpacity style={{}} onPress={handleLogOut}>
           <Text
             style={{
               color: '#1c8adb',

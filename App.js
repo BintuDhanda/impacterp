@@ -156,8 +156,9 @@ function App() {
                       name="HomeScreen"
                       options={{
                         headerTitleContainerStyle: {
-                          maxWidth: width - 93,
-                          width: width - 93,
+                          maxWidth: width - 100,
+                          width: width - 100,
+                          overflow: 'hidden',
                         },
                         title: user?.academyName || 'Home',
                       }}

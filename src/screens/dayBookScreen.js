@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {UserContext} from '../../App';
 import {useContext} from 'react';
 import {Get as httpGet, Post as httpPost} from '../constants/httpService';
+import {PrimaryButton, SecondaryButton} from '@src/components/buttons';
 
 const DayBookScreen = () => {
   const {user, setUser} = useContext(UserContext);
@@ -75,7 +76,7 @@ const DayBookScreen = () => {
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
   const [sumCreditAndDebitDayBook, setSumCreditAndDebitDayBook] = useState({});
   const [dayBookDeleteId, setDayBookDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
@@ -132,14 +133,19 @@ const DayBookScreen = () => {
   };
 
   // Function to handle button press
+  const [searching, setSearching] = useState(false);
   const handleSearch = () => {
+    setSearching(true);
     setDayBookList([]);
     setSkip(0);
     GetDayBookList();
     GetSumDayBookCreditAndDebitDayBook();
     setShowSearch(false);
+    setSearching(false);
   };
-
+  useEffect(() => {
+    handleSearch();
+  }, []);
   useEffect(() => {
     if (accountList.length == 0) {
       GetAccountList();
@@ -266,8 +272,9 @@ const DayBookScreen = () => {
     setDayBookDeleteId(0);
     setShowDelete(false);
   };
-
+  const [submitting, setSubmitting] = useState(false);
   const handleSaveDayBookCredit = async () => {
+    setSubmitting(true);
     try {
       if (dayBookCredit.Credit !== 0) {
         await httpPost('DayBook/post', dayBookCredit).then(response => {
@@ -301,10 +308,12 @@ const DayBookScreen = () => {
         autoHide: true,
       });
     }
+    setSubmitting(false);
   };
 
   const handleSaveDayBookDebit = async () => {
     try {
+      setSubmitting(true);
       if (dayBookDebit.Debit !== 0) {
         await httpPost('DayBook/post', dayBookDebit).then(response => {
           if (response.status === 200) {
@@ -337,6 +346,7 @@ const DayBookScreen = () => {
         autoHide: true,
       });
     }
+    setSubmitting(false);
   };
 
   const handleCloseModal = () => {
@@ -681,37 +691,22 @@ const DayBookScreen = () => {
                   )}
                   <View
                     style={{flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
-                        marginRight: 3,
-                      }}
+                    <PrimaryButton
+                      loading={searching}
                       onPress={() => {
                         handleSearch();
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Search
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                      }}
+                      title="Search"
+                    />
+                    <SecondaryButton
                       style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        marginTop: 10,
+                        marginLeft: 10,
                       }}
                       onPress={() => {
                         setShowSearch(false);
-                      }}>
-                      <Text style={{fontSize: 16, color: Colors.background}}>
-                        Close
-                      </Text>
-                    </TouchableOpacity>
+                      }}
+                      title="Close"
+                    />
                   </View>
                 </View>
               </View>
@@ -900,41 +895,18 @@ const DayBookScreen = () => {
                       flexDirection: 'row',
                       justifyContent: 'flex-end',
                     }}>
-                    <TouchableOpacity
+                    <PrimaryButton
+                      loading={submitting}
+                      onPress={handleSaveDayBookCredit}
+                      title={dayBookCredit.DayBookId === 0 ? 'Add' : 'Save'}
+                    />
+                    <SecondaryButton
                       style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                      }}
-                      onPress={handleSaveDayBookCredit}>
-                      <Text
-                        style={{
-                          color: Colors.background,
-                          fontSize: 14,
-                          fontWeight: 'bold',
-                        }}>
-                        {dayBookCredit.DayBookId === 0 ? 'Add' : 'Save'}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
                         marginLeft: 10,
                       }}
-                      onPress={handleCloseModal}>
-                      <Text
-                        style={{
-                          color: Colors.background,
-                          fontSize: 14,
-                          fontWeight: 'bold',
-                        }}>
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
+                      onPress={handleCloseModal}
+                      title="Cancel"
+                    />
                   </View>
                 </View>
               </View>
@@ -1039,41 +1011,18 @@ const DayBookScreen = () => {
                       flexDirection: 'row',
                       justifyContent: 'flex-end',
                     }}>
-                    <TouchableOpacity
+                    <PrimaryButton
+                      loading={submitting}
+                      onPress={handleSaveDayBookDebit}
+                      title={dayBookCredit.DayBookId === 0 ? 'Add' : 'Save'}
+                    />
+                    <SecondaryButton
                       style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                      }}
-                      onPress={handleSaveDayBookDebit}>
-                      <Text
-                        style={{
-                          color: Colors.background,
-                          fontSize: 14,
-                          fontWeight: 'bold',
-                        }}>
-                        {dayBookDebit.DayBookId === 0 ? 'Add' : 'Save'}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#f25252',
-                        borderRadius: 5,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
                         marginLeft: 10,
                       }}
-                      onPress={handleCloseModal}>
-                      <Text
-                        style={{
-                          color: Colors.background,
-                          fontSize: 14,
-                          fontWeight: 'bold',
-                        }}>
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
+                      onPress={handleCloseModal}
+                      title="Cancel"
+                    />
                   </View>
                 </View>
               </View>

@@ -22,6 +22,7 @@ import {
   Delete as httpDelete,
 } from '../constants/httpService';
 import ShowError from '../constants/ShowError';
+import {PrimaryButton, SecondaryButton} from '@src/components/buttons';
 
 const AccountCategoryScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
@@ -69,10 +70,11 @@ const AccountCategoryScreen = ({navigation}) => {
     });
     setModalVisible(true);
   };
-
+  const [submitting, setSubmitting] = useState(false);
   const handleSaveAccountCategory = () => {
     if (IsFormValid()) {
       try {
+        setSubmitting(true);
         if (accountCategory.AccountCategoryId !== 0) {
           httpPost('AccountCategory/put', accountCategory)
             .then(response => {
@@ -126,6 +128,7 @@ const AccountCategoryScreen = ({navigation}) => {
               });
             });
         }
+        setSubmitting(false);
         setModalVisible(false);
       } catch (error) {
         console.log('Error saving AccountCategory:', error);
@@ -402,45 +405,13 @@ const AccountCategoryScreen = ({navigation}) => {
                   })
                 }
               />
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 5,
-                  paddingVertical: 10,
-                  paddingHorizontal: 20,
-                  marginBottom: 10,
-                }}
-                onPress={handleSaveAccountCategory}>
-                <Text
-                  style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                  }}>
-                  {accountCategory.AccountCategoryId !== 0 ? 'Save' : 'Add'}
-                </Text>
-              </TouchableOpacity>
+              <PrimaryButton
+                loading={submitting}
+                onPress={handleSaveAccountCategory}
+                title={accountCategory.AccountCategoryId !== 0 ? 'Save' : 'Add'}
+              />
             </View>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#f25252',
-                borderRadius: 5,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-              }}
-              onPress={handleClose}>
-              <Text
-                style={{
-                  color: Colors.background,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                Close
-              </Text>
-            </TouchableOpacity>
+            <SecondaryButton style={{}} onPress={handleClose} title="Close" />
           </View>
         </Modal>
 

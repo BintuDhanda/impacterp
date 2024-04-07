@@ -21,6 +21,7 @@ import {
   Delete as httpDelete,
   Put as httpPut,
 } from '../constants/httpService';
+import {PrimaryButton, SecondaryButton} from '@src/components/buttons';
 
 const RoleScreen = () => {
   const {user, setUser} = useContext(UserContext);
@@ -68,10 +69,10 @@ const RoleScreen = () => {
     });
     setModalVisible(true);
   };
-
+  const [submitting, setSubmitting] = useState(false);
   const handleSaveRole = () => {
     try {
-      console.log(role, 'role');
+      setSubmitting(true);
       if (role.RolesId !== 0) {
         httpPost('Role/roleUpdate', role)
           .then(response => {
@@ -125,6 +126,7 @@ const RoleScreen = () => {
             });
           });
       }
+      setSubmitting(false);
       setModalVisible(false);
     } catch (error) {
       console.log('Error saving Role:', error);
@@ -227,11 +229,11 @@ const RoleScreen = () => {
         </Text>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
-            style={{marginRight: 10}}
-            //onPress={() => handleEditRole(item.rolesId)}>
-            onPress={() =>
-              Alert.alert('You are not Authorised for this action')
-            }>
+            onPress={() => handleEditRole(item.rolesId)}
+            // onPress={() =>
+            //   Alert.alert('You are not Authorised for this action')
+            // }
+            style={{marginRight: 10}}>
             <Icon
               name="pencil"
               size={20}
@@ -240,13 +242,14 @@ const RoleScreen = () => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            // onPress={() => {
-            //   DeleteRoleIdConfirm(item.rolesId);
-            //   setShowDelete(true);
-            // }}>
-            onPress={() =>
-              Alert.alert('You are not Authorised for this action')
-            }>
+            onPress={() => {
+              DeleteRoleIdConfirm(item.rolesId);
+              setShowDelete(true);
+            }}
+            // onPress={() =>
+            //   Alert.alert('You are not Authorised for this action')
+            // }
+            style={{}}>
             <Icon
               name="trash"
               size={20}
@@ -265,15 +268,15 @@ const RoleScreen = () => {
       contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1, padding: 20}}>
         <TouchableOpacity
+          // onPress={() => Alert.alert('You are not Authorised for this action')}>
+          onPress={handleAddRole}
           style={{
             backgroundColor: Colors.primary,
             borderRadius: 5,
             paddingVertical: 10,
             paddingHorizontal: 20,
             marginBottom: 20,
-          }}
-          //onPress={handleAddRole}>
-          onPress={() => Alert.alert('You are not Authorised for this action')}>
+          }}>
           <Text
             style={{
               color: Colors.background,
@@ -379,45 +382,13 @@ const RoleScreen = () => {
                 value={role.RoleName}
                 onChangeText={text => setRole({...role, RoleName: text})}
               />
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 5,
-                  paddingVertical: 10,
-                  paddingHorizontal: 20,
-                  marginBottom: 10,
-                }}
-                onPress={handleSaveRole}>
-                <Text
-                  style={{
-                    color: Colors.background,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                  }}>
-                  {role.RolesId !== 0 ? 'Save' : 'Add'}
-                </Text>
-              </TouchableOpacity>
+              <PrimaryButton
+                loading={submitting}
+                onPress={handleSaveRole}
+                title={role.RolesId !== 0 ? 'Save' : 'Add'}
+              />
             </View>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#f25252',
-                borderRadius: 5,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-              }}
-              onPress={handleClose}>
-              <Text
-                style={{
-                  color: '#ffffff',
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                Close
-              </Text>
-            </TouchableOpacity>
+            <SecondaryButton style={{}} onPress={handleClose} title="Close" />
           </View>
         </Modal>
 

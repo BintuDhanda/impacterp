@@ -20,6 +20,7 @@ import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 import {camelCaseToWords} from '../helpers';
 
 const UserRoleScreen = ({route}) => {
+  const [submitting, setSubmitting] = useState(false);
   const {user, setUser} = useContext(UserContext);
   const {userId, userMobile} = route.params;
   const [userRole, setUserRole] = useState({
@@ -117,6 +118,7 @@ const UserRoleScreen = ({route}) => {
   };
 
   const handleSaveUserRole = async () => {
+    setSubmitting(true);
     await httpPost('UserRole/post', userRole)
       .then(response => {
         if (response.status === 200) {
@@ -142,6 +144,7 @@ const UserRoleScreen = ({route}) => {
           autoHide: true,
         });
       });
+    setSubmitting(false);
   };
 
   const handleCloseModal = () => {
@@ -351,42 +354,18 @@ const UserRoleScreen = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
                   }}>
-                  <TouchableOpacity
+                  <PrimaryButton
+                    loading={submitting}
+                    onPress={handleSaveUserRole}
+                    title={userRole.UserRoleId === 0 ? 'Add' : 'Save'}
+                  />
+                  <SecondaryButton
                     style={{
-                      backgroundColor: Colors.primary,
-                      borderRadius: 5,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                    }}
-                    onPress={handleSaveUserRole}>
-                    <Text
-                      style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                      }}>
-                      {userRole.UserRoleId === 0 ? 'Add' : 'Save'}
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: '#f25252',
-                      borderRadius: 5,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
                       marginLeft: 10,
                     }}
-                    onPress={handleCloseModal}>
-                    <Text
-                      style={{
-                        color: Colors.background,
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                      }}>
-                      Cancel
-                    </Text>
-                  </TouchableOpacity>
+                    onPress={handleCloseModal}
+                    title="Cancel"
+                  />
                 </View>
               </View>
             </View>

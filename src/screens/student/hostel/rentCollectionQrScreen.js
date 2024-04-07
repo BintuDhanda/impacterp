@@ -554,7 +554,7 @@ const RentCollectionQrScreen = () => {
                 maxHeight={300}
                 labelField="hostelRoomBad"
                 valueField="hostelRoomBadStudentId"
-                placeholder={'Select HostelRoomBad'}
+                placeholder={'Select hostel room bad'}
                 searchPlaceholder="Search..."
                 value={hostelRoomBadStudentList?.find(
                   ele =>
