@@ -104,6 +104,11 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 CreatedBy: user.userId,
                 LastUpdatedBy: null,
               });
+            } else if (response.status === 450) {
+              var error = response.data;
+              throw new Error(error);
+            } else {
+              throw new Error('Something went wrong');
             }
           })
           .catch(err => {
@@ -133,6 +138,11 @@ const HostelRoomBadStudentScreen = ({navigation}) => {
                 CreatedBy: user.userId,
                 LastUpdatedBy: null,
               });
+            } else if (response.status === 450) {
+              var error = response.data;
+              throw new Error(error);
+            } else {
+              throw new Error('Something went wrong');
             }
           })
           .catch(err => {
