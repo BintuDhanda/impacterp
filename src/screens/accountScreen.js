@@ -203,32 +203,32 @@ const AccountScreen = ({route, navigation}) => {
       ShowError('Enter a Valid Account Name');
       return false;
     }
-    if (account.AccCategoryId.length == 0) {
+    if (account.AccCategoryId == 0) {
       ShowError('Select Account Category');
       return false;
     }
-    if (account.Gender.length == 0) {
-      ShowError('Select Gender');
-      return false;
-    }
-    if (account.MotherName.length == 0) {
-      ShowError('Enter Valid Mother Name');
-      return false;
-    }
-    if (account.StudentHeight.length == 0) {
-      ShowError('Enter a Valid Height');
-      return false;
-    }
+    // if (account.Gender.length == 0) {
+    //   ShowError('Select Gender');
+    //   return false;
+    // }
+    // if (account.MotherName.length == 0) {
+    //   ShowError('Enter Valid Mother Name');
+    //   return false;
+    // }
+    // if (account.StudentHeight.length == 0) {
+    //   ShowError('Enter a Valid Height');
+    //   return false;
+    // }
 
-    if (account.StudentWeight.length == 0) {
-      ShowError('Enter a Valid Weight');
-      return false;
-    }
+    // if (account.StudentWeight.length == 0) {
+    //   ShowError('Enter a Valid Weight');
+    //   return false;
+    // }
 
-    if (account.BodyRemark.length == 0) {
-      ShowError('Enter a Valid Body Remark');
-      return false;
-    }
+    // if (account.BodyRemark.length == 0) {
+    //   ShowError('Enter a Valid Body Remark');
+    //   return false;
+    // }
 
     return true;
   };

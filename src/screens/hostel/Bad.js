@@ -388,7 +388,7 @@ const HostelRoomBadScreen = ({route}) => {
                   marginBottom: 10,
                   paddingHorizontal: 10,
                 }}
-                keyboardType="number-pad"
+                // keyboardType="number-pad"
                 placeholder="Hostel Room Bad No."
                 value={hostelRoomBad.HostelRoomBadNo}
                 onChangeText={text =>

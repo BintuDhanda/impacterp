@@ -227,7 +227,7 @@ const RoleScreen = () => {
           }}>
           {item.roleName}
         </Text>
-        <View style={{flexDirection: 'row'}}>
+        {/* <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             onPress={() => handleEditRole(item.rolesId)}
             // onPress={() =>
@@ -257,7 +257,7 @@ const RoleScreen = () => {
               style={{marginRight: 8, textAlignVertical: 'center'}}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     );
   };
@@ -267,7 +267,7 @@ const RoleScreen = () => {
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1, padding: 20}}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           // onPress={() => Alert.alert('You are not Authorised for this action')}>
           onPress={handleAddRole}
           style={{
@@ -286,7 +286,7 @@ const RoleScreen = () => {
             }}>
             Add Role
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {showDelete && (
           <Modal transparent visible={showDelete}>

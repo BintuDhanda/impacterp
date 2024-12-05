@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {Post as httpPost} from './httpService';
 export const sendOTP = async (otp, mobile) => {
   const smsType = 'OTPSMS';
