@@ -10,82 +10,42 @@ import {
   ScrollView,
 } from 'react-native';
 import {FlatList} from '@src/components/flatlist';
+import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 import Colors from '../constants/Colors';
 import Toast from 'react-native-toast-message';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {UserContext} from '../../App';
 import {useContext} from 'react';
-import {Get as httpGet, Post as httpPost} from '../constants/httpService';
 import ShowError from '../constants/ShowError';
 
-const BatchScreen = ({route}) => {
+const VillageScreen = ({route}) => {
   const {user, setUser} = useContext(UserContext);
-  const {courseId, courseName} = route.params;
-  const [batch, setBatch] = useState({
-    BatchId: 0,
-    BatchName: '',
-    Fees: '',
-    StartDate: '',
-    EndDate: '',
+  const {cityId, cityName} = route.params;
+  const [village, setVillage] = useState({
+    VillageId: 0,
+    VillageName: '',
     IsActive: true,
-    CourseId: courseId,
+    CityId: cityId,
     CreatedAt: null,
     CreatedBy: user.userId,
     LastUpdatedBy: null,
   });
-  const [batchList, setBatchList] = useState([]);
+  const [villageList, setVillageList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-
-  const [selectStartDate, setSelectStartDate] = useState(new Date());
-  const [selectEndDate, setSelectEndDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [batchDeleteId, setBatchDeleteId] = useState(0);
+  const [villageDeleteId, setVillageDeleteId] = useState(0);
   const [showDelete, setShowDelete] = useState(false);
 
-  const handleStartDateChange = (event, date) => {
-    if (date !== undefined) {
-      setSelectStartDate(date);
-      setBatch({...batch, StartDate: date});
-    }
-    setShowDatePicker(false);
-  };
-
-  const handleOpenStartDatePicker = () => {
-    setShowDatePicker(true);
-  };
-  const handleConfirmStartDatePicker = () => {
-    setShowDatePicker(false);
-  };
-
-  const handleToDateChange = (event, date) => {
-    if (date !== undefined) {
-      setSelectEndDate(date);
-      setBatch({...batch, EndDate: date});
-    }
-    setShowEndDatePicker(false);
-  };
-
-  const handleOpenEndDatePicker = () => {
-    setShowEndDatePicker(true);
-  };
-
-  const handleConfirmToDatePicker = () => {
-    setShowEndDatePicker(false);
-  };
-
   useEffect(() => {
-    fetchBatchByCourseId();
+    fetchVillageByCityId();
   }, []);
 
-  const fetchBatchByCourseId = async () => {
+  const fetchVillageByCityId = async () => {
     try {
-      const response = await httpGet(`Batch/getBatchByCourseId?Id=${courseId}`);
-      setBatchList(response.data);
-      console.log(batchList, 'BatchList');
+      const response = await httpGet(`Village/getVillageByCityId?Id=${cityId}`);
+      setVillageList(response.data);
+      console.log(villageList, 'villageList');
     } catch (error) {
-      console.error('Error fetching Batch:', error);
+      console.log('Error fetching villages:', error);
       Toast.show({
         type: 'error',
         text1: `${error}`,
@@ -96,15 +56,12 @@ const BatchScreen = ({route}) => {
     }
   };
 
-  const handleAddBatch = () => {
-    setBatch({
-      BatchId: 0,
-      BatchName: '',
-      Fees: '',
-      StartDate: '',
-      EndDate: '',
+  const handleAddVillage = () => {
+    setVillage({
+      VillageId: 0,
+      VillageName: '',
       IsActive: true,
-      CourseId: courseId,
+      CityId: cityId,
       CreatedAt: null,
       CreatedBy: user.userId,
       LastUpdatedBy: null,
@@ -112,17 +69,14 @@ const BatchScreen = ({route}) => {
     setModalVisible(true);
   };
 
-  const handleEditBatch = id => {
-    httpGet(`Batch/getById?Id=${id}`)
+  const handleEditVillage = id => {
+    httpGet(`Village/getById?Id=${id}`)
       .then(result => {
         console.log(result);
-        setBatch({
-          BatchId: result.data.batchId,
-          BatchName: result.data.batchName,
-          Fees: result.data.fees,
-          StartDate: result.data.startDate,
-          EndDate: result.data.endDate,
-          CourseId: result.data.courseId,
+        setVillage({
+          VillageId: result.data.villageId,
+          VillageName: result.data.villageName,
+          CityId: result.data.cityId,
           IsActive: result.data.isActive,
           CreatedAt: result.data.createdAt,
           CreatedBy: result.data.createdBy,
@@ -142,20 +96,20 @@ const BatchScreen = ({route}) => {
     setModalVisible(true);
   };
 
-  const DeleteBatchIdConfirm = batchid => {
-    setBatchDeleteId(batchid);
+  const DeleteVillageIdConfirm = villageid => {
+    setVillageDeleteId(villageid);
   };
 
-  const DeleteBatchIdConfirmYes = () => {
-    httpGet(`Batch/delete?Id=${batchDeleteId}`)
+  const DeleteVillageIdConfirmYes = () => {
+    httpGet(`Village/delete?Id=${villageDeleteId}`)
       .then(result => {
         console.log(result);
-        fetchBatchByCourseId();
-        setBatchDeleteId(0);
+        fetchVillageByCityId();
+        setVillageDeleteId(0);
         setShowDelete(false);
       })
       .catch(error => {
-        console.error('Delete Batch error', error);
+        console.error('Delete Village error', error);
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -166,27 +120,24 @@ const BatchScreen = ({route}) => {
       });
   };
 
-  const DeleteBatchIdConfirmNo = () => {
-    setBatchDeleteId(0);
+  const DeleteVillageIdConfirmNo = () => {
+    setVillageDeleteId(0);
     setShowDelete(false);
   };
 
-  const handleSaveBatch = async () => {
+  const handleSaveVillage = async () => {
     if (IsFormValid()) {
       try {
-        if (batch.BatchId !== 0) {
-          await httpPost('Batch/put', batch)
+        if (village.VillageId !== 0) {
+          await httpPost('Village/put', village)
             .then(response => {
               if (response.status === 200) {
-                fetchBatchByCourseId();
-                Alert.alert('Success', 'Batch Update successfully');
-                setBatch({
-                  BatchId: 0,
-                  BatchName: '',
-                  Fees: '',
-                  StartDate: '',
-                  EndDate: '',
-                  CourseId: courseId,
+                fetchVillageByCityId();
+                Alert.alert('Success', 'Village Update successfully');
+                setVillage({
+                  VillageId: 0,
+                  VillageName: '',
+                  CityId: cityId,
                   IsActive: true,
                   CreatedAt: null,
                   CreatedBy: user.userId,
@@ -195,7 +146,7 @@ const BatchScreen = ({route}) => {
               }
             })
             .catch(err => {
-              console.error('Update error in Batch', err);
+              console.error('Update error in Village', err);
               Toast.show({
                 type: 'error',
                 text1: `${err}`,
@@ -205,17 +156,14 @@ const BatchScreen = ({route}) => {
               });
             });
         } else {
-          await httpPost('Batch/post', batch).then(response => {
+          await httpPost('Village/post', village).then(response => {
             if (response.status === 200) {
-              fetchBatchByCourseId();
-              Alert.alert('Success', 'Batch is Added Successfully');
-              setBatch({
-                BatchId: 0,
-                BatchName: '',
-                Fees: '',
-                StartDate: '',
-                EndDate: '',
-                CourseId: courseId,
+              fetchVillageByCityId();
+              Alert.alert('Success', 'Village is Added Successfully');
+              setVillage({
+                VillageId: 0,
+                VillageName: '',
+                CityId: cityId,
                 IsActive: true,
                 CreatedAt: null,
                 CreatedBy: user.userId,
@@ -226,7 +174,7 @@ const BatchScreen = ({route}) => {
         }
         setModalVisible(false);
       } catch (error) {
-        console.error('Error saving Batch:', error);
+        console.log('Error saving Village:', error);
         Toast.show({
           type: 'error',
           text1: `${error}`,
@@ -238,24 +186,8 @@ const BatchScreen = ({route}) => {
     }
   };
   const IsFormValid = () => {
-    if (batch.BatchName.length == 0) {
-      ShowError('Enter a Valid Batch Name');
-      return false;
-    }
-    if (batch.Fees.length == 0) {
-      ShowError('Enter Valid Fees');
-      return false;
-    }
-    if (batch.StartDate.length == 0) {
-      ShowError('Select Start Date');
-      return false;
-    }
-    if (batch.EndDate.length == 0) {
-      ShowError('Select End Date');
-      return false;
-    }
-    if (batch.CourseId.length == 0) {
-      ShowError('Select Course');
+    if (village.VillageName.length == 0) {
+      ShowError('Enter a Valid Village Name');
       return false;
     }
 
@@ -265,37 +197,11 @@ const BatchScreen = ({route}) => {
     setModalVisible(false);
   };
 
-  const getFormattedDate = datestring => {
-    const datetimeString = datestring;
-    const date = new Date(datetimeString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
-  };
-  const convertToIndianTimee = datetimeString => {
-    const utcDate = new Date(datetimeString);
-
-    // Convert to IST (Indian Standard Time)
-    // utcDate.setMinutes(utcDate.getMinutes() + 330); // IST is UTC+5:30
-
-    const istDate = new Intl.DateTimeFormat('en-IN', {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true, // Use 12-hour format with AM/PM
-    }).format(utcDate);
-
-    return istDate;
-  };
-
-  const renderBatchCard = ({item}) => (
+  const renderVillageCard = ({item}) => (
     <View
       style={{
+        flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: Colors.background,
         borderRadius: 10,
@@ -309,45 +215,17 @@ const BatchScreen = ({route}) => {
         borderWidth: 1.5,
         borderColor: Colors.primary,
       }}>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>Batch Name : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {item.batchName}
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>Batch Fees : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {item.fees}
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>Start Date : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {convertToIndianTimee(item.startDate)}
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>End Date : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {convertToIndianTimee(item.endDate)}
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>Duration : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {item.duration}
-        </Text>
-      </View>
-      <View
+      <Text
         style={{
-          flexDirection: 'row',
-          marginTop: 10,
-          justifyContent: 'flex-end',
+          fontSize: 16,
+          fontWeight: 'bold',
         }}>
+        {item.villageName}
+      </Text>
+      <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           style={{marginRight: 10}}
-          onPress={() => handleEditBatch(item.batchId)}>
+          onPress={() => handleEditVillage(item.villageId)}>
           <Icon
             name="pencil"
             size={20}
@@ -357,7 +235,7 @@ const BatchScreen = ({route}) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            DeleteBatchIdConfirm(item.batchId);
+            DeleteVillageIdConfirm(item.villageId);
             setShowDelete(true);
           }}>
           <Icon
@@ -381,19 +259,18 @@ const BatchScreen = ({route}) => {
           justifyContent: 'center',
         }}>
         <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-          Course Name : {courseName}
+          City Name : {cityName}
         </Text>
         <TouchableOpacity
           style={{
-            flex: 1,
             backgroundColor: Colors.primary,
             borderRadius: 5,
             paddingVertical: 10,
             paddingHorizontal: 20,
+            marginBottom: 20,
             marginTop: 10,
-            marginBottom: 10,
           }}
-          onPress={handleAddBatch}>
+          onPress={handleAddVillage}>
           <Text
             style={{
               color: Colors.background,
@@ -401,7 +278,7 @@ const BatchScreen = ({route}) => {
               fontWeight: 'bold',
               textAlign: 'center',
             }}>
-            Add Batch
+            Add Village
           </Text>
         </TouchableOpacity>
 
@@ -443,7 +320,7 @@ const BatchScreen = ({route}) => {
                       marginRight: 3,
                     }}
                     onPress={() => {
-                      DeleteBatchIdConfirmYes();
+                      DeleteVillageIdConfirmYes();
                     }}>
                     <Text style={{fontSize: 16, color: Colors.background}}>
                       Yes
@@ -458,7 +335,7 @@ const BatchScreen = ({route}) => {
                       marginTop: 10,
                     }}
                     onPress={() => {
-                      DeleteBatchIdConfirmNo();
+                      DeleteVillageIdConfirmNo();
                     }}>
                     <Text style={{fontSize: 16, color: Colors.background}}>
                       No
@@ -471,9 +348,9 @@ const BatchScreen = ({route}) => {
         )}
 
         <FlatList
-          data={batchList}
-          keyExtractor={item => item.batchId.toString()}
-          renderItem={renderBatchCard}
+          data={villageList}
+          keyExtractor={item => item.villageId.toString()}
+          renderItem={renderVillageCard}
         />
 
         {modalVisible && (
@@ -498,100 +375,11 @@ const BatchScreen = ({route}) => {
                     borderColor: Colors.primary,
                     borderRadius: 8,
                     padding: 8,
-                    marginBottom: 10,
                   }}
-                  placeholder="Batch Name"
-                  value={batch.BatchName}
-                  onChangeText={text => setBatch({...batch, BatchName: text})}
+                  placeholder="Village Name"
+                  value={village.VillageName}
+                  onChangeText={text => setVillage({...village, VillageName: text})}
                 />
-                <TextInput
-                  style={{
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                    padding: 8,
-                    marginBottom: 10,
-                  }}
-                  placeholder="Batch Fees"
-                  value={batch.Fees.toString()}
-                  onChangeText={text => setBatch({...batch, Fees: text})}
-                />
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 10,
-                    paddingHorizontal: 10,
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                  }}>
-                  <TouchableOpacity onPress={handleOpenStartDatePicker}>
-                    <Icon name={'calendar'} size={25} />
-                  </TouchableOpacity>
-                  <TextInput
-                    style={{
-                      marginLeft: 10,
-                      fontSize: 16,
-                      color: Colors.secondary,
-                    }}
-                    value={
-                      batch.StartDate === ''
-                        ? 'Select Start Date'
-                        : getFormattedDate(batch.StartDate)
-                    }
-                    placeholder="Select Start date"
-                    editable={false}
-                  />
-                </View>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={selectStartDate}
-                    mode="date"
-                    display="default"
-                    onChange={handleStartDateChange}
-                    onConfirm={handleConfirmStartDatePicker}
-                    onCancel={handleConfirmStartDatePicker}
-                  />
-                )}
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 10,
-                    paddingHorizontal: 10,
-                    borderWidth: 1,
-                    borderColor: Colors.primary,
-                    borderRadius: 8,
-                  }}>
-                  <TouchableOpacity onPress={handleOpenEndDatePicker}>
-                    <Icon name={'calendar'} size={25} />
-                  </TouchableOpacity>
-                  <TextInput
-                    style={{
-                      marginLeft: 10,
-                      fontSize: 16,
-                      color: Colors.secondary,
-                    }}
-                    value={
-                      batch.EndDate === ''
-                        ? 'Select End Date'
-                        : getFormattedDate(batch.EndDate)
-                    }
-                    placeholder="Select End date"
-                    editable={false}
-                  />
-                </View>
-                {showEndDatePicker && (
-                  <DateTimePicker
-                    value={selectEndDate}
-                    mode="date"
-                    display="default"
-                    onChange={handleToDateChange}
-                    onConfirm={handleConfirmToDatePicker}
-                    onCancel={handleConfirmToDatePicker}
-                  />
-                )}
                 <View
                   style={{
                     marginTop: 10,
@@ -605,14 +393,14 @@ const BatchScreen = ({route}) => {
                       paddingVertical: 8,
                       paddingHorizontal: 12,
                     }}
-                    onPress={handleSaveBatch}>
+                    onPress={handleSaveVillage}>
                     <Text
                       style={{
                         color: Colors.background,
                         fontSize: 14,
                         fontWeight: 'bold',
                       }}>
-                      {batch.BatchId === 0 ? 'Add' : 'Save'}
+                      {village.VillageId === 0 ? 'Add' : 'Save'}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -644,7 +432,7 @@ const BatchScreen = ({route}) => {
   );
 };
 
-export default BatchScreen;
+export default VillageScreen;
 
 // const styles = StyleSheet.create({
 //   container: {
@@ -698,7 +486,7 @@ export default BatchScreen;
 //     height: 40,
 //     fontSize: 16,
 //   },
-//   batchCard: {
+//   villageCard: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     justifyContent: 'space-between',
@@ -713,7 +501,7 @@ export default BatchScreen;
 //     shadowRadius: 4,
 //     elevation: 4,
 //   },
-//   batchName: {
+//   villageName: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },

@@ -50,11 +50,6 @@ export const menus = [
     icon: 'money',
   },
   {
-    title: 'Token Fees',
-    path: 'StudentTokenFeesScreen',
-    icon: 'credit-card',
-  },
-  {
     title: 'Attendance',
     path: 'AttendanceScreen',
     icon: 'calendar',

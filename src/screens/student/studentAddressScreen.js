@@ -84,7 +84,7 @@ const AddressScreen = ({route, navigation}) => {
     });
   };
 
-  const renderTokenCard = ({item}) => (
+  const renderAddressCard = ({item}) => (
     <View
       style={{
         justifyContent: 'space-between',
@@ -260,7 +260,7 @@ const AddressScreen = ({route, navigation}) => {
         <FlatList
           data={addressList}
           keyExtractor={item => item.studentAddressId.toString()}
-          renderItem={renderTokenCard}
+          renderItem={renderAddressCard}
         />
         <Toast ref={ref => Toast.setRef(ref)} />
       </View>

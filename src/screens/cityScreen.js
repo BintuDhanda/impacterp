@@ -18,7 +18,7 @@ import {UserContext} from '../../App';
 import {useContext} from 'react';
 import ShowError from '../constants/ShowError';
 
-const CityScreen = ({route}) => {
+const CityScreen = ({route, navigation}) => {
   const {user, setUser} = useContext(UserContext);
   const {stateId, stateName} = route.params;
   const [city, setCity] = useState({
@@ -38,6 +38,10 @@ const CityScreen = ({route}) => {
   useEffect(() => {
     fetchCityByStateId();
   }, []);
+
+  const handleNavigate = (cityId, cityName) => {
+    navigation.navigate('VillageScreen', {cityId: cityId, cityName: cityName});
+  };
 
   const fetchCityByStateId = async () => {
     try {
@@ -231,6 +235,16 @@ const CityScreen = ({route}) => {
             size={20}
             color={'#5a67f2'}
             style={{marginLeft: 8, textAlignVertical: 'center'}}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{marginRight: 10}}
+          onPress={() => handleNavigate(item.cityId, item.cityName)}>
+          <Icon
+            name="cogs"
+            size={20}
+            color={Colors.primary}
+            style={{marginRight: 8, textAlignVertical: 'center'}}
           />
         </TouchableOpacity>
         <TouchableOpacity

@@ -146,12 +146,6 @@ const StudentDetailsScreen = ({navigation}) => {
   const handleAddStudentQualificationNavigate = studentId => {
     navigation.navigate('StudentQualificationScreen', {studentId: studentId});
   };
-  const handleAddStudentTokenNavigate = (studentId, label) => {
-    navigation.navigate('StudentTokenScreen', {
-      studentId: studentId,
-      studentName: label,
-    });
-  };
   const handleAddStudentBatchNavigate = studentId => {
     navigation.navigate('StudentBatchScreen', {studentId: studentId});
   };
@@ -311,26 +305,6 @@ const StudentDetailsScreen = ({navigation}) => {
               alignSelf: 'center',
             }}>
             Qualification
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: Colors.primary,
-            borderRadius: 5,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            marginRight: 3,
-          }}
-          onPress={() => handleAddStudentTokenNavigate(item.value, item.label)}>
-          <Text
-            style={{
-              color: Colors.background,
-              fontSize: 14,
-              fontWeight: 'bold',
-              alignSelf: 'center',
-            }}>
-            Token
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

@@ -27,7 +27,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
     StudentId: studentId,
     BatchId: '',
     RegistrationNumber: '',
-    TokenNumber: '',
     IsActive: true,
     CreatedAt: null,
     CreatedBy: user.userId,
@@ -116,7 +115,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
           DateOfJoin: response.data.dateOfJoin,
           BatchId: response.data.batchId,
           RegistrationNumber: response.data.registrationNumber,
-          TokenNumber: response.data.tokenNumber.toString(),
           StudentId: response.data.studentId,
           IsActive: response.data.isActive,
           CreatedAt: response.data.createdAt,
@@ -150,7 +148,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
                   StudentId: studentId,
                   BatchId: '',
                   RegistrationNumber: '',
-                  TokenNumber: '',
                   IsActive: true,
                   CreatedAt: null,
                   CreatedBy: user.userId,
@@ -184,51 +181,26 @@ const StudentBatchFormScreen = ({route, navigation}) => {
                   autoHide: true,
                 });
               } else {
-                httpPost(
-                  `StudentBatch/IsExistsToken?TokenNumber=${studentBatch.TokenNumber}`,
-                )
+                httpPost('StudentBatch/post', studentBatch)
                   .then(response => {
-                    if (response.data == true) {
-                      Toast.show({
-                        type: 'error',
-                        text1: 'This Token Number is Already Exist',
-                        position: 'bottom',
-                        visibilityTime: 2000,
-                        autoHide: true,
+                    if (response.status === 200) {
+                      Alert.alert('Success', 'Add Batch Successfully');
+                      setStudentBatch({
+                        StudentBatchId: 0,
+                        DateOfJoin: '',
+                        StudentId: studentId,
+                        BatchId: '',
+                        RegistrationNumber: '',
+                        IsActive: true,
+                        CreatedAt: null,
+                        CreatedBy: user.userId,
+                        LastUpdatedBy: null,
                       });
-                    } else {
-                      httpPost('StudentBatch/post', studentBatch)
-                        .then(response => {
-                          if (response.status === 200) {
-                            Alert.alert('Success', 'Add Batch Successfully');
-                            setStudentBatch({
-                              StudentBatchId: 0,
-                              DateOfJoin: '',
-                              StudentId: studentId,
-                              BatchId: '',
-                              RegistrationNumber: '',
-                              TokenNumber: '',
-                              IsActive: true,
-                              CreatedAt: null,
-                              CreatedBy: user.userId,
-                              LastUpdatedBy: null,
-                            });
-                            navigation.goBack();
-                          }
-                        })
-                        .catch(err => {
-                          console.error('Batch Add error :', err);
-                          Toast.show({
-                            type: 'error',
-                            text1: `${err}`,
-                            position: 'bottom',
-                            visibilityTime: 2000,
-                            autoHide: true,
-                          });
-                        });
+                      navigation.goBack();
                     }
                   })
                   .catch(err => {
+                    console.error('Batch Add error :', err);
                     Toast.show({
                       type: 'error',
                       text1: `${err}`,
@@ -347,7 +319,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
       StudentId: studentId,
       BatchId: '',
       RegistrationNumber: '',
-      TokenNumber: '',
       IsActive: true,
       CreatedAt: null,
       CreatedBy: user.userId,
@@ -366,10 +337,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
     }
     if (studentBatch.RegistrationNumber.length == 0) {
       ShowError('Enter Valid Registration Number');
-      return false;
-    }
-    if (studentBatch.TokenNumber.length == 0) {
-      ShowError('Enter Valid Token Number');
       return false;
     }
 
@@ -572,28 +539,6 @@ const StudentBatchFormScreen = ({route, navigation}) => {
             }
             placeholder="Enter Registeration Number"
           />
-          <Text
-            style={{fontSize: 16, marginBottom: 5, color: Colors.secondary}}>
-            Token Number :
-          </Text>
-          <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: Colors.primary,
-              borderRadius: 5,
-              paddingHorizontal: 10,
-              paddingVertical: 8,
-              marginBottom: 10,
-              fontSize: 16,
-            }}
-            value={studentBatch.TokenNumber}
-            keyboardType="numeric"
-            onChangeText={value =>
-              setStudentBatch({...studentBatch, TokenNumber: value})
-            }
-            placeholder="Enter Token Number"
-          />
-
           <TouchableOpacity
             style={{
               backgroundColor: Colors.primary,

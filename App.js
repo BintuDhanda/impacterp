@@ -38,17 +38,13 @@ import StudentAddressFormScreen from './src/screens/student/studentAddressFormSc
 import AddressScreen from './src/screens/student/studentAddressScreen';
 import StudentQualificationScreen from './src/screens/student/qualification/studentQualificationScreen';
 import StudentQualificationFormScreen from './src/screens/student/qualification/studentQualificationFormScreen';
-import StudentTokenScreen from './src/screens/student/token/studentTokenScreen';
-import StudentTokenFormScreen from './src/screens/student/token/studentTokenFormScreen';
 import StudentBatchScreen from './src/screens/student/studentBatch/studentBatchScreen';
 import StudentBatchFormScreen from './src/screens/student/studentBatch/studentBatchFormScreen';
 import StudentBatchFeesScreen from './src/screens/feeCollection';
 import StudentBatchFeesHistoryScreen from './src/screens/studentBatchFeesHistoryScreen';
-import StudentTokenFeesScreen from './src/screens/tokenFeesScreen';
 import AttendanceScreen from './src/screens/attendanceScreen';
 import AttendanceHistoryScreen from './src/screens/attendanceHistoryScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import StudentTokenFeesHistoryScreen from './src/screens/studentTokenFeesHistoryScreen';
 import UserRoleScreen from './src/screens/userRoleScreen';
 import AccountDayBookScreen from './src/screens/accountDaybookScreen';
 import Colors from './src/constants/Colors';
@@ -70,6 +66,8 @@ import StundetHostelRoomBad from './src/screens/student/hostel';
 import StundetHostelRoomBadRent from './src/screens/student/hostel/Rent';
 import RentCollectionQrScreen from './src/screens/student/hostel/rentCollectionQrScreen';
 import Academies from './src/screens/academies';
+import VillageScreen from '@src/screens/villageScreen';
+
 const {width} = Dimensions.get('window');
 export const UserContext = React.createContext();
 const Stack = createStackNavigator();
@@ -210,6 +208,11 @@ function App() {
                       component={CityScreen}
                     />
                     <Stack.Screen
+                      name="VillageScreen"
+                      options={{title: 'Village'}}
+                      component={VillageScreen}
+                    />
+                    <Stack.Screen
                       name="CourseCategoryScreen"
                       options={{title: 'Course Category'}}
                       component={CourseCategoryScreen}
@@ -248,26 +251,6 @@ function App() {
                       name="StudentQualificationFormScreen"
                       options={{title: 'Student Qualification Form'}}
                       component={StudentQualificationFormScreen}
-                    />
-                    <Stack.Screen
-                      name="StudentTokenScreen"
-                      options={{title: 'Student Token'}}
-                      component={StudentTokenScreen}
-                    />
-                    <Stack.Screen
-                      name="StudentTokenFormScreen"
-                      options={{title: 'Student Token Form'}}
-                      component={StudentTokenFormScreen}
-                    />
-                    <Stack.Screen
-                      name="StudentTokenFeesScreen"
-                      options={{title: 'Student Token Fees'}}
-                      component={StudentTokenFeesScreen}
-                    />
-                    <Stack.Screen
-                      name="StudentTokenFeesHistoryScreen"
-                      options={{title: 'Student Token Fees History'}}
-                      component={StudentTokenFeesHistoryScreen}
                     />
                     <Stack.Screen
                       name="StudentBatchScreen"

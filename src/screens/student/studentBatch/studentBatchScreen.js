@@ -133,12 +133,6 @@ const StudentBatchScreen = ({route, navigation}) => {
           {item.registrationNumber}
         </Text>
       </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={{fontSize: 16}}>Token Number : </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 8}}>
-          {item.tokenNumber}
-        </Text>
-      </View>
       <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
         <TouchableOpacity
           style={{marginRight: 10}}
